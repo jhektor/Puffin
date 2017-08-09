@@ -1,8 +1,8 @@
 [Mesh]
     type = GeneratedMesh
     dim = 2
-    nx = 80
-    ny = 80
+    nx = 120
+    ny = 120
     nz = 0
     xmin = 0
     xmax = 40
@@ -44,7 +44,7 @@
     [./c_imc]
         order = FIRST
         family = LAGRANGE
-        initial_condition = 0.55
+        initial_condition = 0.45
     [../]
 
     # phase concentration  Sn in Sn
@@ -101,7 +101,7 @@
         type = FunctionIC
         #function = '0.2*if(y<=10,1,0)+0.5*if(y>10&y<=18,1,0)+0.8*if(y>18,1,0)' #TODO: Make nicer, should be possible to use values of the other variables.
         #function = '0.2*if(sqrt((x-40)^2+(y-40)^2)<=10,1,0)+0.5*if(sqrt((x-40)^2+(y-40)^2)>10&sqrt((x-40)^2+(y-40)^2)<=18,1,0)+0.8*if(sqrt((x-40)^2+(y-40)^2)>18,1,0)' #TODO: Make nicer, should be possible to use values of the other variables.
-        function = '0.15*if(sqrt((x-20)^2+(y-20)^2)<=8,1,0)+0.55*if(sqrt((x-20)^2+(y-20)^2)>8&sqrt((x-20)^2+(y-20)^2)<=16,1,0)+0.9*if(sqrt((x-20)^2+(y-20)^2)>16,1,0)' #TODO: Make nicer, should be possible to use values of the other variables.
+        function = '0.15*if(sqrt((x-20)^2+(y-20)^2)<=8,1,0)+0.45*if(sqrt((x-20)^2+(y-20)^2)>8&sqrt((x-20)^2+(y-20)^2)<=16,1,0)+0.9*if(sqrt((x-20)^2+(y-20)^2)>16,1,0)' #TODO: Make nicer, should be possible to use values of the other variables.
     [../]
 []
 
@@ -111,13 +111,13 @@
         type = DerivativeParsedMaterial
         f_name = fch_cu
         args = 'c_cu'
-        function = '20*(c_cu-0.2)^2'
+        function = '20*(c_cu-0.1)^2'
     [../]
     [./fch_imc] #Chemical energy Cu phase
         type = DerivativeParsedMaterial
         f_name = fch_imc
         args = 'c_imc'
-        function = '10*(c_imc-0.5)^2'
+        function = '10*(c_imc-0.45)^2'
     [../]
     [./fch_sn] #Chemical energy Sn phase
         type = DerivativeParsedMaterial
@@ -165,7 +165,7 @@
       function_name = g_imc
     [../]
     #Double well, not used
-    [./g_cu]
+    [./g_sn]
       type = BarrierFunctionMaterial
       g_order = SIMPLE
       eta=eta_sn
@@ -184,7 +184,7 @@
         f_name = M
         args = 'eta_cu eta_imc eta_sn'
         constant_names = 'M_cu M_imc M_sn'
-        constant_expressions = '15 15 15'
+        constant_expressions = '1. 1. 1.'
         material_property_names = 'h_cu h_imc h_sn'
         function = 'M_cu*h_cu+M_imc*h_imc+M_sn*h_sn'
 
@@ -193,7 +193,7 @@
     [./constants]
         type = GenericConstantMaterial
         prop_names  = 'L kappa gamma mu tgrad_corr_mult'
-        prop_values = '1 0.5 0.5 1 0'
+        prop_values = '1. 0.5 0.5 1. 0.'
     [../]
 []
 
@@ -206,7 +206,7 @@
         variable = c
         ca       = c_imc
         cb       = c_sn
-        fa_name  = fch_imc
+        fa_name  = fch_imc #only fa is used
         fb_name  = fch_sn
         #args_a = 'c_cu'
         w        = w
@@ -277,7 +277,7 @@
       mob_name = L
       args      = 'eta_imc eta_sn'
     [../]
-    [./ACInterface1] # L*kappa*grad\eta_i
+    [./ACInterface_cu] # L*kappa*grad\eta_i
       type = ACInterface
       variable = eta_cu
       kappa_name = kappa
@@ -316,7 +316,7 @@
       mob_name = L
       args      = 'eta_cu eta_sn'
     [../]
-    [./ACInterface1] # L*kappa*grad\eta_i
+    [./ACInterface_imc] # L*kappa*grad\eta_i
       type = ACInterface
       variable = eta_imc
       kappa_name = kappa
@@ -355,7 +355,7 @@
       mob_name = L
       args      = 'eta_cu eta_imc'
     [../]
-    [./ACInterface1] # L*kappa*grad\eta_i
+    [./ACInterface_sn] # L*kappa*grad\eta_i
       type = ACInterface
       variable = eta_sn
       kappa_name = kappa
@@ -381,7 +381,7 @@
   nl_rel_tol = 1.0e-10
   nl_abs_tol = 1.0e-11
 
-  num_steps = 40
+  num_steps = 100
   dt = 0.5
 []
 

@@ -17,7 +17,7 @@ old_library=''
 inherited_linker_flags=' -fopenmp'
 
 # Libraries that this one depends upon.
-dependency_libs=' -L/home/johan/soft/moose//modules/module_loader/lib/ /home/johan/soft/moose//modules/module_loader/lib/libmodule_loader_with_tm_pf-opt.la -L/home/johan/soft/moose//modules/phase_field/lib/ -L/home/johan/soft/moose//modules/tensor_mechanics/lib/ /home/johan/soft/moose//modules/phase_field/lib/libphase_field-opt.la /home/johan/soft/moose//modules/phase_field/lib/libphase_field-opt.la /home/johan/soft/moose//modules/tensor_mechanics/lib/libtensor_mechanics-opt.la /home/johan/soft/moose//modules/tensor_mechanics/lib/libtensor_mechanics-opt.la /opt/moose/mpich/mpich-3.2/gcc-opt/lib/libmpicxx.la /opt/moose/gcc-5.3.0/lib/../lib64/libstdc++.la /opt/moose/mpich/mpich-3.2/gcc-opt/lib/libmpi.la -lrt -lpthread /opt/moose/gcc-5.3.0/lib/../lib64/libstdc++.la'
+dependency_libs=' -L/home/johan/projects/moose/modules/module_loader/lib/ /home/johan/projects/moose/modules/module_loader/lib/libmodule_loader_with_tm_pf-opt.la -L/home/johan/projects/moose/modules/phase_field/lib/ -L/home/johan/projects/moose/modules/tensor_mechanics/lib/ /home/johan/projects/moose/modules/phase_field/lib/libphase_field-opt.la /home/johan/projects/moose/modules/phase_field/lib/libphase_field-opt.la /home/johan/projects/moose/modules/tensor_mechanics/lib/libtensor_mechanics-opt.la /home/johan/projects/moose/modules/tensor_mechanics/lib/libtensor_mechanics-opt.la /opt/moose/mpich/mpich-3.2/clang-opt/lib/libmpicxx.la /opt/moose/gcc-6.2.0/lib/../lib64/libstdc++.la /opt/moose/mpich/mpich-3.2/clang-opt/lib/libmpi.la -lrt -lpthread /opt/moose/gcc-6.2.0/lib/../lib64/libstdc++.la'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/home/johan/soft/moose/scripts/puffin/lib'
+libdir='/home/johan/projects/Puffin/lib'

@@ -174,7 +174,7 @@
   nl_rel_tol = 1.0e-10
   nl_abs_tol = 1.0e-11
 
-  num_steps = 200
+  num_steps = 800
   dt = 0.5
 []
 
