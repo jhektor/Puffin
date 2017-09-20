@@ -73,7 +73,7 @@ Here we take
   f_{ch}=\sum_ih_i(\vbf{\eta})f_i(x_i,\vbf{\eta}),
   \label{eq:fch}
 \end{equation}
-with $f_i(x_i,\vbf{\eta})=\frac{G_i(x_i)}{\bar{V}^m}$ where $G_i$ is a representation of the Gibbs energy of phase $i$ and $\bar{V}^m=\sum_jh_jV^m_j$ denotes the molar volume in the current integration point.
+with $f_i(x_i,\vbf{\eta})=\frac{G_i(x_i)}{V^m}$ where $G_i$ is a representation of the Gibbs energy of phase $i$ and $V^m$ denotes the molar volume which is assumed to be constant.
 The interface energy is taken as
 \begin{equation}
   f_{int}=m\left(\sum_i\left(\frac{\eta_i^4}{4}-\frac{\eta_i^2}{2}\right)+\sum_i\sum_{j\ne i}\frac{\beta}{2}\eta_i^2\eta_j^2+\frac{1}{4}\right)+\frac{\alpha}{2}\sum_i\left(\gradient\eta_i\right)^2,
@@ -153,18 +153,10 @@ The derivative of the chemical energy is
 \end{equation}
 where
 \begin{equation}
-\begin{aligned}
-  h_j\partdiff{f_j}{\eta_i}&=h_j\partdiff{f_j}{\bar{V}^m}\partdiff{\bar{V}^m}{h_j}\partdiff{h_j}{\eta_i}+h_j\underbrace{\partdiff{f_j}{G_j}\partdiff{G_j}{x_j}}_{\mu_j}\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i} \\
-  &=-h_j\frac{f_j}{\bar{V}^m}\partdiff{\bar{V}^m}{h_j}\partdiff{h_j}{\eta_i}+\mu_jh_j\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i}
-\end{aligned},
+  h_j\partdiff{f_j}{\eta_i}=h_j\underbrace{\partdiff{f_j}{G_j}\partdiff{G_j}{x_j}}_{\mu_j}\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i} =\mu_jh_j\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i}.
 \label{eq:dfjdetai}
 \end{equation}
-where it was used that
-\begin{equation}
-  \partdiff{f_j}{\bar{V}^m}=-\frac{G_j}{\bar{V}^{m^2}}=-\frac{f_j}{\bar{V}^m}.
-\end{equation}
-In the case where the molar volume is assumed constant the first term of \cref{eq:dfjdetai} vanishes.
-For the second term we can use that $\partdiff{c}{\eta_i}=0$, equation \cref{eq:mass} then gives
+Using that $\partdiff{c}{\eta_i}=0$, equation \cref{eq:mass} then gives
 \begin{equation}
 \begin{aligned}
   \partdiff{c}{\eta_i}&=\sum_j\left(\partdiff{h_j}{\eta_i}x_j+h_j\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i}\right)=\sum_j\partdiff{h_j}{\eta_i}\left(x_j+h_j\partdiff{x_j}{h_j}\right)=0 \\
@@ -173,13 +165,14 @@ For the second term we can use that $\partdiff{c}{\eta_i}=0$, equation \cref{eq:
 \end{equation} 
 By making use of the KKS condition \cref{eq:dfchdeta} can then be written
 \begin{equation}
-  \partdiff{f_{ch}}{\eta_i}=\sum_j\partdiff{h_j}{\eta_i}\left(f_j-h_j\frac{f_j}{\bar{V}^m}\partdiff{\bar{V}^m}{h_j}\partdiff{h_j}{\eta_i}-\mu_jx_j\right)
+  \partdiff{f_{ch}}{\eta_i}=\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j\right)
 \end{equation}
 
 Equation \cref{eq:AC1} now becomes
 \begin{multline}
-  \partdiff{\eta_i}{t}=-L\left(\sum_j\partdiff{h_j}{\eta_i}\left(f_j-h_j\frac{f_j}{\bar{V}^m}\partdiff{\bar{V}^m}{h_j}\partdiff{h_j}{\eta_i}-\mu_jx_j\right)\right. \\
+  \partdiff{\eta_i}{t}=-L\left(\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j\right)\right. \\
   \left.+m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i\right).
+  \label{eq:AC}
 \end{multline}
 The mobility $L$ is taken as
 \begin{equation}
@@ -187,11 +180,29 @@ The mobility $L$ is taken as
 \end{equation} 
 $L_{ij}$ is taken as 
 \begin{equation}
-  L_{ij}=\frac{2m}{3\alpha\left(x_i^{eq}-x_j^{eq}\right)^2}\frac{V^m_iM_i+V^m_jM_j}{2},
+  L_{ij}=\frac{2m}{3\alpha\left(x_i^{eq}-x_j^{eq}\right)^2}\frac{M_i+M_j}{2},
   \label{eq:lab}
 \end{equation}
-where $M_i=\frac{D_i}{\secdiff{G_i}{x_i}}$ and $M_j=\frac{D_j}{\secdiff{G_j}{x_j}}$ are the mobilities and $x_i^{eq}$ and $x_j^{eq}$ are the equilibrium molar fractions of phases $i$ and $j$ respectively.  
+where $M_i=\frac{D_i}{\secdiff{f_i}{x_i}}$ and $M_j=\frac{D_j}{\secdiff{f_j}{x_j}}$ are the mobilities and $x_i^{eq}$ and $x_j^{eq}$ are the equilibrium molar fractions of phases $i$ and $j$ respectively.  
 
+The units of \cref{eq:AC} are
+\begin{equation}
+\si[per-mode=fraction]{\per\second}=\frac{\si[per-mode=fraction]{\joule\per\cubic\meter}}{\si[per-mode=fraction]{\joule\per\meter}}\frac{\si[per-mode=fraction]{\square\meter\per\second}}{\si[per-mode=fraction]{\joule\per\cubic\meter}}\si[per-mode=fraction]{\joule\per\cubic\meter}=\si[per-mode=fraction]{\per\second}.
+\end{equation}
+\subsection{Non-constant molar volume}
+I'm not sure it is possible to easily remove the assumption of constant molar volume.
+It is certainly not as easy as I thought before.
+For non-constant molar volume \cref{eq:mass} becomes $c=\sum_ih_i\frac{x_i}{V^m_i}$ which converts $c$ to units of \si{\mol\per\cubic\meter}.
+The problem is that the free energy is formulated in units of \si{\joule\per\cubic\meter}, which means that $\partdiff{F}{c}$ get the units \si{\joule\per\mole}.
+I don't think this is good neither for the KKS conditions nor for the Cahn-Hilliard equation.
+Perhaps we can formulate the \cref{eq:CH} as
+\begin{equation}
+  \frac{1}{V^m}\partdiff{c}{t}=\gradient\cdot M(\vbf{\eta},c)\gradient\mu_i
+\end{equation}
+together with the mass balance in \cref{eq:mass} and still have $c$ dimensionless.
+Then the question is how to choose $V^m$?
+
+Another way is maybe to formulate the energies in \si{\joule\per\mol} but then I guess the mesh will represent a certain number of moles instead of a certain volume? 
 \subsection{Weak form residual equations}
 The weak form of the residual equation for $\eta_i$ is constructed from \cref{eq:AC1} by multiplication with a test function $\psi$ and integrating over the domain:
 \begin{equation}
@@ -206,9 +217,8 @@ Inserting the derivatives calculated above gives
 \begin{equation}
 \begin{aligned}
   \vbf{R}_{\eta_i}=&\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\sum_j\partdiff{h_j}{\eta_i}f_j}{\psi}-\vint{L\partdiff{h_j}{\eta_i}\mu_jx_j}{\psi}\\
-  &-\vint{L\sum_j\partdiff{h_j}{\eta_i}h_j\frac{f_j}{\bar{V}^m}\partdiff{\bar{V}^m}{h_j}\partdiff{h_j}{\eta_i}}{\psi}+\vint{L\partdiff{f_d}{\eta_i}}{\psi} \\
-  &+\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi} \\
-   &-\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}
+  &+\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi} \\
+  &+\vint{L\partdiff{f_d}{\eta_i}}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi} -\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}
  \end{aligned}
 \end{equation}
 
@@ -289,7 +299,6 @@ For the Cahn-Hilliard equation and the KKS conditions the kernels in \cref{tab:C
   $\vint{\partdiff{\eta_i}{t}}{\psi}$ & & \texttt{TimeDerivative} \\
   $\vint{L\sum_j\partdiff{h_j}{\eta_i}f_j+w\partdiff{g}{\eta_i}}{\psi}$ & $L$, $w=0$ & \texttt{KKSMultiACBulkF}\tablefootnote{This kernel includes a double well that we don't use. Therefore $w=0$. } \\
   $-\vint{L\partdiff{h_j}{\eta_i}\mu_jx_j}{\psi}$ & $L$ & \texttt{KKSMultiACBulkC} \\
-  $-\vint{L\sum_j\partdiff{h_j}{\eta_i}h_j\frac{f_j}{\bar{V}^m}\partdiff{\bar{V}^m}{h_j}\partdiff{h_j}{\eta_i}}{\psi}$ & &  \\
   $\vint{L\partdiff{f_d}{\eta_i}}{\psi}$ & & \\
   $\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi}$ & $m$, $\beta$ &  \texttt{ACGrGrMulti} \\
   $\vint{\alpha\gradient\eta_i}{\gradient L\psi}$ & $L$, $\alpha$ & \texttt{ACInterface}\\

@@ -4,6 +4,10 @@
 #include "ModulesApp.h"
 #include "MooseSyntax.h"
 
+//PUFFIN
+//POSTPROCESSORS
+#include "IMCFraction.h"
+
 template<>
 InputParameters validParams<PuffinApp>()
 {
@@ -40,6 +44,8 @@ extern "C" void PuffinApp__registerObjects(Factory & factory) { PuffinApp::regis
 void
 PuffinApp::registerObjects(Factory & factory)
 {
+  // Register new stuff here
+  registerPostprocessor(IMCFraction);
 }
 
 // External entry point for dynamic syntax association
