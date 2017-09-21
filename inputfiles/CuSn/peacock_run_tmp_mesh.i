@@ -1,9 +1,11 @@
 [Mesh]
   type = GeneratedMesh
-  dim = 1
-  nx = 2000
+  dim = 2
+  nx = 1000
+  ny = 3
   xmin = 0
-  xmax = 200000 # [nm]
+  xmax = 100000 # [nm]
+  elem_type = QUAD4
 []
 
 [Variables]
@@ -82,10 +84,10 @@
   [../]
   [./ckernel]
     # Gives residual for chemical potential dc/dt+M\grad(mu)
+    # args = 'eta_cu eta_imc eta_sn'
     type = SplitCHWRes # Ok if M is not depending on c or w
     mob_name = M
     variable = w
-    args = 'eta_cu eta_imc eta_sn'
   [../]
   [./chempot_cu_imc]
     type = KKSPhaseChemicalPotential
@@ -122,7 +124,7 @@
     hj_names = 'h_cu h_imc h_sn'
     gi_name = g_cu
     eta_i = eta_cu
-    wi = 1
+    wi = 0
     mob_name = L
     args = 'c_cu c_imc c_sn eta_imc eta_sn'
   [../]
@@ -139,21 +141,21 @@
   [../]
   [./ACInterface_cu]
     # L*kappa*grad\eta_i
+    # args      = 'eta_imc eta_sn'
     type = ACInterface
     variable = eta_cu
     kappa_name = kappa
     mob_name = L
-    args = 'eta_imc eta_sn'
-    variable_L = true
+    variable_L = false
   [../]
   [./ACdfintdeta_cu]
     # L*m*(eta_i^3-eta_i+2*beta*eta_i*sum_j eta_j^2)
+    # args = 'eta_imc eta_sn'
     type = ACGrGrMulti # Jacobian not correct for non-constant mobility?
     variable = eta_cu
     v = 'eta_imc eta_sn'
     gamma_names = 'gamma gamma'
     mob_name = L
-    args = 'eta_imc eta_sn'
   [../]
   [./detadt_imc]
     type = TimeDerivative
@@ -167,7 +169,7 @@
     hj_names = 'h_cu h_imc h_sn'
     gi_name = g_imc
     eta_i = eta_imc
-    wi = 1
+    wi = 0
     mob_name = L
     args = 'c_cu c_imc c_sn eta_cu eta_sn'
   [../]
@@ -184,20 +186,20 @@
   [../]
   [./ACInterface_imc]
     # L*kappa*grad\eta_i
+    # args      = 'eta_cu eta_sn'
     type = ACInterface
     variable = eta_imc
     kappa_name = kappa
     mob_name = L
-    args = 'eta_cu eta_sn'
-    variable_L = true
+    variable_L = false
   [../]
   [./ACdfintdeta_imc]
+    # args = 'eta_cu eta_sn'
     type = ACGrGrMulti
     variable = eta_imc
     v = 'eta_cu eta_sn'
     gamma_names = 'gamma gamma'
     mob_name = L
-    args = 'eta_cu eta_sn'
   [../]
   [./detadt_sn]
     type = TimeDerivative
@@ -211,7 +213,7 @@
     hj_names = 'h_cu h_imc h_sn'
     gi_name = g_sn
     eta_i = eta_sn
-    wi = 1
+    wi = 0
     mob_name = L
     args = 'c_cu c_imc c_sn eta_imc eta_cu'
   [../]
@@ -228,20 +230,20 @@
   [../]
   [./ACInterface_sn]
     # L*kappa*grad\eta_i
+    # args      = 'eta_cu eta_imc'
     type = ACInterface
     variable = eta_sn
     kappa_name = kappa
     mob_name = L
-    args = 'eta_cu eta_imc'
-    variable_L = true
+    variable_L = false
   [../]
   [./ACdfintdeta_sn]
+    # args= 'eta_cu eta_imc'
     type = ACGrGrMulti
     variable = eta_sn
     v = 'eta_cu eta_imc'
     gamma_names = 'gamma gamma'
     mob_name = L
-    args = 'eta_cu eta_imc'
   [../]
 []
 
@@ -278,9 +280,16 @@
     variable = f_density
     execute_on = TIMESTEP_END
   [../]
+  [./imc_fraction]
+    type = IMCFraction
+    variable = eta_imc
+    eta = 'eta_cu eta_sn'
+    execute_on = Timestep_end
+  [../]
 []
 
 [Executioner]
+  # end_time = 64000000
   # very simple adaptive time stepper
   type = Transient
   solve_type = PJFNK
@@ -290,8 +299,8 @@
   nl_max_its = 10
   l_tol = 1.0e-4
   nl_rel_tol = 1.0e-10
-  nl_abs_tol = 1.0e-11
-  end_time = 40000
+  nl_abs_tol = 1.0e-10
+  num_steps = 500
   [./TimeStepper]
     # Turn on time stepping
     type = IterationAdaptiveDT

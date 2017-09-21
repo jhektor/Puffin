@@ -494,8 +494,8 @@
   l_max_its = 30
   nl_max_its = 10
   l_tol = 1.0e-4
-  nl_rel_tol = 1.0e-9
-  nl_abs_tol = 1.0e-10
+  nl_rel_tol = 1.0e-10
+  nl_abs_tol = 1.0e-11
 
   end_time = 64000000
   #num_steps = 500
@@ -524,7 +524,13 @@
 []
 
 [Outputs]
-  exodus = true
+  file_base = moelans2011fig2_tight
+  [./exodus_out]
+    type = Exodus
+    interval = 100
+  [../]
+  #exodus = true
   csv = true
   print_perf_log = true
+  interval = 10
 []
