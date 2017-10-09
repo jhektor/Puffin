@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2017.6.15)  4 AUG 2017 17:07
+This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2017.8.23)  14 SEP 2017 14:17
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1203,29 +1203,29 @@ File: se-ascii-print.def 2011/12/02 v1.10 stringenc: Printable ASCII characters
 )
 [1
 
-] [2] [3] [4] [5] [6] [7]
-Overfull \hbox (57.01994pt too wide) in paragraph at lines 366--366
+] [2] [3] [4] [5] [6] [7] [8]
+Overfull \hbox (57.01994pt too wide) in paragraph at lines 384--384
 []  \EU1/lmtt/m/n/12 petsc_options_iname = '-pc_type -sub_pc_type   -sub_pc_fac
 tor_shift_type'[] 
  []
 
-[8] (./AC-CH-nodef.bbl)
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 372.
- [9]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 372.
+(./AC-CH-nodef.bbl [9])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 390.
+ [10]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 390.
  (./AC-CH-nodef.aux
 Package cleveref Info: loaded `english' language definitions on input line 20.
 )
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 372.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 372.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 390.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 390.
  ) 
 Here is how much of TeX's memory you used:
- 28886 strings out of 493638
- 553279 string characters out of 6146796
- 738780 words of memory out of 5000000
- 31969 multiletter control sequences out of 15000+600000
+ 28889 strings out of 493638
+ 553310 string characters out of 6146796
+ 738782 words of memory out of 5000000
+ 31972 multiletter control sequences out of 15000+600000
  18008 words of font info for 101 fonts, out of 8000000 for 9000
  1328 hyphenation exceptions out of 8191
- 48i,15n,45p,10389b,845s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 48i,19n,45p,10389b,875s stack positions out of 5000i,500n,10000p,200000b,80000s
 
-Output written on AC-CH-nodef.pdf (9 pages).
+Output written on AC-CH-nodef.pdf (10 pages).

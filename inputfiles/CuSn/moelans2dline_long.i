@@ -59,7 +59,7 @@
     [./c_sn]
         order = FIRST
         family = LAGRANGE
-        initial_condition = 0.95
+        initial_condition = 0.999#0.95
         #scaling = 1e-5
     [../]
 
@@ -105,7 +105,7 @@
     [./c] #Concentration of Sn
         variable = c
         type = FunctionIC
-        function = '0.05*if(x<=50000,1,0)+0.455*if(x>50000&x<=58000,1,0)+0.95*if(x>58000,1,0)'
+        function = '0.05*if(x<=50000,1,0)+0.455*if(x>50000&x<=58000,1,0)+0.999*if(x>58000,1,0)'
     [../]
 []
 
@@ -120,7 +120,7 @@
     [./constants]
         type = GenericConstantMaterial
         prop_names = 'A_cu A_imc A_sn D_cu D_imc D_sn sigma delta gamma tgrad_corr_mult'
-        prop_values = '1e8 1e9 1e9 1e-25 1e-16 1e-14 0.5 0.667e-6 1.5 0' #J/m^3 m^2/s J/m^2 m - ?
+        prop_values = '1e8 1e9 1e9 1e-25 1e-16 1e-13 0.5 0.667e-6 1.5 0' #J/m^3 m^2/s J/m^2 m - ?
     [../]
     [./kappa]
         type = ParsedMaterial
@@ -472,6 +472,18 @@
       eta = 'eta_cu eta_sn'
       execute_on = Timestep_end
     [../]
+    [./cu_fraction]
+      type = IMCFraction
+      variable = eta_cu
+      eta = 'eta_imc eta_sn'
+      execute_on = Timestep_end
+    [../]
+    [./sn_fraction]
+      type = IMCFraction
+      variable = eta_sn
+      eta = 'eta_cu eta_imc'
+      execute_on = Timestep_end
+    [../]
 
     #Monitoring the progress
     [./time]
@@ -497,7 +509,7 @@
   nl_rel_tol = 1.0e-10
   nl_abs_tol = 1.0e-11
 
-  end_time = 64000000
+  end_time = 16000000
   #num_steps = 500
   #very simple adaptive time stepper
   [./TimeStepper]
@@ -524,10 +536,10 @@
 []
 
 [Outputs]
-  file_base = moelans2011fig2_tight
+  file_base = moelans2011fig3_tight
   [./exodus_out]
     type = Exodus
-    interval = 100
+    interval = 25
   [../]
   #exodus = true
   csv = true

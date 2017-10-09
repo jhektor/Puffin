@@ -1,10 +1,24 @@
+# [Mesh]
+# type = GeneratedMesh
+# dim = 2
+# nx = 2000
+# ny = 1
+# xmin = 0
+# xmax = 200000 #[nm]
+# ymin = 0
+# ymax = 100
+# elem_type = QUAD4
+# []
+
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 1000
-  ny = 3
+  nx = 100
+  ny = 100
   xmin = 0
-  xmax = 100000 # [nm]
+  xmax = 10000 # [nm]
+  ymin = 0
+  ymax = 10000
   elem_type = QUAD4
 []
 
@@ -18,27 +32,32 @@
   # order parameter Cu6Sn5
   # order parameter Sn
   [./c]
+    # scaling = 1e-1
     order = FIRST
     family = LAGRANGE
   [../]
   [./w]
+    # scaling = 1e-3
     order = FIRST
     family = LAGRANGE
   [../]
   [./c_cu]
+    # scaling = 1e-1
     order = FIRST
     family = LAGRANGE
     initial_condition = 0.05
   [../]
   [./c_imc]
+    # scaling = 1e-2
     order = FIRST
     family = LAGRANGE
     initial_condition = 0.455
   [../]
   [./c_sn]
+    # scaling = 1e-5
     order = FIRST
     family = LAGRANGE
-    initial_condition = 0.95
+    initial_condition = 0.95 # 0.999
   [../]
   [./eta_cu]
     order = FIRST
@@ -83,11 +102,11 @@
     v = c
   [../]
   [./ckernel]
-    # Gives residual for chemical potential dc/dt+M\grad(mu)
-    # args = 'eta_cu eta_imc eta_sn'
+    # Gives residual for chemical potential dc/dt+M\grad(mu) kansekse ska använda matDiffusion instaället, som kks_multiphase
     type = SplitCHWRes # Ok if M is not depending on c or w
     mob_name = M
     variable = w
+    args = 'eta_cu eta_imc eta_sn'
   [../]
   [./chempot_cu_imc]
     type = KKSPhaseChemicalPotential
@@ -141,21 +160,21 @@
   [../]
   [./ACInterface_cu]
     # L*kappa*grad\eta_i
-    # args      = 'eta_imc eta_sn'
     type = ACInterface
     variable = eta_cu
     kappa_name = kappa
     mob_name = L
-    variable_L = false
+    args = 'eta_imc eta_sn'
+    variable_L = true
   [../]
   [./ACdfintdeta_cu]
     # L*m*(eta_i^3-eta_i+2*beta*eta_i*sum_j eta_j^2)
-    # args = 'eta_imc eta_sn'
     type = ACGrGrMulti # Jacobian not correct for non-constant mobility?
     variable = eta_cu
     v = 'eta_imc eta_sn'
     gamma_names = 'gamma gamma'
     mob_name = L
+    args = 'eta_imc eta_sn'
   [../]
   [./detadt_imc]
     type = TimeDerivative
@@ -186,20 +205,20 @@
   [../]
   [./ACInterface_imc]
     # L*kappa*grad\eta_i
-    # args      = 'eta_cu eta_sn'
     type = ACInterface
     variable = eta_imc
     kappa_name = kappa
     mob_name = L
-    variable_L = false
+    args = 'eta_cu eta_sn'
+    variable_L = true
   [../]
   [./ACdfintdeta_imc]
-    # args = 'eta_cu eta_sn'
     type = ACGrGrMulti
     variable = eta_imc
     v = 'eta_cu eta_sn'
     gamma_names = 'gamma gamma'
     mob_name = L
+    args = 'eta_cu eta_sn'
   [../]
   [./detadt_sn]
     type = TimeDerivative
@@ -230,20 +249,20 @@
   [../]
   [./ACInterface_sn]
     # L*kappa*grad\eta_i
-    # args      = 'eta_cu eta_imc'
     type = ACInterface
     variable = eta_sn
     kappa_name = kappa
     mob_name = L
-    variable_L = false
+    args = 'eta_cu eta_imc'
+    variable_L = true
   [../]
   [./ACdfintdeta_sn]
-    # args= 'eta_cu eta_imc'
     type = ACGrGrMulti
     variable = eta_sn
     v = 'eta_cu eta_imc'
     gamma_names = 'gamma gamma'
     mob_name = L
+    args = 'eta_cu eta_imc'
   [../]
 []
 
@@ -263,33 +282,50 @@
     type = ParsedAux
     variable = f_int
     args = 'eta_cu eta_imc eta_sn'
-    constant_names = 'gamma mu'
-    constant_expressions = '1.5 1.'
-    function = mu*(0.25*eta_cu^4-0.5*eta_cu^2+0.25*eta_imc^4-0.5*eta_imc^2+0.25*eta_sn^4-0.5*eta_sn^2+gamma*(eta_cu^2*(eta_imc^2+eta_sn^2)+eta_imc^2*eta_sn^2))+0.25
+    constant_names = 'sigma delta gamma length_scale energy_scale'
+    constant_expressions = '0.5 0.667e-6 1.5 1e9 6.24150943e18'
+    function = 'mu:=(6*sigma/delta)*(energy_scale/length_scale^3); mu*(0.25*eta_cu^4-0.5*eta_cu^2+0.25*eta_imc^4-0.5*eta_imc^2+0.25*eta_sn^4-0.5*eta_sn^2+gamma*(eta_cu^2*(eta_imc^2+eta_sn^2)+eta_imc^2*eta_sn^2)+0.25)'
   [../]
 []
 
 [Postprocessors]
-  [./imc_thickness]
-    type = NodalSum
-    execute_on = timestep_end
-    variable = eta_imc
-  [../]
+  # Monitoring the progress
   [./total_energy]
     type = ElementIntegralVariablePostprocessor
     variable = f_density
     execute_on = TIMESTEP_END
   [../]
-  [./imc_fraction]
-    type = IMCFraction
-    variable = eta_imc
-    eta = 'eta_cu eta_sn'
-    execute_on = Timestep_end
+  [./cu_area_h]
+    type = ElementIntegralMaterialProperty
+    mat_prop = h_cu
+    execute_on = TIMESTEP_END
+  [../]
+  [./imc_area_h]
+    type = ElementIntegralMaterialProperty
+    mat_prop = h_imc
+    execute_on = TIMESTEP_END
+  [../]
+  [./sn_area_h]
+    type = ElementIntegralMaterialProperty
+    mat_prop = h_sn
+    execute_on = TIMESTEP_END
+  [../]
+  [./time]
+    type = RunTime
+    time_type = active
+  [../]
+  [./step_size]
+    type = TimestepSize
   [../]
 []
 
+[Debug]
+  show_var_residual_norms = false
+  show_material_props = false
+[]
+
 [Executioner]
-  # end_time = 64000000
+  # num_steps = 500
   # very simple adaptive time stepper
   type = Transient
   solve_type = PJFNK
@@ -299,8 +335,8 @@
   nl_max_its = 10
   l_tol = 1.0e-4
   nl_rel_tol = 1.0e-10
-  nl_abs_tol = 1.0e-10
-  num_steps = 500
+  nl_abs_tol = 1.0e-10 # 1.0e-11
+  end_time = 64000000
   [./TimeStepper]
     # Turn on time stepping
     type = IterationAdaptiveDT
@@ -312,7 +348,14 @@
 []
 
 [Outputs]
-  exodus = true
+  # exodus = true
+  file_base = keep/Cu-SnIC # moelans2011fig2_Limc_sn_Mvar_sharp
   csv = true
+  print_perf_log = true
+  interval = 1 # 5
+  [./exodus_out]
+    type = Exodus
+    interval = 1 # 25
+  [../]
 []
 

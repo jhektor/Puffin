@@ -369,6 +369,12 @@
     [../]
 
 []
+[Postprocessors]
+    [./imc_thickness]
+        type = NodalSum
+        execute_on = timestep_begin
+        variable = eta_imc
+    [../]
 
 [Executioner]
   type = Transient
@@ -382,7 +388,7 @@
   nl_abs_tol = 1.0e-11
 
   num_steps = 100
-  dt = 0.5
+  dt = 0.25
 []
 
 [Preconditioning]
@@ -399,4 +405,5 @@
 
 [Outputs]
   exodus = true
+  csv = true
 []
