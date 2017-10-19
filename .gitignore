@@ -1,0 +1,3 @@
+#ignore jit files
+tmp_jit*
+.jitcache*
