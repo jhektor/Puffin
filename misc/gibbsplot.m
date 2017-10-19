@@ -2,13 +2,35 @@ clear all
 close all
 
 syms c
-ABC_cu=[1e8 0 0];
-ABC_imc=[1e9 0 -1e6];
-ABC_sn=[1e9 0 1e7];
+%Moelans J/m³ 
 
-xhat_cu=0.076;
-xhat_imc=0.455;
-xhat_sn=0.978;
+% ABC_cu=[1e8 0 0];
+% ABC_imc=[1e9 0 -1e6];
+% ABC_sn=[1e9 0 1e7];
+% 
+% xhat_cu=0.076;
+% xhat_imc=0.455;
+% xhat_sn=0.978;
+
+%Min J/mol rumstemp
+ABC_cu=[1.0133e5 -2.1146e4 -1.2842e4];
+ABC_imc=[4e5 -6.9892e3 -1.9185e4];
+ABC_sn=[4.2059e6 7.1680e3 -1.5265e4];
+
+xhat_cu=0.10569;
+xhat_imc=0.41753;
+xhat_sn=0.99941;
+
+% 140 Li2009
+ABC_cu=[4.0359e5 -4.1474e4 -1.468e4];
+ABC_imc=[4e6 1.9832e3 -2.4536e4];
+ABC_sn=[7.3613e5 5.0136e3 -2.173e4];
+
+xhat_cu=0.0109;
+xhat_imc=0.4355;
+xhat_sn=0.9953;
+
+
 
 G_cu=0.5*ABC_cu(1)*(c-xhat_cu).^2+ABC_cu(2)*(c-xhat_cu)+ABC_cu(3);
 G_imc=0.5*ABC_imc(1)*(c-xhat_imc).^2+ABC_imc(2)*(c-xhat_imc)+ABC_imc(3);
