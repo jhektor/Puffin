@@ -1,3 +1,7 @@
 #ignore jit files
 tmp_jit*
 .jitcache*
+
+#ignore result files
+*.e
+*.csv

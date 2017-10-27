@@ -1,6 +1,6 @@
 % fname = 'moelans2011fig2_Lmean_Mvar_sharp.csv'
-fname = 'moelans2011fig3_Lvar_Mvar_sharp_barrier3.csv'
-% fname = 'test_Lij.csv'
+% fname = 'moelans2011fig3_Lvar_Mvar_sharp_barrier3.csv'
+fname = 'test_moelans.csv'
 
 
 dy = 100; %element height in [nm]
@@ -10,18 +10,18 @@ data = csvread(fname,1,0); %read csv file skipping the first row
 
 time = data(:,1);
 
-imc = 0.5*data(:,3)/dy; %half thickness of imc layer [micrometer]
+imc = 0.5*(data(:,3)+data(:,4))/dy; %half thickness of imc layer [micrometer]
 % imc(1)=1.5;
 cu = data(:,2)/dy;%/1000;
-sn = data(:,4)/dy;%/1000;
+sn = data(:,5)/dy;%/1000;
 figure()
 plot(sqrt(time),cu,sqrt(time),imc,sqrt(time),sn)
 legend('cu','imc','sn')
 figure()
 plot(sqrt(time),imc)
-energy = data(:,7); %total energy of the system [eV]
-energy(1) = data(2,7); 
-step_size = data(:,5);
+energy = data(:,8); %total energy of the system [eV]
+% energy(1) = data(2,8); 
+step_size = data(:,6);
 
 % fname2 = 'moelans2011fig3_Limc_sn_Msn_sharp.csv'
 % data2 = csvread(fname2,1,0); %read csv file skipping the first row

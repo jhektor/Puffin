@@ -1,24 +1,12 @@
-# [Mesh]
-# type = GeneratedMesh
-# dim = 2
-# nx = 2000
-# ny = 1
-# xmin = 0
-# xmax = 200000 #[nm]
-# ymin = 0
-# ymax = 100
-# elem_type = QUAD4
-# []
-
 [Mesh]
   type = GeneratedMesh
   dim = 2
-  nx = 100
-  ny = 100
+  nx = 2000
+  ny = 1
   xmin = 0
-  xmax = 10000 # [nm]
+  xmax = 200000 # [nm]
   ymin = 0
-  ymax = 10000
+  ymax = 100
   elem_type = QUAD4
 []
 
@@ -349,13 +337,13 @@
 
 [Outputs]
   # exodus = true
-  file_base = keep/Cu-SnIC # moelans2011fig2_Limc_sn_Mvar_sharp
+  file_base = test # keep/moelans2011fig3_Limc_sn_Mvar_sharp
   csv = true
   print_perf_log = true
   interval = 1 # 5
   [./exodus_out]
     type = Exodus
-    interval = 1 # 25
+    interval = 1
   [../]
 []
 
