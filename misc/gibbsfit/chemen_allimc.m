@@ -5,9 +5,9 @@ T=25+273.15; %Temperature
 R=8.3144621; %Gas constant
 
 Vm=16.29e-6; %m^3/mole
-Vmcu=7.124e-6;%7.11e-6;%Vm;
-Vmeps=8.6e-6;%Vm;
-Vmeta=10.6e-6;%Vm;
+Vmcu=Vm;%7.124e-6;%7.11e-6;%Vm;
+Vmeps=Vm;%8.6e-6;%Vm;
+Vmeta=Vm;%10.6e-6;%Vm;
 Vmsn=Vm;
 
 

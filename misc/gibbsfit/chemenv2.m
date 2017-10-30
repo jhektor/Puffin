@@ -1,14 +1,15 @@
+%% This is the one used in the paper
 %% Fit of Gibbs energy, as in Moelans 2015
 close all
 clear all
 
-T=25+273.15;%453;%25+273.15;
+T=220+273.15;%453;%25+273.15;
 R=8.3144621;
 
 Vm=16.29e-6; %m^3/mole
-Vmcu=7.124e-6;%7.11e-6;%Vm;
-Vmeps=8.6e-6;%Vm;
-Vmeta=10.6e-6;%Vm;
+Vmcu=Vm;%7.124e-6;%7.11e-6;%Vm;
+Vmeps=Vm;%8.6e-6;%Vm;
+Vmeta=Vm;%10.6e-6;%Vm;
 Vmsn=Vm;
 %% Thermodynamic data from Shim KOLLA HUR DET BLIR MED DU2009
 if T<1357.77
@@ -59,105 +60,138 @@ musns=-Gbctcu+G0bctsn+R*T*(log(cs)-log(1-cs));
 d2sn=R*T/(cs-cs^2);
 
 % %Cu6Sn5 with added c-dependence
-etat=2e5;
+etat=2e5;%2e5;
 etatc=0.435;
 Gseta=etat*(cs-etatc)^2-6869.5-0.1589*T+0.455*G0bctsn+0.545*G0alphacu;
 muetas=2*etat*(cs-etatc);
 d2eta=2*etat;
 % %Cu3Sn with added c-dependence
 epst=2e5;
-epstc=0.25;
+epstc=0.249;
 Gseps=epst*(cs-epstc)^2-8194.2-0.2043*T+0.25*G0bctsn+0.75*G0alphacu;
-mepss=2*epst*(cs-epstc);
+mueps=2*epst*(cs-epstc);
 d2eps=2*epst;
 
 %% find equilibrium concentrations
-init_guess=[0,0.5;0,0.5];
+% Cu - eta
+init_guess=[0,0.3;0.3,0.5];
 e1=subs(Gscu,cs,c1)-subs(mucus,cs,c1)*c1==subs(Gseta,cs,c2)-subs(muetas,cs,c2)*c2;
 e2=subs(mucus,cs,c1)==subs(muetas,cs,c2);
 
-[chatcu,ccueta]=vpasolve([e1,e2],[c1,c2],init_guess);
+[ccu_eta,ceta_cu]=vpasolve([e1,e2],[c1,c2],init_guess);
 
-t1=subs(Gscu,cs,chatcu)-subs(mucus,cs,chatcu)*chatcu+subs(mucus,cs,chatcu)*cs;
+t0=subs(Gscu,cs,ccu_eta)-subs(mucus,cs,ccu_eta)*ccu_eta+subs(mucus,cs,ccu_eta)*cs;
 
-% % eps-eta
-% init_guess=[0,0.5;0,0.7];
-% e1=subs(Gseps,cs,c1)-subs(muepss,cs,c1)*c1==subs(Gseta,cs,c2)-subs(muetas,cs,c2)*c2;
-% e2=subs(muepss,cs,c1)==subs(muetas,cs,c2);
-% [cepseta,cetaeps]=vpasolve([e1,e2],[c1,c2],init_guess);
-% % cepseta=0.21;
-% % cetaeps=0.45;
-% t2=subs(Gseps,cs,cepseta)-subs(muepss,cs,cepseta)*cepseta+subs(muepss,cs,cepseta)*cs;
+% Cu - eps
+init_guess=[0,0.5;0.,0.4];
+e1=subs(Gscu,cs,c1)-subs(mucus,cs,c1)*c1==subs(Gseps,cs,c2)-subs(mueps,cs,c2)*c2;
+e2=subs(mucus,cs,c1)==subs(mueps,cs,c2);
+
+[chat_cu,ceps_cu]=vpasolve([e1,e2],[c1,c2],init_guess);
+
+t1=subs(Gscu,cs,chat_cu)-subs(mucus,cs,chat_cu)*chat_cu+subs(mucus,cs,chat_cu)*cs;
+
+% eps-eta
+init_guess=[0.2,0.4;0.3,0.5];
+e1=subs(Gseps,cs,c1)-subs(mueps,cs,c1)*c1==subs(Gseta,cs,c2)-subs(muetas,cs,c2)*c2;
+e2=subs(mueps,cs,c1)==subs(muetas,cs,c2);
+[ceps_eta,ceta_eps]=vpasolve([e1,e2],[c1,c2],init_guess);
+
+chat_eps = 0.5*(ceps_cu+ceps_eta);
+
+% cepseta=0.21;
+% cetaeps=0.45;
+t2=subs(Gseps,cs,ceps_eta)-subs(mueps,cs,ceps_eta)*ceps_eta+subs(mueps,cs,ceps_eta)*cs;
 
 %eta-Sn
-init_guess=[0.3,1;0.3,1];
+init_guess=[0.,1;0.,1];
 e1=subs(Gssn,cs,c1)-subs(musns,cs,c1)*c1==subs(Gseta,cs,c2)-subs(muetas,cs,c2)*c2;
 e2=subs(musns,cs,c1)==subs(muetas,cs,c2);
-[chatsn,cetasn]=vpasolve([e1,e2],[c1,c2],init_guess);
-t3=subs(Gssn,cs,chatsn)-subs(musns,cs,chatsn)*chatsn+subs(musns,cs,chatsn)*cs;
+[chat_sn,ceta_sn]=vpasolve([e1,e2],[c1,c2],init_guess);
+t3=subs(Gssn,cs,chat_sn)-subs(musns,cs,chat_sn)*chat_sn+subs(musns,cs,chat_sn)*cs;
 
-chateta=0.5*(ccueta+cetasn);
+chat_eta=0.5*(ceta_eps+ceta_sn);
 
 %Sn-Cu
 init_guess=[0,1;0,1];
 e1=subs(Gssn,cs,c1)-subs(musns,cs,c1)*c1==subs(Gscu,cs,c2)-subs(mucus,cs,c2)*c2;
 e2=subs(musns,cs,c1)==subs(mucus,cs,c2);
-[csncu,ccusn]=vpasolve([e1,e2],[c1,c2],init_guess);
-t4=subs(Gssn,cs,csncu)-subs(musns,cs,csncu)*csncu+subs(musns,cs,csncu)*cs;
+[csn_cu,ccu_sn]=vpasolve([e1,e2],[c1,c2],init_guess);
+t4=subs(Gssn,cs,csn_cu)-subs(musns,cs,csn_cu)*csn_cu+subs(musns,cs,csn_cu)*cs;
+
+%Cu3Sn - Sn
+init_guess=[0,1;0,1];
+e1=subs(Gssn,cs,c1)-subs(musns,cs,c1)*c1==subs(Gseps,cs,c2)-subs(mueps,cs,c2)*c2;
+e2=subs(musns,cs,c1)==subs(mueps,cs,c2);
+[csn_eps,ceps_sn]=vpasolve([e1,e2],[c1,c2],init_guess);
+t5=subs(Gssn,cs,csn_eps)-subs(musns,cs,csn_eps)*csn_eps+subs(musns,cs,csn_eps)*cs;
 %% Approximation
 %Cu
-Agcu=subs(d2cu,cs,chatcu);
-Bgcu=subs(mucus,cs,chatcu);
-Cgcu=subs(Gscu,cs,chatcu);
+Agcu=subs(d2cu,cs,chat_cu);
+Bgcu=subs(mucus,cs,chat_cu);
+Cgcu=subs(Gscu,cs,chat_cu);
 Afcu=1/Vmcu*Agcu;
 Bfcu=1/Vmcu*Bgcu;
 Cfcu=1/Vmcu*Cgcu;
 %Sn
-Agsn=subs(d2sn,cs,chatsn);
-Bgsn=subs(musns,cs,chatsn);
-Cgsn=subs(Gssn,cs,chatsn);
+Agsn=subs(d2sn,cs,chat_sn);
+Bgsn=subs(musns,cs,chat_sn);
+Cgsn=subs(Gssn,cs,chat_sn);
 Afsn=1/Vmsn*Agsn;
 Bfsn=1/Vmsn*Bgsn;
 Cfsn=1/Vmsn*Cgsn;
 %Cu6Sn5
-Ageta=subs(d2eta,cs,chateta);
-Bgeta=subs(muetas,cs,chateta);
-Cgeta=subs(Gseta,cs,chateta);
+Ageta=subs(d2eta,cs,chat_eta);
+Bgeta=subs(muetas,cs,chat_eta);
+Cgeta=subs(Gseta,cs,chat_eta);
 Afeta=1/Vmeta*Ageta;
 Bfeta=1/Vmeta*Bgeta;
 Cfeta=1/Vmeta*Cgeta;
 
-% Gibbs energy
-gcu=0.5*Agcu*(cs-chatcu)^2+Bgcu*(cs-chatcu)+Cgcu;
-mucu=Agcu*(cs-chatcu)+Bgcu;
-% geps=0.5*Ageps*(cs-chateps)^2+Bgeps*(cs-chateps)+Cgeps;
-geta=0.5*Ageta*(cs-chateta)^2+Bgeta*(cs-chateta)+Cgeta;
-mueta=Ageta*(cs-chateta)+Bgeta;
-gsn=0.5*Agsn*(cs-chatsn)^2+Bgsn*(cs-chatsn)+Cgsn;
-musn=Agsn*(cs-chatsn)+Bgsn;
-% Free energy density
-fcu=0.5*Afcu*(cs-chatcu)^2+Bfcu*(cs-chatcu)+Cfcu;
-% feps=0.5*Afeps*(cs-chateps)^2+Bfeps*(cs-chateps)+Cfeps;
-feta=0.5*Afeta*(cs-chateta)^2+Bfeta*(cs-chateta)+Cfeta;
-fsn=0.5*Afsn*(cs-chatsn)^2+Bfsn*(cs-chatsn)+Cfsn;
+%Cu3Sn
+Ageps=subs(d2eps,cs,chat_eta);
+Bgeps=subs(mueps,cs,chat_eta);
+Cgeps=subs(Gseps,cs,chat_eta);
+Afeps=1/Vmeps*Ageps;
+Bfeps=1/Vmeps*Bgeps;
+Cfeps=1/Vmeps*Cgeps;
 
+
+% Gibbs energy
+gcu=0.5*Agcu*(cs-chat_cu)^2+Bgcu*(cs-chat_cu)+Cgcu;
+mucu=Agcu*(cs-chat_cu)+Bgcu;
+geps=0.5*Ageps*(cs-chat_eps)^2+Bgeps*(cs-chat_eps)+Cgeps;
+mueps=Ageps*(cs-chat_eps)+Bgeps;
+geta=0.5*Ageta*(cs-chat_eta)^2+Bgeta*(cs-chat_eta)+Cgeta;
+mueta=Ageta*(cs-chat_eta)+Bgeta;
+gsn=0.5*Agsn*(cs-chat_sn)^2+Bgsn*(cs-chat_sn)+Cgsn;
+musn=Agsn*(cs-chat_sn)+Bgsn;
+% Free energy density
+fcu=0.5*Afcu*(cs-chat_cu)^2+Bfcu*(cs-chat_cu)+Cfcu;
+feps=0.5*Afeps*(cs-chat_eps)^2+Bfeps*(cs-chat_eps)+Cfeps;
+feta=0.5*Afeta*(cs-chat_eta)^2+Bfeta*(cs-chat_eta)+Cfeta;
+fsn=0.5*Afsn*(cs-chat_sn)^2+Bfsn*(cs-chat_sn)+Cfsn;
+mucu = mucu/Vmcu;
+mueps = mueps/Vmeps;
+mueta = mueta/Vmeta;
+musn = musn/Vmsn;
 
 %% plot
 %Gibbs
 figure()
 hold on
-p1=ezplot(gcu,[0,1]);
+p1=fplot(gcu,[0,1]);
 % set(p1,'Color','blue')
-p2=ezplot(geta,[0,1]);
+p2=fplot(geta,[0,1]);
 % set(p2,'Color','red');
-p3=ezplot(gsn,[0,1]);
+p3=fplot(gsn,[0,1]);
 % set(p3,'Color','green')
-% p2=ezplot(geps,[0,1]);
+p7=fplot(geps,[0,1]);
 % set(p2,'Color','magenta');
-p4=ezplot(Gscu,[0,1]);
+p4=fplot(Gscu,[0,1]);
 % set(p4,'Color','black')
-p5=ezplot(Gssn,[0,1]);
-p6=ezplot(Gseta,[0,1]);
+p5=fplot(Gssn,[0,1]);
+p6=fplot(Gseta,[0,1]);
 % set(p4,'Color','black')
 % legend('Cu','eps','eta','Sn','Gcu','Gsn')
 % p6=ezplot(t1,[0,1]);
@@ -169,63 +203,81 @@ p6=ezplot(Gseta,[0,1]);
 title(' ')
 ylabel('Gibbs energy [J/mol]')
 xlabel('Mole fraction of Sn')
-axis([0,1,-20e3,-5e3]);
+axis([0,1,-4e4,0]);
 legend('Cu-fit','Cu6Sn5-fit','Sn-fit','Cu','Sn','Location','sw')
 hold off
 
 %Free energy density
 figure()
 hold on
-p1=ezplot(fcu,[0,1]);
+p1=fplot(fcu,[0,1]);
 % set(p1,'Color','blue')
-p2=ezplot(feta,[0,1]);
+p7=ezplot(feps,[0,1]);
+p2=fplot(feta,[0,1]);
 % set(p2,'Color','red');
-p3=ezplot(fsn,[0,1]);
+p3=fplot(fsn,[0,1]);
 % set(p3,'Color','green')
-% p2=ezplot(feps,[0,1]);
 % set(p2,'Color','magenta');
-p4=ezplot(1/Vmcu*Gscu,[0,1]);
+p4=fplot(1/Vmcu*Gscu,[0,1]);
 % set(p4,'Color','black')
-p5=ezplot(1/Vmsn*Gssn,[0,1]);
+p5=fplot(1/Vmsn*Gssn,[0,1]);
 % set(p4,'Color','black')
-% legend('Cu','eps','eta','Sn','Gcu','Gsn')
+legend('Cu','eps','eta','Sn','Gcu','Gsn')
 title('Free energy density')
-axis([0,1,-22e8,-5e8]);
+axis([0,1,-2e9,0]);
 hold off
 
 
 figure()
 hold on
-p1=ezplot(mucu,[0,1]);
+p1=fplot(mucu,[0,1]);
 % set(p1,'Color','blue')
-p2=ezplot(mueta,[0,1]);
+p4=fplot(mueps,[0,1]);
+p2=fplot(mueta,[0,1]);
 % set(p2,'Color','red');
-p3=ezplot(musn,[0,1]);
-legend('cu','imc','sn')
+p3=fplot(musn,[0,1]);
+legend('cu','cu3sn','cu6sn5','sn')
 hold off
 
 
 
 disp('Cu')
-Agcu=eval(Agcu)
-Bgcu=eval(Bgcu)
-Cgcu=eval(Cgcu)
+Afcu=eval(Afcu)
+Bfcu=eval(Bfcu)
+Cfcu=eval(Cfcu)
+disp('--------')
+disp('Cu3Sn')
+Afeps=eval(Afeps)
+Bfeps=eval(Bfeps)
+Cfeps=eval(Cfeps)
 disp('--------')
 disp('Cu6Sn5')
-Ageta=eval(Ageta)
-Bgeta=eval(Bgeta)
-Cgeta=Cgeta
+Afeta=eval(Afeta)
+Bfeta=eval(Bfeta)
+Cfeta=eval(Cfeta)
 disp('---------')
 disp('Sn')
-Agsn=eval(Agsn)
-Bgsn=eval(Bgsn)
-Cgsn=eval(Cgsn)
+Afsn=eval(Afsn)
+Bfsn=eval(Bfsn)
+Cfsn=eval(Cfsn)
 disp('-----------')
 disp('Interface concentrations')
-chatcu=chatcu
-chateta=chateta
-chatsn=chatsn
-ccueta=eval(ccueta)
-cetasn=eval(cetasn)
+chatcu=chat_cu
+chateps = chat_eps
+chateta=chat_eta
+chatsn=chat_sn
 
+ccu_eps=eval(chat_cu)
+ceps_cu = eval(ceps_cu)
+ceta_eps=eval(ceta_eps)
+ceps_eta=eval(ceps_eta)
+csn_eta=eval(chat_sn)
+ceta_sn=eval(ceta_sn)
+
+ccu_eta=eval(ccu_eta)
+ceta_cu=eval(ceta_cu)
+ccu_sn=eval(ccu_sn)
+csn_cu=eval(csn_cu)
+csn_eps=eval(csn_eps)
+ceps_sn=eval(ceps_sn)
 

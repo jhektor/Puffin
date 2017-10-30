@@ -30,13 +30,13 @@
     [./c]
         order = FIRST
         family = LAGRANGE
-        scaling = 1e3
+        #scaling = 1e2
     [../]
     # chemical potential
     [./w]
         order = FIRST
         family = LAGRANGE
-        #scaling = 1e-1
+        #scaling = 1e3
     [../]
 
     # phase concentration  Sn in Cu
@@ -45,7 +45,7 @@
         family = LAGRANGE
         initial_condition = 0.002
         #initial_condition = 0.10569
-        scaling = 1e3
+        #scaling = 1e2
     [../]
 
     # phase concentration  Sn in Cu6Sn5
@@ -53,14 +53,14 @@
         order = FIRST
         family = LAGRANGE
         initial_condition = 0.417
-        scaling = 1e3
+        #scaling = 1e2
     [../]
     # phase concentration  Sn in Cu6Sn5
     [./c_imc2]
         order = FIRST
         family = LAGRANGE
         initial_condition = 0.417
-        scaling = 1e3
+        #scaling = 1e2
     [../]
 
     # phase concentration  Sn in Sn
@@ -68,32 +68,32 @@
         order = FIRST
         family = LAGRANGE
         initial_condition = 0.999
-        scaling = 1e3
+        #scaling = 1e2
     [../]
 
     # order parameter Cu
     [./eta_cu]
         order = FIRST
         family = LAGRANGE
-        scaling = 1e3
+        #scaling = 1e3
     [../]
     # order parameter Cu6Sn5
     [./eta_imc1]
         order = FIRST
         family = LAGRANGE
-        scaling = 1e3
+        #scaling = 1e3
     [../]
     [./eta_imc2]
         order = FIRST
         family = LAGRANGE
-        scaling = 1e3
+        #scaling = 1e3
     [../]
 
     # order parameter Sn
     [./eta_sn]
         order = FIRST
         family = LAGRANGE
-        scaling = 1e3
+        #scaling = 1e3
     [../]
 
 []
@@ -178,7 +178,7 @@
         variable = c
         corners = '0. 0. 0.   0. 1200. 0.   3000+dx. 1200. 0.   1000.+dx 1200. 0.   0. 2600.+dx 0.'
         opposite_corners = '4000. 1000.+dx 0.   1000. 2600. 0   4000. 2600. 0.   3000. 2600. 0.   4000. 6000. 0.'
-        inside = '0.002 0.417 0.455 0.417 0.999'
+        inside = '0.002 0.417 0.417 0.417 0.999'
         #inside = '0.10569 0.417 0.417 0.417 0.999'
         #type = FunctionIC
         #variable = c
@@ -231,8 +231,8 @@
   [./diffusion_constants]
     type = GenericConstantMaterial
     prop_names = 'D_cu D_imc D_sn'
-    #prop_values = '2.877e-36 6.575e-19 2.452e-17' # m^2/s
-    prop_values = '1e-19 6.575e-19 2.452e-17' # m^2/s
+    prop_values = '2.877e-36 6.575e-19 2.452e-17' # m^2/s
+    #prop_values = '1e-19 6.575e-19 2.452e-17' # m^2/s
   [../]
   [./D_gb]
     type = ParsedMaterial
@@ -275,7 +275,7 @@
     type = ParsedMaterial
     material_property_names = 'L_cu_imc L_imc_sn'
     f_name = L_imc_imc
-    function = 'L_cu_imc'
+    function = 'L_imc_sn'
   [../]
   #Free energy
   [./fch_cu] #Chemical energy Cu phase
@@ -310,101 +310,103 @@
       function = '(energy_scale/length_scale^3)*(0.5*A_sn*(c_sn-chat_sn)^2+B_sn*(c_sn-chat_sn)+C_sn)' #eV/nm^3
       derivative_order = 2
   [../]
-    #SwitchingFunction
-    [./h_cu]
-        type = SwitchingFunctionMultiPhaseMaterial
-        h_name = h_cu
-        all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-        phase_etas = eta_cu
-    [../]
+  #SwitchingFunction
+  [./h_cu]
+      type = SwitchingFunctionMultiPhaseMaterial
+      h_name = h_cu
+      all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+      phase_etas = eta_cu
+  [../]
 
-    [./h_imc1]
-        type = SwitchingFunctionMultiPhaseMaterial
-        h_name = h_imc1
-        all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-        phase_etas = eta_imc1
-    [../]
-    [./h_imc2]
-        type = SwitchingFunctionMultiPhaseMaterial
-        h_name = h_imc2
-        all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-        phase_etas = eta_imc2
-    [../]
+  [./h_imc1]
+      type = SwitchingFunctionMultiPhaseMaterial
+      h_name = h_imc1
+      all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+      phase_etas = eta_imc1
+  [../]
+  [./h_imc2]
+      type = SwitchingFunctionMultiPhaseMaterial
+      h_name = h_imc2
+      all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+      phase_etas = eta_imc2
+  [../]
 
-    [./h_sn]
-        type = SwitchingFunctionMultiPhaseMaterial
-        h_name = h_sn
-        all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-        phase_etas = eta_sn
-    [../]
+  [./h_sn]
+      type = SwitchingFunctionMultiPhaseMaterial
+      h_name = h_sn
+      all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+      phase_etas = eta_sn
+  [../]
 
-    #Double well, not used MAYBE USE TO KEEP THE ORDER PARAMETERS IN [0:1]
-    [./g_cu]
-      type = BarrierFunctionMaterial
-      g_order = SIMPLE
-      eta=eta_cu
-      well_only = True
-      function_name = g_cu
-    [../]
-    #Double well, not used
-    [./g_imc1]
-      type = BarrierFunctionMaterial
-      g_order = SIMPLE
-      eta=eta_imc1
-      well_only = True
-      function_name = g_imc1
-    [../]
-    [./g_imc2]
-      type = BarrierFunctionMaterial
-      g_order = SIMPLE
-      eta=eta_imc2
-      well_only = True
-      function_name = g_imc2
-    [../]
-    #Double well, not used
-    [./g_sn]
-      type = BarrierFunctionMaterial
-      g_order = SIMPLE
-      eta=eta_sn
-      well_only = True
-      function_name = g_sn
-    [../]
-    [./Mgb]
-      type=ParsedMaterial
-      material_property_names = 'D_gb delta delta_real h_cu(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc1(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc2(eta_cu,eta_imc1,eta_imc2,eta_sn) h_sn(eta_cu,eta_imc1,eta_imc2,eta_sn) A_cu A_imc A_sn length_scale energy_scale time_scale'
-      f_name = Mgb
-      function = '(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h_cu*A_cu+h_imc1*A_imc+h_imc2*A_imc+h_sn*A_sn)*delta)'
-      #function = '4e-5'
-    [../]
-    [./CHMobility]
-        type = DerivativeParsedMaterial
-        f_name = M
-        args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-        material_property_names = 'h_cu(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc1(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc2(eta_cu,eta_imc1,eta_imc2,eta_sn) h_sn(eta_cu,eta_imc1,eta_imc2,eta_sn) D_cu D_imc D_sn A_cu A_imc A_sn Mgb length_scale energy_scale time_scale'
-        #function = 's:=eta_cu^2+eta_imc1^2+eta_imc2^2+eta_sn^2;p:=eta_imc1^2*eta_imc2^2;(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn+p*Mgb/s)' #nm^5/eVs
-        #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)+if(h_imc1*h_imc2>1./16.,0,Mgb)' #nm^5/eVs
-        function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)+h_imc1*h_imc2*Mgb' #nm^5/eVs
-        #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_sn/A_sn+h_imc*D_sn/A_sn+h_sn*D_sn/A_sn)' #nm^5/eVs
-        derivative_order = 2
-        outputs = exodus_out
-    [../]
+  #Double well, not used MAYBE USE TO KEEP THE ORDER PARAMETERS IN [0:1]
+  [./g_cu]
+    type = BarrierFunctionMaterial
+    g_order = SIMPLE
+    eta=eta_cu
+    well_only = True
+    function_name = g_cu
+  [../]
+  #Double well, not used
+  [./g_imc1]
+    type = BarrierFunctionMaterial
+    g_order = SIMPLE
+    eta=eta_imc1
+    well_only = True
+    function_name = g_imc1
+  [../]
+  [./g_imc2]
+    type = BarrierFunctionMaterial
+    g_order = SIMPLE
+    eta=eta_imc2
+    well_only = True
+    function_name = g_imc2
+  [../]
+  #Double well, not used
+  [./g_sn]
+    type = BarrierFunctionMaterial
+    g_order = SIMPLE
+    eta=eta_sn
+    well_only = True
+    function_name = g_sn
+  [../]
+    #[./Mgb]
+    #  type=ParsedMaterial
+    #  #args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+    #  material_property_names = 'D_gb delta delta_real h_cu(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc1(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc2(eta_cu,eta_imc1,eta_imc2,eta_sn) h_sn(eta_cu,eta_imc1,eta_imc2,eta_sn) A_cu A_imc A_sn length_scale energy_scale time_scale'
+    #  f_name = Mgb
+    #  function = '(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h_cu*A_cu+h_imc1*A_imc+h_imc2*A_imc+h_sn*A_sn)*delta)'
+    #  #function = '4e-5'
+    #[../]
+  [./CHMobility]
+    type = DerivativeParsedMaterial
+    f_name = M
+    args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+    material_property_names = 'h_cu(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc1(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc2(eta_cu,eta_imc1,eta_imc2,eta_sn) h_sn(eta_cu,eta_imc1,eta_imc2,eta_sn) D_cu D_imc D_sn A_cu A_imc A_sn length_scale energy_scale time_scale delta_real delta D_gb'
+    #function = 's:=eta_cu^2+eta_imc1^2+eta_imc2^2+eta_sn^2;p:=eta_imc1^2*eta_imc2^2;(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn+p*Mgb/s)' #nm^5/eVs
+    #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)+if(h_imc1*h_imc2>1./16.,0,Mgb)' #nm^5/eVs
+    #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)+h_imc1*h_imc2*Mgb' #nm^5/eVs
+    function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)' #'+h_imc1*h_imc2*(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h_cu*A_cu+h_imc1*A_imc+h_imc2*A_imc+h_sn*A_sn)*delta)' #nm^5/eVs
+    #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_sn/A_sn+h_imc*D_sn/A_sn+h_sn*D_sn/A_sn)' #nm^5/eVs
+    derivative_order = 2
+    outputs = exodus_out
+  [../]
 
-    [./ACMobility]
-        type = DerivativeParsedMaterial
-        f_name = L
-        args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-        material_property_names = 'L_cu_imc L_imc_sn L_cu_sn L_imc_imc' # h_cu(eta_cu,eta_imc,eta_sn) h_imc(eta_cu,eta_imc,eta_sn) h_sn(eta_cu,eta_imc,eta_sn)'
+  [./ACMobility]
+    type = DerivativeParsedMaterial
+    f_name = L
+    args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+    material_property_names = 'L_cu_imc L_imc_sn L_cu_sn L_imc_imc' # h_cu(eta_cu,eta_imc,eta_sn) h_imc(eta_cu,eta_imc,eta_sn) h_sn(eta_cu,eta_imc,eta_sn)'
 
-        # Added epsilon to prevent division by 0 (Larry Aagesen)
-        function ='pf:=1e5;eps:=0.01;(L_cu_imc*(pf*eta_cu^2+eps)*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))+L_imc_sn*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))*(pf*eta_sn^2+eps)+L_cu_sn*(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps)+L_imc_imc*(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps))/((pf*eta_cu^2+eps)*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))+((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))*(pf*eta_sn^2+eps)+(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps))'
-        #function ='L_imc_sn'
+    # Added epsilon to prevent division by 0 (Larry Aagesen)
+    function ='pf:=1e5;eps:=0.01;(L_cu_imc*(pf*eta_cu^2+eps)*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))+L_imc_sn*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))*(pf*eta_sn^2+eps)+L_cu_sn*(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps)+L_imc_imc*(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps))/((pf*eta_cu^2+eps)*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))+((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))*(pf*eta_sn^2+eps)+(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps)+(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps))'
+    #function ='L_imc_sn'
 
-        # Conditional function (Daniel Schwen)
-        #function ='numer:=L_cu_imc*eta_cu^2*eta_imc^2+L_imc_sn*eta_imc^2*eta_sn^2+L_cu_sn*eta_cu^2*eta_sn^2;denom:=eta_cu^2*eta_imc^2+eta_imc^2*eta_sn^2+eta_cu^2*eta_sn^2;if(denom!=0,numer/denom,0.5*(L_cu_imc+L_imc_sn))'
+    # Conditional function (Daniel Schwen)
+    #function ='numer:=L_cu_imc*eta_cu^2*eta_imc^2+L_imc_sn*eta_imc^2*eta_sn^2+L_cu_sn*eta_cu^2*eta_sn^2;denom:=eta_cu^2*eta_imc^2+eta_imc^2*eta_sn^2+eta_cu^2*eta_sn^2;if(denom!=0,numer/denom,0.5*(L_cu_imc+L_imc_sn))'
 
-        derivative_order = 2
-        outputs = exodus_out
-    [../]
+    derivative_order = 2
+    outputs = exodus_out
+  [../]
 []
 
 [Kernels]
@@ -477,7 +479,7 @@
       hj_names  = 'h_cu h_imc1 h_imc2 h_sn'
       gi_name   = g_cu
       eta_i     = eta_cu
-      wi        = 5
+      wi        = 0
       mob_name = L
       args      = 'c_cu c_imc1 c_imc2 c_sn eta_imc1 eta_imc2 eta_sn'
     [../]
@@ -520,7 +522,7 @@
       hj_names  = 'h_cu h_imc1 h_imc2 h_sn'
       gi_name   = g_imc1
       eta_i     = eta_imc1
-      wi        = 5
+      wi        = 0
       mob_name = L
       args      = 'c_cu c_imc1 c_imc2 c_sn eta_cu eta_imc2 eta_sn'
     [../]
@@ -562,7 +564,7 @@
       hj_names  = 'h_cu h_imc1 h_imc2 h_sn'
       gi_name   = g_imc2
       eta_i     = eta_imc2
-      wi        = 5
+      wi        = 0
       mob_name = L
       args      = 'c_cu c_imc1 c_imc2 c_sn eta_cu eta_imc1 eta_sn'
     [../]
@@ -604,7 +606,7 @@
       hj_names  = 'h_cu h_imc1 h_imc2 h_sn'
       gi_name   = g_sn
       eta_i     = eta_sn
-      wi        = 5
+      wi        = 0
       mob_name = L
       args      = 'c_cu c_imc1 c_imc2 c_sn eta_imc1 eta_imc2 eta_cu'
     [../]
@@ -662,7 +664,7 @@
         additional_free_energy = f_int
         interfacial_vars = 'eta_cu eta_imc1 eta_imc2 eta_sn'
         kappa_names = 'kappa kappa kappa kappa'
-        w = 5
+        w = 0
         execute_on = 'initial timestep_end'
     [../]
     [./f_int]
