@@ -1,7 +1,7 @@
 close all
 clear all
 
-T=25+273.15; %Temperature
+T=220+273.15; %Temperature
 R=8.3144621; %Gas constant
 
 Vm=16.29e-6; %m^3/mole
@@ -11,7 +11,7 @@ Vmeta=Vm;%10.6e-6;%Vm;
 Vmsn=Vm;
 
 
-version=2; %1 for Li2009, 2 for Shim1996
+version=1; %1 for Li2009, 2 for Shim1996
 
 if version==1
     %% Thermodynamic data from Li, Du et al. 2009
@@ -280,14 +280,14 @@ hold off
 % C_Cusnliq=eval(C_Cusnliq)
 % disp('--------')
 disp('Cu snbct')
-A_Cusnbct=eval(A_Cusnbct)
-B_Cusnbct=eval(B_Cusnbct)
-C_Cusnbct=eval(C_Cusnbct)
+A_Cusnbct=eval(A_Cusnbct/Vmcu)
+B_Cusnbct=eval(B_Cusnbct/Vmcu)
+C_Cusnbct=eval(C_Cusnbct/Vmcu)
 disp('--------')
 disp('Cu3Sn snbct')
-A_eps=eval(A_eps)
-B_eps=eval(B_eps)
-C_eps=eval(C_eps)
+A_eps=eval(A_eps/Vmeps)
+B_eps=eval(B_eps/Vmeps)
+C_eps=eval(C_eps/Vmeps)
 disp('--------')
 % disp('Cu6Sn5 sn liq')
 % A_etasnliq=eval(A_etasnliq)
@@ -295,9 +295,9 @@ disp('--------')
 % C_etasnliq=eval(C_etasnliq)
 % disp('---------')
 disp('Cu6Sn5 sn bct')
-A_etasnbct=eval(A_etasnbct)
-B_etasnbct=eval(B_etasnbct)
-C_etasnbct=eval(C_etasnbct)
+A_etasnbct=eval(A_etasnbct/Vmeta)
+B_etasnbct=eval(B_etasnbct/Vmeta)
+C_etasnbct=eval(C_etasnbct/Vmeta)
 % disp('---------')
 % disp('Sn liq')
 % A_Snliq=eval(A_Snliq)
@@ -305,9 +305,9 @@ C_etasnbct=eval(C_etasnbct)
 % C_Snliq=eval(C_Snliq)
 disp('---------')
 disp('Sn bct')
-A_Snbct=eval(A_Snbct)
-B_Snbct=eval(B_Snbct)
-C_Snbct=eval(C_Snbct)
+A_Snbct=eval(A_Snbct/Vmsn)
+B_Snbct=eval(B_Snbct/Vmsn)
+C_Snbct=eval(C_Snbct/Vmsn)
 disp('-----------')
 disp('Interface concentrations')
 % xhat_Cusnliq=eval(xhat_Cusnliq)

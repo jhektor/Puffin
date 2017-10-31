@@ -1,25 +1,25 @@
 [Mesh]
     type = GeneratedMesh
     dim = 2
-    nx = 40
-    ny = 60
+    nx = 1000
+    ny = 1
     xmin = 0
-    xmax = 2000 #[nm]
+    xmax = 100000 #[nm]
     ymin = 0
-    ymax = 3000
+    ymax = 100
     elem_type = QUAD4
 []
 
 [BCs]
     [./neumann]
         type = NeumannBC
-        boundary = 'top bottom'
+        boundary = 'left right'
         variable = 'c w c_cu c_imc1 c_imc2 c_sn eta_cu eta_imc1 eta_imc2 eta_sn'
         value = 0
     [../]
     [./Periodic]
-      [./x]
-        auto_direction = 'x'
+      [./y]
+        auto_direction = y
         variable = 'c w c_cu c_imc1 c_imc2 c_sn eta_cu eta_imc1 eta_imc2 eta_sn'
       [../]
     [../]
@@ -30,7 +30,7 @@
     [./c]
         order = FIRST
         family = LAGRANGE
-        #scaling = 1e2
+        #scaling = 1e3
     [../]
     # chemical potential
     [./w]
@@ -43,32 +43,32 @@
     [./c_cu]
         order = FIRST
         family = LAGRANGE
-        initial_condition = 0.002
+        initial_condition = 0.02
         #initial_condition = 0.10569
-        #scaling = 1e2
+        #scaling = 1e3
     [../]
 
-    # phase concentration  Sn in Cu6Sn5
+    # phase concentration  Sn in Cu3Sn
     [./c_imc1]
         order = FIRST
         family = LAGRANGE
-        initial_condition = 0.417
-        #scaling = 1e2
+        initial_condition = 0.2433
+        #scaling = 1e3
     [../]
     # phase concentration  Sn in Cu6Sn5
     [./c_imc2]
         order = FIRST
         family = LAGRANGE
-        initial_condition = 0.417
-        #scaling = 1e2
+        initial_condition = 0.4351
+        #scaling = 1e3
     [../]
 
     # phase concentration  Sn in Sn
     [./c_sn]
         order = FIRST
         family = LAGRANGE
-        initial_condition = 0.999
-        #scaling = 1e2
+        initial_condition = 0.9889
+        #scaling = 1e3
     [../]
 
     # order parameter Cu
@@ -99,91 +99,31 @@
 []
 [ICs]
     [./eta_cu] #Cu
-        type = MultiBoundingBoxIC
-        variable = eta_cu
-        corners = '0. 0. 0.'
-        opposite_corners = '2000. 600. 0.'
-        inside = 1.
-        outside = 0.
-
-
-        #variable = eta_cu
-        #type = BoundingBoxIC
-        #x1 = 0
-        #x2 = 2000
-        #y1 = 0
-        #y2 = 600
-        #inside = 1
-        #outside = 0
-        #type = FunctionIC
-        #function = 'if(y<=600,1,0)'
+      type = FunctionIC
+      variable = eta_cu
+      function = 'if(x<=10000,1,0)'
     [../]
-    [./eta_imc1] #Cu6Sn5
-        type = MultiBoundingBoxIC
-        variable = eta_imc1
-        corners = '0. 650. 0.   1550. 650. 0.'
-        opposite_corners = '500. 1000. 0   2000. 1000. 0.'
-        inside = 1.
-        outside = 0.
-        #variable = eta_imc1
-        #type = SmoothSuperellipsoidIC
-        #x1 = 1000
-        #y1 = 900
-        #n = 2
-        #a = 500
-        #b = 300
-        #int_width = 0
-        #invalue = 1
-        #outvalue = 0
-
-        #type = FunctionIC
-        ##function = 'if(y>600&y<=1200,if(x<500|x>1500,1,0),0)'
-        #function = '0'
+    [./eta_imc1] #Cu3Sn
+      type = FunctionIC
+      variable = eta_imc1
+      function = 'if(x>10000&x<=11000,1,0)'
     [../]
     [./eta_imc2] #Cu6Sn5
-        type = MultiBoundingBoxIC
-        variable = eta_imc2
-        corners = '550. 650. 0.'
-        opposite_corners = '1500. 1000. 0.'
-        inside = 1.
-        outside = 0.
-        #variable = eta_imc2
-        #type = SmoothSuperellipsoidIC
-        #x1 = 0
-        #y1 = 900
-        #n = 2
-        #a = 500
-        #b = 300
-        #int_width = 0
-        #invalue = 1
-        #outvalue = 0
-        #type = FunctionIC
-        #function = 'if(y>600&y<=1200,if(x>=500&x<=1500,1,0),0)'
-        #function = 'if(y>600&y<=1200,1,0)'
+      type = FunctionIC
+      variable = eta_imc2
+      function = 'if(x>11000&x<=12000,1,0)'
     [../]
     [./eta_sn] #Sn
-        type = MultiBoundingBoxIC
-        variable = eta_sn
-        corners = '0. 1050. 0.'
-        opposite_corners = '2000. 3000. 0.'
-        inside = 1.
-        outside = 0.
-        #type = FunctionIC
-        #variable = eta_sn
-        #function = 'if(y>1200,1,0)'
+      type = FunctionIC
+      variable = eta_sn
+      function = 'if(x>12000,1,0)'
     [../]
 
     [./c] #Concentration of Sn
-        type = MultiBoundingBoxIC
-        variable = c
-        corners = '0. 0. 0.   0. 650. 0.   0. 1050. 0.'
-        opposite_corners = '2000. 600. 0.   2000. 1000. 0.   2000. 3000. 0.'
-        inside = '0.002 0.417 0.999'
-        #inside = '0.10569 0.417 0.417 0.417 0.999'
-        #type = FunctionIC
-        #variable = c
-        ##function = 'if(y<=600,0.002,0)+if(y>600&y<=1200,0.417,0)+if(y>1200,0.999,0)'
-        #function = 'c_cu*eta_cu+c_imc1*eta_imc1+c_imc2*eta_imc2+c_sn*eta_sn'
+      type = FunctionIC
+      variable = c
+      function = 'if(x<=10000,0.02,0)+if(x>10000&x<=11000,0.2433,0)+if(x>11000&x<=12000,0.4351,0)+if(x>12000,0.9889,0)'
+      #function = 'c_cu*eta_cu+c_imc1*eta_imc1+c_imc2*eta_imc2+c_sn*eta_sn'
     [../]
 []
 
@@ -197,49 +137,48 @@
   [./model_constants]
     type = GenericConstantMaterial
     prop_names = 'sigma delta delta_real gamma Vm tgrad_corr_mult'
-    prop_values = '0.5 0.3e-6 5e-10 1.5 16.29e-6 0' #J/m^2 m - ?
+    prop_values = '0.5 400e-9 5e-10 1.5 16.29e-6 0' #J/m^2 m - ?
   [../]
-  #Constants
+  #Constants The energy parameters are for 220 C
   [./energy_A]
     type = GenericConstantMaterial
-    prop_names = 'A_cu A_imc A_sn'
+    prop_names = 'A_cu A_eps A_eta A_sn'
     #prop_values = '1.0133e5/Vm 4e5/Vm 4.2059e6/Vm' #J/m^3
-    prop_values = '6.2204e9 2.4555e10 2.5819e11' #J/m^3
+    prop_values = '1.7756e10 2.4555e11 2.4555e11 2.3033e10' #J/m^3
   [../]
   [./energy_B]
     type = GenericConstantMaterial
-    prop_names = 'B_cu B_imc B_sn'
+    prop_names = 'B_cu B_eps B_eta B_sn'
     #prop_values = '-2.1146e4/Vm -6.9892e3/Vm 7.168e3/Vm' #J/m^3
-    prop_values = '-1.2981e9 -0.0429e10 0.0044e11' #J/m^3
+    prop_values = '-2.6351e9 -1.4014e9 2.3251e7 2.14216e8' #J/m^3
   [../]
   [./energy_C]
     type = GenericConstantMaterial
-    prop_names = 'Cf_cu Cf_imc Cf_sn'
+    prop_names = 'C_cu C_eps C_eta C_sn'
     #prop_values = '-1.2842e4/Vm -1.9185e4/Vm -1.5265e4/Vm' #J/m^3
-    prop_values = '-0.7883e9 -0.1178e10 -0.0094e11' #J/m^3
-    #prop_values = '0.9887e9 0. 8.37e8' #J/m^3
+    prop_values = '-1.1441e9 -1.7294e9 -1.7646e9 -1.646e9' #J/m^3
   [../]
   [./energy_c_ab]
     type = GenericConstantMaterial
-    prop_names = 'c_cu_imc c_imc_cu c_imc_sn c_sn_imc c_cu_sn c_sn_cu'
-    prop_values = '0.1057 0.3821 0.4529 0.9994 0.3112 0.9976' #-
+    prop_names = 'c_cu_eps c_cu_eta c_cu_sn c_eps_cu c_eps_eta c_eps_sn c_eta_cu c_eta_eps c_eta_sn c_sn_cu c_sn_eps c_sn_eta'
+    prop_values = '0.02 0.1957 0.6088 0.2383 0.2483 0.000 0.4299 0.4343 0.4359 0.9789 0.000 0.9889' #-
   [../]
   [./energy_chat]
     type = GenericConstantMaterial
-    prop_names = 'chat_cu chat_imc chat_sn'
-    prop_values = '0.1057 0.41753 0.9994' #-
+    prop_names = 'chat_cu chat_eps chat_eta chat_sn'
+    prop_values = '0.02 0.2433 0.4351 0.9889' #-
   [../]
   [./diffusion_constants]
     type = GenericConstantMaterial
-    prop_names = 'D_cu D_imc D_sn'
-    prop_values = '2.877e-36 6.575e-19 2.452e-17' # m^2/s
-    #prop_values = '1e-19 6.575e-19 2.452e-17' # m^2/s
+    prop_names = 'D_cu D_eps D_eta D_sn'
+    #prop_values = '2.877e-36 6.575e-19 2.452e-17' # m^2/s
+    prop_values = '2.8311e-23 2.7650e-15 5.9702e-15 4.0866e-14' # m^2/s
   [../]
   [./D_gb]
     type = ParsedMaterial
-    material_property_names = 'D_imc'
+    material_property_names = 'D_eta'
     f_name = D_gb
-    function = '200*D_imc'
+    function = '200*D_eta'
   [../]
 
   [./kappa]
@@ -254,17 +193,35 @@
     f_name = mu
     function = '6*(sigma/delta)*energy_scale/length_scale^3' #eV/nm^3
   [../]
-  [./L_cu_imc]
+  [./L_cu_eps] #TODO: lägg in args
     type = ParsedMaterial
-    material_property_names = 'mu kappa D_cu D_imc A_cu A_imc c_cu_imc c_imc_cu length_scale energy_scale time_scale'
-    f_name = L_cu_imc
-    function = '(length_scale^5/(energy_scale*time_scale))*2*mu*(D_cu/A_cu+D_imc/A_imc)/(3*kappa*(c_cu_imc-c_imc_cu)^2)' #nm^3/eVs
+    material_property_names = 'mu kappa D_cu D_eps A_cu A_eps c_cu_eps c_eps_cu length_scale energy_scale time_scale'
+    f_name = L_cu_eps
+    function = '(length_scale^5/(energy_scale*time_scale))*2*mu*(D_cu/A_cu+D_eps/A_eps)/(3*kappa*(c_cu_eps-c_eps_cu)^2)' #nm^3/eVs
   [../]
-  [./L_imc_sn]
+  [./L_cu_eta]
     type = ParsedMaterial
-    material_property_names = 'mu kappa D_sn D_imc A_sn A_imc c_sn_imc c_imc_sn length_scale energy_scale time_scale'
-    f_name = L_imc_sn
-    function = '(length_scale^5/(energy_scale*time_scale))*2*mu*(D_sn/A_sn+D_imc/A_imc)/(3*kappa*(c_sn_imc-c_imc_sn)^2)'
+    material_property_names = 'mu kappa D_cu D_eta A_cu A_eta c_cu_eta c_eta_cu length_scale energy_scale time_scale'
+    f_name = L_cu_eta
+    function = '(length_scale^5/(energy_scale*time_scale))*2*mu*(D_cu/A_cu+D_eta/A_eta)/(3*kappa*(c_cu_eta-c_eta_cu)^2)' #nm^3/eVs
+  [../]
+  [./L_eps_eta]
+    type = ParsedMaterial
+    material_property_names = 'mu kappa D_eps D_eta A_eps A_eta c_eps_eta c_eta_eps length_scale energy_scale time_scale'
+    f_name = L_eps_eta
+    function = '(length_scale^5/(energy_scale*time_scale))*2*mu*(D_eps/A_eps+D_eta/A_eta)/(3*kappa*(c_eps_eta-c_eta_eps)^2)'
+  [../]
+  [./L_eps_sn]
+    type = ParsedMaterial
+    material_property_names = 'mu kappa D_eps D_sn A_eps A_sn c_eps_sn c_sn_eps length_scale energy_scale time_scale'
+    f_name = L_eps_sn
+    function = '(length_scale^5/(energy_scale*time_scale))*2*mu*(D_eps/A_eps+D_sn/A_sn)/(3*kappa*(c_eps_sn-c_sn_eps)^2)'
+  [../]
+  [./L_eta_sn]
+    type = ParsedMaterial
+    material_property_names = 'mu kappa D_sn D_eta A_sn A_eta c_sn_eta c_eta_sn length_scale energy_scale time_scale'
+    f_name = L_eta_sn
+    function = '(length_scale^5/(energy_scale*time_scale))*2*mu*(D_sn/A_sn+D_eta/A_eta)/(3*kappa*(c_sn_eta-c_eta_sn)^2)'
   [../]
   [./L_cu_sn]
     type = ParsedMaterial
@@ -272,146 +229,141 @@
     f_name = L_cu_sn
     function = '(length_scale^5/(energy_scale*time_scale))*2*mu*(D_sn/A_sn+D_cu/A_cu)/(3*kappa*(c_sn_cu-c_cu_sn)^2)'
   [../]
-  [./L_imc_imc]
-    type = ParsedMaterial
-    material_property_names = 'L_cu_imc L_imc_sn'
-    f_name = L_imc_imc
-    function = 'L_imc_sn'
-  [../]
+  #[./L_imc_imc]
+  #  type = ParsedMaterial
+  #  material_property_names = 'L_cu_imc L_imc_sn'
+  #  f_name = L_imc_imc
+  #  function = 'L_cu_imc'
+  #[../]
   #Free energy
   [./fch_cu] #Chemical energy Cu phase
       type = DerivativeParsedMaterial
       f_name = fch_cu
       args = 'c_cu'
-      material_property_names = 'A_cu B_cu Cf_cu chat_cu length_scale energy_scale'
-      function = '(energy_scale/length_scale^3)*(0.5*A_cu*(c_cu-chat_cu)^2+B_cu*(c_cu-chat_cu)+Cf_cu)' #eV/nm^3
+      material_property_names = 'A_cu B_cu C_cu chat_cu length_scale energy_scale'
+      function = '(energy_scale/length_scale^3)*(0.5*A_cu*(c_cu-chat_cu)^2+B_cu*(c_cu-chat_cu)+C_cu)' #eV/nm^3
       derivative_order = 2
-      outputs = exodus_out
   [../]
-  [./fch_imc1] #Chemical energy Cu6Sn5 phase grain 1
+  [./fch_imc1] #Chemical energy Cu3Sn phase
       type = DerivativeParsedMaterial
       f_name = fch_imc1
       args = 'c_imc1'
-      material_property_names = 'A_imc B_imc Cf_imc chat_imc length_scale energy_scale'
-      function = '(energy_scale/length_scale^3)*(0.5*A_imc*(c_imc1-chat_imc)^2+B_imc*(c_imc1-chat_imc)+Cf_imc)' #eV/nm^3
+      material_property_names = 'A_eps B_eps C_eps chat_eps length_scale energy_scale'
+      function = '(energy_scale/length_scale^3)*(0.5*A_eps*(c_imc1-chat_eps)^2+B_eps*(c_imc1-chat_eps)+C_eps)' #eV/nm^3
       derivative_order = 2
-      outputs = exodus_out
   [../]
   [./fch_imc2] #Chemical energy Cu6Sn5 phase grain 2
       type = DerivativeParsedMaterial
       f_name = fch_imc2
       args = 'c_imc2'
-      material_property_names = 'A_imc B_imc Cf_imc chat_imc length_scale energy_scale'
-      function = '(energy_scale/length_scale^3)*(0.5*A_imc*(c_imc2-chat_imc)^2+B_imc*(c_imc2-chat_imc)+Cf_imc)' #eV/nm^3
+      material_property_names = 'A_eta B_eta C_eta chat_eta length_scale energy_scale'
+      function = '(energy_scale/length_scale^3)*(0.5*A_eta*(c_imc2-chat_eta)^2+B_eta*(c_imc2-chat_eta)+C_eta)' #eV/nm^3
       derivative_order = 2
-      outputs = exodus_out
   [../]
   [./fch_sn] #Chemical energy Sn phase
       type = DerivativeParsedMaterial
       f_name = fch_sn
       args = 'c_sn'
-      material_property_names = 'A_sn B_sn Cf_sn chat_sn length_scale energy_scale'
-      function = '(energy_scale/length_scale^3)*(0.5*A_sn*(c_sn-chat_sn)^2+B_sn*(c_sn-chat_sn)+Cf_sn)' #eV/nm^3
+      material_property_names = 'A_sn B_sn C_sn chat_sn length_scale energy_scale'
+      function = '(energy_scale/length_scale^3)*(0.5*A_sn*(c_sn-chat_sn)^2+B_sn*(c_sn-chat_sn)+C_sn)' #eV/nm^3
       derivative_order = 2
-      outputs = exodus_out
   [../]
-  #SwitchingFunction
-  [./h_cu]
-      type = SwitchingFunctionMultiPhaseMaterial
-      h_name = h_cu
-      all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-      phase_etas = eta_cu
-  [../]
+    #SwitchingFunction
+    [./h_cu]
+        type = SwitchingFunctionMultiPhaseMaterial
+        h_name = h_cu
+        all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+        phase_etas = eta_cu
+    [../]
 
-  [./h_imc1]
-      type = SwitchingFunctionMultiPhaseMaterial
-      h_name = h_imc1
-      all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-      phase_etas = eta_imc1
-  [../]
-  [./h_imc2]
-      type = SwitchingFunctionMultiPhaseMaterial
-      h_name = h_imc2
-      all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-      phase_etas = eta_imc2
-  [../]
+    [./h_imc1]
+        type = SwitchingFunctionMultiPhaseMaterial
+        h_name = h_imc1
+        all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+        phase_etas = eta_imc1
+    [../]
+    [./h_imc2]
+        type = SwitchingFunctionMultiPhaseMaterial
+        h_name = h_imc2
+        all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+        phase_etas = eta_imc2
+    [../]
 
-  [./h_sn]
-      type = SwitchingFunctionMultiPhaseMaterial
-      h_name = h_sn
-      all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-      phase_etas = eta_sn
-  [../]
+    [./h_sn]
+        type = SwitchingFunctionMultiPhaseMaterial
+        h_name = h_sn
+        all_etas = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+        phase_etas = eta_sn
+    [../]
 
-  #Double well, not used MAYBE USE TO KEEP THE ORDER PARAMETERS IN [0:1]
-  [./g_cu]
-    type = BarrierFunctionMaterial
-    g_order = SIMPLE
-    eta=eta_cu
-    well_only = True
-    function_name = g_cu
-  [../]
-  #Double well, not used
-  [./g_imc1]
-    type = BarrierFunctionMaterial
-    g_order = SIMPLE
-    eta=eta_imc1
-    well_only = True
-    function_name = g_imc1
-  [../]
-  [./g_imc2]
-    type = BarrierFunctionMaterial
-    g_order = SIMPLE
-    eta=eta_imc2
-    well_only = True
-    function_name = g_imc2
-  [../]
-  #Double well, not used
-  [./g_sn]
-    type = BarrierFunctionMaterial
-    g_order = SIMPLE
-    eta=eta_sn
-    well_only = True
-    function_name = g_sn
-  [../]
-  [./Mgb]
-    type=ParsedMaterial
-    #args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-    material_property_names = 'D_gb delta delta_real h_cu(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc1(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc2(eta_cu,eta_imc1,eta_imc2,eta_sn) h_sn(eta_cu,eta_imc1,eta_imc2,eta_sn) A_cu A_imc A_sn length_scale energy_scale time_scale'
-    f_name = Mgb
-    function = '(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h_cu*A_cu+h_imc1*A_imc+h_imc2*A_imc+h_sn*A_sn)*delta)'
-    #function = '4e-5'
-  [../]
-  [./CHMobility]
-    type = DerivativeParsedMaterial
-    f_name = M
-    args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-    material_property_names = 'h_cu(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc1(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc2(eta_cu,eta_imc1,eta_imc2,eta_sn) h_sn(eta_cu,eta_imc1,eta_imc2,eta_sn) D_cu D_imc D_sn A_cu A_imc A_sn length_scale energy_scale time_scale Mgb'
-    #function = 's:=eta_cu^2+eta_imc1^2+eta_imc2^2+eta_sn^2;p:=eta_imc1^2*eta_imc2^2;(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn+p*Mgb/s)' #nm^5/eVs
-    #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)+if(h_imc1*h_imc2>1./16.,0,Mgb)' #nm^5/eVs
-    function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)+h_imc1*h_imc2*Mgb' #nm^5/eVs
-    #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)' #'+h_imc1*h_imc2*(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h_cu*A_cu+h_imc1*A_imc+h_imc2*A_imc+h_sn*A_sn)*delta)' #nm^5/eVs
-    #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_sn/A_sn+h_imc*D_sn/A_sn+h_sn*D_sn/A_sn)' #nm^5/eVs
-    derivative_order = 2
-    outputs = exodus_out
-  [../]
+    #Double well, not used MAYBE USE TO KEEP THE ORDER PARAMETERS IN [0:1]
+    [./g_cu]
+      type = BarrierFunctionMaterial
+      g_order = SIMPLE
+      eta=eta_cu
+      well_only = True
+      function_name = g_cu
+    [../]
+    #Double well, not used
+    [./g_imc1]
+      type = BarrierFunctionMaterial
+      g_order = SIMPLE
+      eta=eta_imc1
+      well_only = True
+      function_name = g_imc1
+    [../]
+    [./g_imc2]
+      type = BarrierFunctionMaterial
+      g_order = SIMPLE
+      eta=eta_imc2
+      well_only = True
+      function_name = g_imc2
+    [../]
+    #Double well, not used
+    [./g_sn]
+      type = BarrierFunctionMaterial
+      g_order = SIMPLE
+      eta=eta_sn
+      well_only = True
+      function_name = g_sn
+    [../]
+    [./Mgb]
+      type=ParsedMaterial
+      material_property_names = 'D_gb delta delta_real h_cu(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc1(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc2(eta_cu,eta_imc1,eta_imc2,eta_sn) h_sn(eta_cu,eta_imc1,eta_imc2,eta_sn) A_cu A_eps A_eta A_sn length_scale energy_scale time_scale'
+      f_name = Mgb
+      function = '(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h_cu*A_cu+h_imc1*A_eps+h_imc2*A_eta+h_sn*A_sn)*delta)'
+      #function = '4e-5'
+    [../]
+    [./CHMobility]
+        type = DerivativeParsedMaterial
+        f_name = M
+        args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+        material_property_names = 'h_cu(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc1(eta_cu,eta_imc1,eta_imc2,eta_sn) h_imc2(eta_cu,eta_imc1,eta_imc2,eta_sn) h_sn(eta_cu,eta_imc1,eta_imc2,eta_sn) D_cu D_eps D_eta D_sn A_cu A_eps A_eta A_sn Mgb length_scale energy_scale time_scale'
+        #function = 's:=eta_cu^2+eta_imc1^2+eta_imc2^2+eta_sn^2;p:=eta_imc1^2*eta_imc2^2;(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn+p*Mgb/s)' #nm^5/eVs
+        #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)+if(h_imc1*h_imc2>1./16.,0,Mgb)' #nm^5/eVs
+        function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_eps/A_eps+h_imc2*D_eta/A_eta+h_sn*D_sn/A_sn)' #'+h_imc1*h_imc2*Mgb' #nm^5/eVs
+        #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_sn/A_sn+h_imc*D_sn/A_sn+h_sn*D_sn/A_sn)' #nm^5/eVs
+        derivative_order = 2
+        outputs = exodus_out
+    [../]
 
-  [./ACMobility]
-    type = DerivativeParsedMaterial
-    f_name = L
-    args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
-    material_property_names = 'L_cu_imc L_imc_sn L_cu_sn L_imc_imc' # h_cu(eta_cu,eta_imc,eta_sn) h_imc(eta_cu,eta_imc,eta_sn) h_sn(eta_cu,eta_imc,eta_sn)'
+    [./ACMobility]
+        type = DerivativeParsedMaterial
+        f_name = L
+        args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
+        #material_property_names = 'L_cu_eps L_cu_eta L_cu_sn L_eps_eta L_eps_sn L_eta_sn'
+        material_property_names = 'L_cu_eps L_eps_eta L_eta_sn'
+        # Added epsilon to prevent division by 0 (Larry Aagesen)
+        #function ='pf:=1e5;eps:=0.01;(L_cu_eps*(pf*eta_cu^2+eps)*(pf*eta_imc1^2+eps)+L_cu_eta*(pf*eta_cu^2+eps)*(pf*eta_imc2^2+eps)+L_eps_sn*(pf*eta_imc1^2+eps)*(pf*eta_sn^2+eps)+L_eps_eta*(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps)+L_eta_sn*(pf*eta_imc2^2+eps)*(pf*eta_sn^2+eps)+L_cu_sn*(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps))/((pf*eta_cu^2+eps)*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))+((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))*(pf*eta_sn^2+eps)+(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps)+(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps))'
+        function ='pf:=1e5;eps:=0.01;(L_cu_eps*(pf*eta_cu^2+eps)*(pf*eta_imc1^2+eps)+L_eps_eta*(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps)+L_eta_sn*(pf*eta_imc2^2+eps)*(pf*eta_sn^2+eps))/((pf*eta_cu^2+eps)*(pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps)*(pf*eta_sn^2+eps)+(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps))'
+        #function ='L_imc_sn'
 
-    # Added epsilon to prevent division by 0 (Larry Aagesen)
-    function ='pf:=1e5;eps:=0.01;(L_cu_imc*(pf*eta_cu^2+eps)*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))+L_imc_sn*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))*(pf*eta_sn^2+eps)+L_cu_sn*(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps)+L_imc_imc*(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps))/((pf*eta_cu^2+eps)*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))+((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))*(pf*eta_sn^2+eps)+(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps)+(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps))'
-    #function ='L_imc_sn'
+        # Conditional function (Daniel Schwen)
+        #function ='numer:=L_cu_imc*eta_cu^2*eta_imc^2+L_imc_sn*eta_imc^2*eta_sn^2+L_cu_sn*eta_cu^2*eta_sn^2;denom:=eta_cu^2*eta_imc^2+eta_imc^2*eta_sn^2+eta_cu^2*eta_sn^2;if(denom!=0,numer/denom,0.5*(L_cu_imc+L_imc_sn))'
 
-    # Conditional function (Daniel Schwen)
-    #function ='numer:=L_cu_imc*eta_cu^2*(eta_imc1^2+eta_imc2^2)+L_imc_sn*(eta_imc1^2+eta_imc2^2)*eta_sn^2+L_cu_sn*eta_cu^2*eta_sn^2;denom:=eta_cu^2*(eta_imc1^2+eta_imc2^2)+(eta_imc1^2+eta_imc2^2)*eta_sn^2+eta_cu^2*eta_sn^2;if(denom!=0,numer/denom,0.5*(L_cu_imc+L_imc_sn))'
-
-    derivative_order = 2
-    outputs = exodus_out
-  [../]
+        derivative_order = 2
+        outputs = exodus_out
+    [../]
 []
 
 [Kernels]
@@ -484,7 +436,7 @@
       hj_names  = 'h_cu h_imc1 h_imc2 h_sn'
       gi_name   = g_cu
       eta_i     = eta_cu
-      wi        = 10.
+      wi        = 10
       mob_name = L
       args      = 'c_cu c_imc1 c_imc2 c_sn eta_imc1 eta_imc2 eta_sn'
     [../]
@@ -527,7 +479,7 @@
       hj_names  = 'h_cu h_imc1 h_imc2 h_sn'
       gi_name   = g_imc1
       eta_i     = eta_imc1
-      wi        = 10.
+      wi        = 10
       mob_name = L
       args      = 'c_cu c_imc1 c_imc2 c_sn eta_cu eta_imc2 eta_sn'
     [../]
@@ -569,7 +521,7 @@
       hj_names  = 'h_cu h_imc1 h_imc2 h_sn'
       gi_name   = g_imc2
       eta_i     = eta_imc2
-      wi        = 10.
+      wi        = 10
       mob_name = L
       args      = 'c_cu c_imc1 c_imc2 c_sn eta_cu eta_imc1 eta_sn'
     [../]
@@ -611,7 +563,7 @@
       hj_names  = 'h_cu h_imc1 h_imc2 h_sn'
       gi_name   = g_sn
       eta_i     = eta_sn
-      wi        = 10.
+      wi        = 10
       mob_name = L
       args      = 'c_cu c_imc1 c_imc2 c_sn eta_imc1 eta_imc2 eta_cu'
     [../]
@@ -669,7 +621,7 @@
         additional_free_energy = f_int
         interfacial_vars = 'eta_cu eta_imc1 eta_imc2 eta_sn'
         kappa_names = 'kappa kappa kappa kappa'
-        w = 10.
+        w = 10
         execute_on = 'initial timestep_end'
     [../]
     [./f_int]
@@ -677,7 +629,7 @@
         variable = f_int
         args = 'eta_cu eta_imc1 eta_imc2 eta_sn'
         constant_names = 'sigma delta gamma length_scale energy_scale'
-        constant_expressions = '0.5 0.4e-6 1.5 1e9 6.24150943e18'
+        constant_expressions = '0.5 0.667e-6 1.5 1e9 6.24150943e18'
         function ='mu:=(6*sigma/delta)*(energy_scale/length_scale^3); mu*(0.25*eta_cu^4-0.5*eta_cu^2+0.25*eta_imc1^4-0.5*eta_imc1^2+0.25*eta_imc2^4-0.5*eta_imc2^2+0.25*eta_sn^4-0.5*eta_sn^2+gamma*(eta_cu^2*(eta_imc1^2+eta_imc2^2+eta_sn^2)+eta_imc1^2*(eta_imc2^2+eta_sn^2))+0.25)'
         execute_on = 'initial timestep_end'
     [../]
@@ -744,12 +696,12 @@
   nl_abs_tol = 1.0e-7#1.0e-11
 
   #num_steps = 2000
-  end_time = 2.16e6
+  end_time = 172800 #48 hours
   #very simple adaptive time stepper
   [./TimeStepper]
       # Turn on time stepping
       type = IterationAdaptiveDT
-      dt = 1
+      dt = 1e-4
       cutback_factor = 0.2
       growth_factor = 2.
       optimal_iterations = 5
@@ -770,7 +722,7 @@
 []
 
 [Outputs]
-  file_base = RT_slow-50nm-wi10-350nm
+  file_base = line220C
   [./exodus_out]
     type = Exodus
     interval = 1

@@ -13,13 +13,15 @@ syms c
 % xhat_sn=0.978;
 
 % %Min J/mol rumstemp
-% ABC_cu=[1.0133e5 -2.1146e4 -1.2842e4]/16.29e-6;
-% ABC_eta=[4e5 -6.9892e3 -1.9185e4]/16.29e-6;
-% ABC_sn=[4.2059e6 7.1680e3 -1.5265e4]/16.29e-6;
-% 
-% xhat_cu=0.10569;
-% xhat_eta=0.41753;
-% xhat_sn=0.99941;
+ABC_cu=[1.0133e5 -2.1146e4 -1.2842e4+1.9185e4]/16.29e-6;
+ABC_eps=[0 0 0];
+ABC_eta=[4e5 -6.9892e3 -1.9185e4+1.9185e4]/16.29e-6;
+ABC_sn=[4.2059e6 7.1680e3 -1.5265e4+1.9185e4]/16.29e-6;
+
+xhat_cu=0.10569;
+xhat_eps = 0;
+xhat_eta=0.41753;
+xhat_sn=0.99941;
 
 % 140 Li2009
 % ABC_cu=[4.0359e5 -4.1474e4 -1.468e4];
@@ -31,15 +33,15 @@ syms c
 % xhat_sn=0.9953;
 
 %Min J/m^3 220
-ABC_cu=[1.9926e10 -2.69e9 -1.1364e9];
-ABC_eps=[1.2277e11 2.2825e10 3.8822e8];
-ABC_eta=[2.4555e10 2.2279e7 -1.7646e9];
-ABC_sn=[2.3172e10 2.1576e8 -1.646e9];
-
-xhat_cu=0.0171;
-xhat_eps=0.3281;
-xhat_eta=0.4359;
-xhat_sn=0.989;
+% ABC_cu=[1.9926e10 -2.69e9 -1.1364e9];
+% ABC_eps=[1.2277e11 2.2825e10 3.8822e8];
+% ABC_eta=[2.4555e10 2.2279e7 -1.7646e9];
+% ABC_sn=[2.3172e10 2.1576e8 -1.646e9];
+% 
+% xhat_cu=0.0171;
+% xhat_eps=0.3281;
+% xhat_eta=0.4359;
+% xhat_sn=0.989;
 
 G_cu=0.5*ABC_cu(1)*(c-xhat_cu).^2+ABC_cu(2)*(c-xhat_cu)+ABC_cu(3);
 G_eps=0.5*ABC_eps(1)*(c-xhat_eps).^2+ABC_eps(2)*(c-xhat_eps)+ABC_eps(3);
