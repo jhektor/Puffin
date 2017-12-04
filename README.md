@@ -1,3 +1,3 @@
 # Puffin
-Phase Field coupled with crystal plasticity. Based on the Moose framework
+Phase Field coupled with crystal plasticity (not yet included). Based on the Moose framework
 
