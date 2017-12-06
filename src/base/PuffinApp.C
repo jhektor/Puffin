@@ -8,6 +8,13 @@
 //POSTPROCESSORS
 #include "IMCFraction.h"
 
+//InitialConditions
+#include "VarDepIC.h"
+#include "UnitySubVarIC.h"
+
+//Actions
+#include "KKSMultiACKernelAction.h"
+
 template<>
 InputParameters validParams<PuffinApp>()
 {
@@ -46,11 +53,16 @@ PuffinApp::registerObjects(Factory & factory)
 {
   // Register new stuff here
   registerPostprocessor(IMCFraction);
+  registerInitialCondition(VarDepIC);
+  registerInitialCondition(UnitySubVarIC);
 }
 
 // External entry point for dynamic syntax association
 extern "C" void PuffinApp__associateSyntax(Syntax & syntax, ActionFactory & action_factory) { PuffinApp::associateSyntax(syntax, action_factory); }
 void
-PuffinApp::associateSyntax(Syntax & /*syntax*/, ActionFactory & /*action_factory*/)
+PuffinApp::associateSyntax(Syntax & syntax, ActionFactory & action_factory)
 {
+  // Register Action stuff here
+  registerAction(KKSMultiACKernelAction, "add_kernel");
+  registerSyntax("KKSMultiACKernelAction","Kernels/KKSMultiACKernel");
 }
