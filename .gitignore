@@ -5,3 +5,7 @@ tmp_jit*
 #ignore result files
 *.e
 *.csv
+
+#ignore compiled files
+*.o
+*puffin-*
