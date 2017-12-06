@@ -20,7 +20,7 @@
 \usepackage{cancel}
 \usepackage{booktabs}
 \usepackage{tablefootnote}
-
+\usepackage{todonotes}
 
 \newcommand{\degs}{\,^{\circ}}
 \providecommand{\abs}[1]{\lvert#1\rvert}
@@ -62,21 +62,21 @@ The phase fields, phase compositions and the global concentration are all dimens
 \subsection{Free energy}
 The free energy is given by
 \begin{equation}
-  F = f_{ch}(\vbf{\eta},\vbf{x})+f_{int}(\vbf{\eta})+f_d(\vbf{\eta},\dots) ,
+  F = f^{ch}(\vbf{\eta},\vbf{x})+f^{int}(\vbf{\eta})+f^d(\vbf{\eta},\dots) ,
   \label{eq:F}
 \end{equation}
-with $f_{ch}$ and $f_{int}$ representing the chemical and interface energies respectively. 
-$f_d$ represents the contribution from any other physics included in the model e.g. deformation, temperature, electric field etc.
+with $f^{ch}$ and $f^{int}$ representing the chemical and interface energies respectively. 
+$f^d$ represents the contribution from any other physics included in the model e.g. deformation, temperature, electric field etc.
 
 Here we take
 \begin{equation}
-  f_{ch}=\sum_ih_i(\vbf{\eta})f_i(x_i,\vbf{\eta}),
+  f^{ch}=\sum_ih_i(\vbf{\eta})f_i(x_i,\vbf{\eta}),
   \label{eq:fch}
 \end{equation}
 with $f_i(x_i,\vbf{\eta})=\frac{G_i(x_i)}{V^m}$ where $G_i$ is a representation of the Gibbs energy of phase $i$ and $V^m$ denotes the molar volume which is assumed to be constant.
 The interface energy is taken as
 \begin{equation}
-  f_{int}=m\left(\sum_i\left(\frac{\eta_i^4}{4}-\frac{\eta_i^2}{2}\right)+\sum_i\sum_{j\ne i}\frac{\beta}{2}\eta_i^2\eta_j^2+\frac{1}{4}\right)+\frac{\alpha}{2}\sum_i\left(\gradient\eta_i\right)^2,
+  f^{int}=m\left(\sum_i\left(\frac{\eta_i^4}{4}-\frac{\eta_i^2}{2}\right)+\sum_i\sum_{j\ne i}\frac{\beta}{2}\eta_i^2\eta_j^2+\frac{1}{4}\right)+\frac{\alpha}{2}\sum_i\left(\gradient\eta_i\right)^2,
   \label{eq:fint}
 \end{equation}
 with $m$, $\alpha$ and $\beta$ being parameters.
@@ -85,7 +85,7 @@ with $m$, $\alpha$ and $\beta$ being parameters.
 \subsubsection{KKS conditions}
 KKS models require the chemical potential to be equal in all coexisting phases, i.e.
 \begin{equation}
-  \partdiff{F}{c}=\partdiff{f_1}{x_1}=\dots=\partdiff{f_n}{x_n}=\mu_1\dots=\mu_n.
+  \partdiff{F}{c}=\partdiff{f_1}{x_1}+\partdiff{f^d_1}{x_1}=\dots=\partdiff{f_n}{x_n}+\partdiff{f^d_n}{x_n}=\mu_1\dots=\mu_n.
   \label{eq:KKS}
 \end{equation}
 Furthermore, mass conservation is fulfilled by
@@ -105,7 +105,7 @@ This term will make the Cahn-Hilliard a fourth order PDE.}
 
 Using \cref{eq:F}, \cref{eq:fch} and \cref{eq:fint} the derivative become
 \begin{equation}
-  \partdiff{F}{c}=\partdiff{f_{ch}}{c}=\sum_i h_i\partdiff{f_i}{x_i}\partdiff{x_i}{c}+\cancelto{0}{\partdiff{h_i}{c}f_i}.
+  \partdiff{F}{c}=\partdiff{f^{ch}}{c}+\partdiff{f^d}{c}=\sum_i h_i\partdiff{f_i}{x_i}\partdiff{x_i}{c}+\cancelto{0}{\partdiff{h_i}{c}f_i}+\partdiff{f^d}{c}.
   \label{eq:dFdc1}
 \end{equation}
 By taking the derivative of the mass conservation \cref{eq:mass} we get
@@ -115,8 +115,8 @@ By taking the derivative of the mass conservation \cref{eq:mass} we get
 Inserting into \cref{eq:dFdc1} and taking into account \cref{eq:KKS} we end up with
 \begin{equation}
   \partdiff{F}{c}=\mu,
-\end{equation}
-where we can arbitrarily choose $\mu=\mu_i$ based on the KKS condition.
+\end{equation} 
+where we can arbitrarily choose $\mu=\mu_i$ based on the KKS condition.\todo{Check how $f^d$ affects this. $\partdiff{f_i}{x_i}\neq\mu_i$}
 With this \cref{eq:CH1} can be written as
 \begin{equation}
   \partdiff{c}{t}=\gradient\cdot M(\vbf{\eta},c)\gradient\mu_i
@@ -136,26 +136,26 @@ The units of \cref{eq:CH} are
 The evolution of each order parameter field follow the Allen-Cahn equation
 \begin{equation}
 \begin{aligned}
-  \partdiff{\eta_i}{t}&=-L(\vbf{\eta})\vardiff{F}{\eta_i}=-L\left(\partdiff{F}{\eta_i}-\gradient\cdot\partdiff{F}{\gradient\eta_i}\right)\\
-  &=-L\left(\partdiff{f_{ch}}{\eta_i}+\partdiff{f_{int}}{\eta_i}+\partdiff{f_d}{\eta_i}-\gradient\partdiff{f_{int}}{\gradient\eta_i}\right).
+  \partdiff{\eta_i}{t}&=-L(\vbf{\eta})\vardiff{F}{\eta_i}+\xi(\vbf{x},t)=-L\left(\partdiff{F}{\eta_i}-\gradient\cdot\partdiff{F}{\gradient\eta_i}\right)\\
+  &=-L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}-\gradient\cdot\partdiff{f^{int}}{\gradient\eta_i}-\gradient\cdot\partdiff{f^d}{\gradient\eta_i}\right).
 \end{aligned}
 \label{eq:AC1}
 \end{equation}
 The derivatives of the interface energy are easy to calculate from \cref{eq:fint}
 \begin{equation}
-  \partdiff{f_{int}}{\eta_i}-\gradient\partdiff{f_{int}}{\gradient\eta_i}=m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i.
+  \partdiff{f^{int}}{\eta_i}-\gradient\partdiff{f^{int}}{\gradient\eta_i}=m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i.
 \end{equation}
 
 The derivative of the chemical energy is
 \begin{equation}
-  \partdiff{f_{ch}}{\eta_i}=\sum_j\left(\partdiff{h_j}{\eta_i}f_j+h_j\partdiff{f_j}{\eta_i}\right),
+  \partdiff{f^{ch}}{\eta_i}=\sum_j\left(\partdiff{h_j}{\eta_i}f_j+h_j\partdiff{f_j}{\eta_i}\right),
   \label{eq:dfchdeta}
 \end{equation}
 where
 \begin{equation}
   h_j\partdiff{f_j}{\eta_i}=h_j\underbrace{\partdiff{f_j}{G_j}\partdiff{G_j}{x_j}}_{\mu_j}\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i} =\mu_jh_j\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i}.
 \label{eq:dfjdetai}
-\end{equation}
+\end{equation}\todo{\cref{eq:dfjdetai} will change with $f^d$}
 Using that $\partdiff{c}{\eta_i}=0$, equation \cref{eq:mass} then gives
 \begin{equation}
 \begin{aligned}
@@ -165,13 +165,13 @@ Using that $\partdiff{c}{\eta_i}=0$, equation \cref{eq:mass} then gives
 \end{equation} 
 By making use of the KKS condition \cref{eq:dfchdeta} can then be written
 \begin{equation}
-  \partdiff{f_{ch}}{\eta_i}=\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j\right)
-\end{equation}
+  \partdiff{f^{ch}}{\eta_i}=\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j\right)
+\end{equation}\todo{will change with $f^d$}
 
 Equation \cref{eq:AC1} now becomes
 \begin{multline}
   \partdiff{\eta_i}{t}=-L\left(\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j\right)\right. \\
-  \left.+m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i\right).
+  \left.+m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i+\partdiff{f^d}{\eta_i}-\gradient\cdot\partdiff{f^d}{\gradient\eta_i}\right).
   \label{eq:AC}
 \end{multline}
 The mobility $L$ is taken as
@@ -207,18 +207,18 @@ Another way is maybe to formulate the energies in \si{\joule\per\mol} but then I
 The weak form of the residual equation for $\eta_i$ is constructed from \cref{eq:AC1} by multiplication with a test function $\psi$ and integrating over the domain:
 \begin{equation}
 \begin{aligned}
-  \vbf{R}_{\eta_i}&=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f_{ch}}{\eta_i}+\partdiff{f_{int}}{\eta_i}+\partdiff{f_d}{\eta_i}\right)}{\psi}-\vint{L\gradient\cdot\alpha\gradient\eta_i}{\psi} \\
-  &=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f_{ch}}{\eta_i}+\partdiff{f_{int}}{\eta_i}+\partdiff{f_d}{\eta_i}\right)}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi}\\
+  \vbf{R}_{\eta_i}&=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}-\vint{L\gradient\cdot\alpha\gradient\eta_i}{\psi} \\
+  &=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi}\\
   &-\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi},
 \end{aligned}
-\end{equation}
+\end{equation}\todo{term with $\partdiff{f^d}{\gradient\eta_i}$ is missing}
 with the divergence theorem used on the last term.
 Inserting the derivatives calculated above gives
 \begin{equation}
 \begin{aligned}
   \vbf{R}_{\eta_i}=&\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\sum_j\partdiff{h_j}{\eta_i}f_j}{\psi}-\vint{L\partdiff{h_j}{\eta_i}\mu_jx_j}{\psi}\\
   &+\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi} \\
-  &+\vint{L\partdiff{f_d}{\eta_i}}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi} -\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}
+  &+\vint{L\partdiff{f^d}{\eta_i}}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi} -\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}
  \end{aligned}
 \end{equation}
 
@@ -243,7 +243,7 @@ All necessary blocks are described below.
 \subsection{Mesh}
 The mesh block can be used to create meshes of simple geometries.
 It can also be used to read the mesh from a file.
-A rectangular 2D mesh is created by like this:
+A rectangular 2D mesh is created like this:
 \begin{verbatim}
 [Mesh]
   type = GeneratedMesh
@@ -297,9 +297,9 @@ For the Cahn-Hilliard equation and the KKS conditions the kernels in \cref{tab:C
   Residual term & Parameters &  Kernel name \\
   \midrule
   $\vint{\partdiff{\eta_i}{t}}{\psi}$ & & \texttt{TimeDerivative} \\
-  $\vint{L\sum_j\partdiff{h_j}{\eta_i}f_j+w\partdiff{g}{\eta_i}}{\psi}$ & $L$, $w=0$ & \texttt{KKSMultiACBulkF}\tablefootnote{This kernel includes a double well that we don't use. Therefore $w=0$. } \\
+  $\vint{L\sum_j\partdiff{h_j}{\eta_i}f_j+w\partdiff{g}{\eta_i}}{\psi}$ & $L$, $w=0$ & \texttt{KKSMultiACBulkF}\tablefootnote{This kernel includes a double well that can be use to constrain the order parameters to $[0,1]$, turn off the double well by setting $w=0$.} \\
   $-\vint{L\partdiff{h_j}{\eta_i}\mu_jx_j}{\psi}$ & $L$ & \texttt{KKSMultiACBulkC} \\
-  $\vint{L\partdiff{f_d}{\eta_i}}{\psi}$ & & \\
+  $\vint{L\partdiff{f^d}{\eta_i}}{\psi}$ & & \\
   $\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi}$ & $m$, $\beta$ &  \texttt{ACGrGrMulti} \\
   $\vint{\alpha\gradient\eta_i}{\gradient L\psi}$ & $L$, $\alpha$ & \texttt{ACInterface}\\
   \bottomrule
