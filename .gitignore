@@ -8,4 +8,6 @@ tmp_jit*
 
 #ignore compiled files
 *.o
+*.so*
 *puffin-*
+yaml*
