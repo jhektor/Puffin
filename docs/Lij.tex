@@ -1,0 +1,73 @@
+\documentclass[10pt,a4paper,notitlepage]{article}
+\usepackage{fontspec}
+\defaultfontfeatures{Mapping=tex-text}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+%\setmainfont{???}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{cleveref}
+\usepackage{subfigure}
+\usepackage{a4wide}
+\usepackage{siunitx}
+\usepackage[textsize=scriptsize,colorinlistoftodos,backgroundcolor=blue!20,textwidth=3.7cm]{todonotes}
+\usepackage{booktabs}
+\usepackage{rotating} 
+\usepackage{adjustbox}
+\usepackage{mhchem}
+
+\newcommand{\degs}{\,^{\circ}}
+\providecommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\vardiff}[2]{\frac{\delta#1}{\delta#2}}
+\newcommand{\partdiff}[2]{\frac{\partial#1}{\partial#2}}
+\providecommand{\diff}[2]{\frac{\mathrm{d}#1}{\mathrm{d}#2}}
+\providecommand{\secdiff}[2]{\frac{\mathrm{d}^2#1}{\mathrm{d}#2^2}}
+\providecommand{\vbf}[1]{\boldsymbol{#1}}
+\providecommand{\gradient}[0]{\vbf{\nabla}}
+\newcommand{\unit}[1]{\ensuremath{\, \mathrm{#1}}}
+\newcommand{\code}[1]{\texttt{#1}}
+%\DeclareMathOperator{\Tr}{Tr}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\providecommand{\inte}[4]{\int_{#1}^{#2}{#3}\,\mathrm{d}{#4}}
+\providecommand{\nablat}{\widetilde{\gradient}}
+\providecommand{\tr}[1]{\mathrm{tr}\left(#1\right)}
+
+\begin{document}
+
+Equation (25) in Moelans paper \cite{moelans2011quantitative} defined the mobility as
+\begin{equation}
+  L_{\alpha,\beta} = \frac{\sqrt{2}mg(\gamma)}{\kappa I_\phi(\gamma)\zeta_{\alpha,\beta}},
+\end{equation}
+using $\gamma=1.5$ leads to $g(\gamma)=\sqrt{2}/3$ and $I_\phi(\gamma)=1/2$.
+Inserting this gives
+\begin{equation}
+  L_{\alpha,\beta} = \frac{4m}{3\kappa\zeta_{\alpha,\beta}},
+\end{equation}
+where $m$ and $\kappa$ are constants that depends on the surface energy and the width of the interface region which I assume are the same for all interfaces.
+The $\zeta_{\alpha,\beta}$ is taken as
+\begin{equation}
+  \zeta_{\alpha,\beta} = \frac{(x_\alpha^{eq}-x_\beta^{eq})^2}{0.5(M_\alpha+M_\beta)},
+\end{equation}
+with $x_\alpha^{eq}$ and $x_\beta^{eq}$ being the equilibrium composition of Sn in the $\alpha$ and $\beta$ phases and
+\begin{equation}
+  M_\alpha = \frac{D_\alpha}{\secdiff{f_\alpha}{x_\alpha}}, \quad   M_\beta = \frac{D_\beta}{\secdiff{f_\beta}{x_\beta}}
+\end{equation}
+are the diffusion mobilities.
+
+Using the parabolic approximation of the free energy $f_\rho=\frac{A_\rho}{2}(x_\rho-x_{\rho,0})^2+C_\rho$ the diffusion mobility becomes
+\begin{equation}
+  M_\rho = \frac{D_\rho}{A_\rho}.
+\end{equation}
+
+For the numerical examples in the paper the diffusion coefficients are taken as $D_{\ce{Cu}}=\num{1e-25}$, $D_{\ce{Cu6Sn5}}=\num{1e-16}$ and $D_{\ce{Sn}}=\SI{1e-14}{\square\meter\per\second}$.
+The energy coefficients are $A_{\ce{Cu}} =\num{1e8}$, $A_{\ce{Cu6Sn5}}=\num{1e9}$, and $A_{\ce{Sn}}=\SI{1e9}{\joule\per\cubic\meter}$
+The huge difference in diffusion coefficients is what creates the difference in mobilities.
+For the interface between \ce{Cu} and \ce{Cu6Sn5} I get $\zeta_{\ce{Cu},\ce{Cu6Sn5}}=\num{3.23e24}$ and for the interface between \ce{Cu6Sn5} and \ce{Sn} I get $\zeta_{\ce{Cu6Sn5},\ce{Sn}}=\num{5.42e22}$.
+This leads to the mobility of the interface between \ce{Cu6Sn5} and \ce{Sn} being about 500 times higher than the mobility between \ce{Cu} and \ce{Cu6Sn5}.
+
+In the simulation I use \si{\electronvolt} and \si{\nano\meter} instead of \si{\joule} and \si{\meter} so the numbers are a bit nicer but their ratio is the same.
+\bibliographystyle{plain}
+\bibliography{ref}
+\end{document}

@@ -24,8 +24,8 @@ Dcu_cu=D0_cu_cu*exp(-Q_cu_cu/(R*T));
 Dcu_sn=D0_cu_sn*exp(-Q_cu_sn/(R*T));
 Dsn_sn=D0_sn_sn*exp(-Q_sn_sn/(R*T));
 
-Dcu=((1-c_sn)*Dcu_cu+c_cu*Dsn_cu)/((1-c_cu)+c_sn) %????????????
-
+% Dcu=((1-c_sn)*Dcu_cu+c_cu*Dsn_cu)/((1-c_cu)+c_sn) %????????????
+% 
 %Cu3Sn
 D0_eps = 5.48e-9;
 Q_eps = 61.9e3;
@@ -34,5 +34,7 @@ Q_eps = 61.9e3;
 D0_eta = 1.84e-9;
 Q_eta = 53.9e3;
 
+Dcu = D0_sn_cu*exp(-Q_sn_cu/(R*T))
 Deps=D0_eps*exp(-Q_eps/(R*T))
 Deta=D0_eta*exp(-Q_eta/(R*T))
+Dsn=D0_sn_sn*exp(-Q_sn_sn/(R*T))

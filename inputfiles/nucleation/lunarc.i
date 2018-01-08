@@ -1,16 +1,13 @@
 [Mesh]
     type = GeneratedMesh
-    dim = 3
-    nx = 1000
-    ny = 1
-    nz = 1
+    dim = 2
+    nx = 2000
+    ny = 2
     xmin = 0
     xmax = 50000 #[nm]
     ymin = 0
     ymax = 50
-    zmin = 0
-    zmax = 50
-    elem_type = HEX8
+    elem_type = QUAD4
 []
 
 #[Adaptivity]
@@ -56,7 +53,7 @@
     [../]
     [./Periodic]
       [./y]
-        auto_direction = 'y z'
+        auto_direction = y
         variable = 'c w c0 c1 c2 c3 eta0 eta1 eta2 eta3'
       [../]
     [../]
@@ -428,7 +425,7 @@
     [./noise_constants]
       type = GenericConstantMaterial
       prop_names = 'T kb lambda dim' #temperature Boltzmann gridsize dimensionality
-      prop_values = '493 8.6173303e-5 50 3'
+      prop_values = '493 8.6173303e-5 25 2'
     [../]
     [./nuc_eps]
       type =  DerivativeParsedMaterial
@@ -543,7 +540,7 @@
 
     #Nucleation Kernel
     [./nucleation_eps]
-      type = LangevinNoise # TODO: This draws random number from a uniform distribution, it should be from a standard gaussian instead(?)
+      type = LangevinNoise
       variable = eta1
       amplitude = 1
       seed = 123456789
@@ -632,10 +629,10 @@
       execute_on = 'Initial TIMESTEP_END'
     [../]
     #Monitoring the progress
-    [./time]
-      type = RunTime
-      time_type = active
-    [../]
+#    [./time]
+#      type = RunTime
+#      time_type = active
+#    [../]
     [./step_size]
       type = TimestepSize
     [../]
@@ -643,7 +640,6 @@
 [Debug]
   show_var_residual_norms = true
   show_material_props = false
-
 []
 [Executioner]
   type = Transient
@@ -688,7 +684,7 @@
 []
 
 [Outputs]
-  file_base = 3d-50nm-50h-bothnuc-D16
+  file_base = line-50h-bothnuc-D16-fine-lunarc
   print_linear_residuals = false
   [./exodus_out]
     type = Exodus

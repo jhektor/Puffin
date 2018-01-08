@@ -14,7 +14,7 @@ validParams<KKSMultiACKernelAction>()
       "op_num", "specifies the total number of order parameters");
   params.addRequiredParam<std::string>("op_name_base", "specifies the base name of the order parameters");
   params.addRequiredParam<std::string>("ci_name_base", "specifies the base name of the phase concentrations");
-  params.addParam<std::string>("fch_name_base","fch","specifies the base name of the chemical energy");
+  params.addParam<std::string>("f_name_base","fch","specifies the base name of the free energy");
   params.addParam<std::string>("h_name_base","h","specifies the base name of the switching functions");
   params.addParam<std::string>("g_name_base","g","specifies the base name of the barrier functions");
   params.addParam<Real>("wi", 0, "Height of double well");
@@ -33,7 +33,7 @@ KKSMultiACKernelAction::KKSMultiACKernelAction(const InputParameters & params)
     _op_num(getParam<unsigned int>("op_num")),
     _op_name_base(getParam<std::string>("op_name_base")),
     _ci_name_base(getParam<std::string>("ci_name_base")),
-    _fch_name_base(getParam<std::string>("fch_name_base")),
+    _f_name_base(getParam<std::string>("f_name_base")),
     _h_name_base(getParam<std::string>("h_name_base")),
     _g_name_base(getParam<std::string>("g_name_base")),
     _implicit(getParam<bool>("implicit"))
@@ -80,7 +80,7 @@ KKSMultiACKernelAction::act()
       // here we can use j to index because we want to load all
       ci[j] = _ci_name_base + Moose::stringify(j);
       h[j] = _h_name_base + Moose::stringify(j);
-      f[j] = _fch_name_base + Moose::stringify(j);
+      f[j] = _f_name_base + Moose::stringify(j);
     }
     //now we are missing ci_op in ci_j in args so we need to add it
     // args[2*_op_num-2] = _ci_name_base + Moose::stringify(op);

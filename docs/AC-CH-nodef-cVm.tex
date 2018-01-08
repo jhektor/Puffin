@@ -136,11 +136,12 @@ The units of \cref{eq:CH} are
 The evolution of each order parameter field follow the Allen-Cahn equation
 \begin{equation}
 \begin{aligned}
-  \partdiff{\eta_i}{t}&=-L(\vbf{\eta})\vardiff{F}{\eta_i}+\xi(\vbf{x},t)=-L\left(\partdiff{F}{\eta_i}-\gradient\cdot\partdiff{F}{\gradient\eta_i}\right)\\
-  &=-L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}-\gradient\cdot\partdiff{f^{int}}{\gradient\eta_i}-\gradient\cdot\partdiff{f^d}{\gradient\eta_i}\right).
+  \partdiff{\eta_i}{t}&=-L(\vbf{\eta})\vardiff{F}{\eta_i}+\xi(\vbf{x},t)=-L\left(\partdiff{F}{\eta_i}-\gradient\cdot\partdiff{F}{\gradient\eta_i}\right)+\xi(\vbf{x},t)\\
+  &=-L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}-\gradient\cdot\partdiff{f^{int}}{\gradient\eta_i}-\gradient\cdot\partdiff{f^d}{\gradient\eta_i}\right)+\xi(\vbf{x},t),
 \end{aligned}
 \label{eq:AC1}
 \end{equation}
+where $\xi(\vbf{x},t)$ is a Langevin force term used to simulate nucleation, see \cref{sec:nuc}.
 The derivatives of the interface energy are easy to calculate from \cref{eq:fint}
 \begin{equation}
   \partdiff{f^{int}}{\eta_i}-\gradient\partdiff{f^{int}}{\gradient\eta_i}=m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i.
@@ -189,6 +190,13 @@ The units of \cref{eq:AC} are
 \begin{equation}
 \si[per-mode=fraction]{\per\second}=\frac{\si[per-mode=fraction]{\joule\per\cubic\meter}}{\si[per-mode=fraction]{\joule\per\meter}}\frac{\si[per-mode=fraction]{\square\meter\per\second}}{\si[per-mode=fraction]{\joule\per\cubic\meter}}\si[per-mode=fraction]{\joule\per\cubic\meter}=\si[per-mode=fraction]{\per\second}.
 \end{equation}
+\subsection{Nucleation}\label{sec:nuc}
+Nucleation of the intermetallic phases is achieved using the so called Langevin force approach where a small pertubation, $\xi$, is added to the Allen-Cahn equations to initiate the evolution of the phase fields.
+Following \cite{shen2007effect} the pertubation is taken as
+\begin{equation}
+  \xi(\vbf{x},t)=\sqrt{\frac{2k_BTL}{\lambda^d\Delta t}}\rho,
+\end{equation}
+where $k_B$ is the Boltzmann constant, $T$ is temperature, $\lambda$ is the grid spacing, $d$ is the dimensionality of the grid (1, 2 or 3 for 1D, 2D or 3D), $\Delta t$ is the timestep, and $\rho$ is a random number drawn from a Gaussian distribution that satisfies $\langle\rho_i\rangle=0$ and $\langle\rho_i\rho_j\rangle=\delta_{ij}$. \todo{Check what the second requirement means and if it is fulfilled by Moose}
 \subsection{Non-constant molar volume}
 I'm not sure it is possible to easily remove the assumption of constant molar volume.
 It is certainly not as easy as I thought before.
@@ -207,18 +215,18 @@ Another way is maybe to formulate the energies in \si{\joule\per\mol} but then I
 The weak form of the residual equation for $\eta_i$ is constructed from \cref{eq:AC1} by multiplication with a test function $\psi$ and integrating over the domain:
 \begin{equation}
 \begin{aligned}
-  \vbf{R}_{\eta_i}&=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}-\vint{L\gradient\cdot\alpha\gradient\eta_i}{\psi} \\
+  \vbf{R}_{\eta_i}&=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}-\vint{L\gradient\cdot\alpha\gradient\eta_i}{\psi}+\vint{\xi}{\psi} \\
   &=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi}\\
-  &-\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi},
+  &+\vint{\xi}{\psi}-\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi},
 \end{aligned}
 \end{equation}\todo{term with $\partdiff{f^d}{\gradient\eta_i}$ is missing}
-with the divergence theorem used on the last term.
+with the divergence theorem used on the gradient term.
 Inserting the derivatives calculated above gives
 \begin{equation}
 \begin{aligned}
   \vbf{R}_{\eta_i}=&\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\sum_j\partdiff{h_j}{\eta_i}f_j}{\psi}-\vint{L\partdiff{h_j}{\eta_i}\mu_jx_j}{\psi}\\
   &+\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi} \\
-  &+\vint{L\partdiff{f^d}{\eta_i}}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi} -\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}
+  &+\vint{L\partdiff{f^d}{\eta_i}}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi} -\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}+\vint{\xi}{\psi}
  \end{aligned}
 \end{equation}
 
@@ -302,6 +310,7 @@ For the Cahn-Hilliard equation and the KKS conditions the kernels in \cref{tab:C
   $\vint{L\partdiff{f^d}{\eta_i}}{\psi}$ & & \\
   $\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi}$ & $m$, $\beta$ &  \texttt{ACGrGrMulti} \\
   $\vint{\alpha\gradient\eta_i}{\gradient L\psi}$ & $L$, $\alpha$ & \texttt{ACInterface}\\
+  $\vint{\xi}{\psi}$ & & \texttt{LangevinNoise} \\
   \bottomrule
 \end{tabular}
 \end{table}

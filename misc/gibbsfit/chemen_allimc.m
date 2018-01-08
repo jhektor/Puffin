@@ -165,11 +165,19 @@ t4=subs(G_Cu,x,x_cueta)-subs(mu_Cu,x,x_cueta)*x_cueta+subs(mu_Cu,x,x_cueta)*x;
 
 
 %Cu3Sn-Cu6Sn5
-init_guess=[0,1;0.3,1];
+init_guess=[0,1;0.,1];
 e1=subs(G_eps,x,x1)-subs(mu_eps,x,x1)*x1==subs(G_eta,x,x2)-subs(mu_eta,x,x2)*x2; %Points on the same line
 e2=subs(mu_eps,x,x1)==subs(mu_eta,x,x2); %with same derivative
 [x_epseta,x_etaeps]=vpasolve([e1,e2],[x1,x2],init_guess);
 t5=subs(G_eps,x,x_epseta)-subs(mu_eps,x,x_epseta)*x_epseta+subs(mu_eps,x,x_epseta)*x;
+
+%Cu3Sn-Sn
+init_guess=[0,1;0.,1];
+e1=subs(G_eps,x,x1)-subs(mu_eps,x,x1)*x1==subs(G_Snbct,x,x2)-subs(mu_Snbct,x,x2)*x2; %Points on the same line
+e2=subs(mu_eps,x,x1)==subs(mu_Snbct,x,x2); %with same derivative
+[x_epssn,x_sneps]=vpasolve([e1,e2],[x1,x2],init_guess);
+t8=subs(G_eps,x,x_epssn)-subs(mu_eps,x,x_epssn)*x_epssn+subs(mu_eps,x,x_epssn)*x;
+
 
 % %Cu6Sn5-Sn liq
 % init_guess=[0.5,1;0.3,1];
@@ -258,12 +266,23 @@ hold off
 
 
 
+f_cu=Gf_Cusnbct/Vmcu;
+f_eps = Gf_eps/Vmeps;
+f_eta = Gf_etasnbct/Vmeta;
+f_sn = Gf_Snbct/Vmsn;
+
+df_cu=diff(f_cu);
+df_eps=diff(f_eps);
+df_eta=diff(f_eta);
+df_sn=diff(f_sn);
+
+
 figure()
 hold on
-p1=ezplot(Gf_Cusnbct/Vmcu,[0,1]);
-p2=ezplot(Gf_eps/Vmeps,[0,1]);
-p3=ezplot(Gf_etasnbct/Vmeta,[0,1]);
-p4=ezplot(Gf_Snbct/Vmsn,[0,1]);
+p1=ezplot(f_cu,[0,1]);
+p2=ezplot(f_eps,[0,1]);
+p3=ezplot(f_eta,[0,1]);
+p4=ezplot(f_sn,[0,1]);
 p5=ezplot(G_Cu/Vmcu,[0,1]);
 p8=ezplot(G_Snbct/Vmsn,[0,1]);
 title('Sn bct')
@@ -279,35 +298,36 @@ hold off
 % B_Cusnliq=eval(B_Cusnliq)
 % C_Cusnliq=eval(C_Cusnliq)
 % disp('--------')
-disp('Cu snbct')
+disp('A')
+disp('--------')
 A_Cusnbct=eval(A_Cusnbct/Vmcu)
-B_Cusnbct=eval(B_Cusnbct/Vmcu)
-C_Cusnbct=eval(C_Cusnbct/Vmcu)
-disp('--------')
-disp('Cu3Sn snbct')
 A_eps=eval(A_eps/Vmeps)
-B_eps=eval(B_eps/Vmeps)
-C_eps=eval(C_eps/Vmeps)
+A_etasnbct=eval(A_etasnbct/Vmeta)
+A_Snbct=eval(A_Snbct/Vmsn)
+
+disp('B')
 disp('--------')
+B_Cusnbct=eval(B_Cusnbct/Vmcu)
+B_eps=eval(B_eps/Vmeps)
+B_etasnbct=eval(B_etasnbct/Vmeta)
+B_Snbct=eval(B_Snbct/Vmsn)
+
 % disp('Cu6Sn5 sn liq')
 % A_etasnliq=eval(A_etasnliq)
 % B_etasnliq=eval(B_etasnliq)
 % C_etasnliq=eval(C_etasnliq)
 % disp('---------')
-disp('Cu6Sn5 sn bct')
-A_etasnbct=eval(A_etasnbct/Vmeta)
-B_etasnbct=eval(B_etasnbct/Vmeta)
+disp('C')
+disp('---------')
+C_Cusnbct=eval(C_Cusnbct/Vmcu)
+C_eps=eval(C_eps/Vmeps)
 C_etasnbct=eval(C_etasnbct/Vmeta)
+C_Snbct=eval(C_Snbct/Vmsn)
 % disp('---------')
 % disp('Sn liq')
 % A_Snliq=eval(A_Snliq)
 % B_Snliq=eval(B_Snliq)
 % C_Snliq=eval(C_Snliq)
-disp('---------')
-disp('Sn bct')
-A_Snbct=eval(A_Snbct/Vmsn)
-B_Snbct=eval(B_Snbct/Vmsn)
-C_Snbct=eval(C_Snbct/Vmsn)
 disp('-----------')
 disp('Interface concentrations')
 % xhat_Cusnliq=eval(xhat_Cusnliq)
@@ -328,3 +348,5 @@ xeta_eps=eval(x_etaeps)
 xeta_sn=eval(x_etasnbct)
 xsn_cu=eval(x_snbctcu)
 xsn_eta=eval(x_snbcteta)
+xeps_sn = eval(x_epssn)
+xsn_eps =eval(x_sneps)

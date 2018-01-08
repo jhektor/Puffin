@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2017.8.23)  14 SEP 2017 14:17
+This is XeTeX, Version 3.14159265-2.6-0.99992 (TeX Live 2015/Debian) (preloaded format=xelatex 2017.8.23)  31 OCT 2017 15:47
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1204,20 +1204,20 @@ File: se-ascii-print.def 2011/12/02 v1.10 stringenc: Printable ASCII characters
 [1
 
 ] [2] [3] [4] [5] [6] [7] [8]
-Overfull \hbox (57.01994pt too wide) in paragraph at lines 384--384
+Overfull \hbox (57.01994pt too wide) in paragraph at lines 385--385
 []  \EU1/lmtt/m/n/12 petsc_options_iname = '-pc_type -sub_pc_type   -sub_pc_fac
 tor_shift_type'[] 
  []
 
 (./AC-CH-nodef.bbl [9])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 390.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 391.
  [10]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 390.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 391.
  (./AC-CH-nodef.aux
 Package cleveref Info: loaded `english' language definitions on input line 20.
 )
-Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 390.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 390.
+Package atveryend Info: Empty hook `AtVeryEndDocument' on input line 391.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 391.
  ) 
 Here is how much of TeX's memory you used:
  28889 strings out of 493638

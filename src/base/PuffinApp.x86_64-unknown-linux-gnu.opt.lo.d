@@ -402,7 +402,11 @@
   /home/johan/projects/moose/framework/include/postprocessors/PostprocessorInterface.h \
   /home/johan/projects/moose/framework/include/utils/RandomInterface.h \
   /home/johan/projects/moose/framework/include/base/ZeroInterface.h \
-  /home/johan/projects/moose/framework/include/base/MooseVariableInterface.h
+  /home/johan/projects/moose/framework/include/base/MooseVariableInterface.h \
+  /home/johan/projects/Puffin/include/ics/VarDepIC.h \
+  /home/johan/projects/moose/framework/include/ics/InitialCondition.h \
+  /home/johan/projects/Puffin/include/ics/UnitySubVarIC.h \
+  /home/johan/projects/Puffin/include/actions/KKSMultiACKernelAction.h
 
 /home/johan/projects/Puffin/include/base/PuffinApp.h:
 
@@ -1209,3 +1213,11 @@
 /home/johan/projects/moose/framework/include/base/ZeroInterface.h:
 
 /home/johan/projects/moose/framework/include/base/MooseVariableInterface.h:
+
+/home/johan/projects/Puffin/include/ics/VarDepIC.h:
+
+/home/johan/projects/moose/framework/include/ics/InitialCondition.h:
+
+/home/johan/projects/Puffin/include/ics/UnitySubVarIC.h:
+
+/home/johan/projects/Puffin/include/actions/KKSMultiACKernelAction.h:

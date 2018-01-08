@@ -1,63 +1,25 @@
 [Mesh]
     type = GeneratedMesh
-    dim = 3
-    nx = 1000
-    ny = 1
-    nz = 1
+    dim = 2
+    nx = 100
+    ny = 100
     xmin = 0
-    xmax = 50000 #[nm]
+    xmax = 1000 #[nm]
     ymin = 0
-    ymax = 50
-    zmin = 0
-    zmax = 50
-    elem_type = HEX8
+    ymax = 1000
+    elem_type = QUAD4
 []
-
-#[Adaptivity]
-#  marker = 'combo'
-#
-#  [./Indicators]
-#    [./error1]
-#      type = GradientJumpIndicator
-#      variable = eta1
-#    [../]
-#    [./error2]
-#      type = GradientJumpIndicator
-#      variable = eta2
-#    [../]
-#  [../]
-#
-#  [./Markers]
-#    [./combo]
-#      type = ComboMarker
-#      markers = 'errorfrac1 errorfrac2'
-#    [../]
-#    [./errorfrac1]
-#      type = ErrorFractionMarker
-#      indicator = error1
-#      refine = 0.75
-#      coarsen = 0.1
-#    [../]
-#    [./errorfrac2]
-#      type = ErrorFractionMarker
-#      indicator = error2
-#      refine = 0.75
-#      coarsen = 0.1
-#    [../]
-#  [../]
-#[]
-
 [BCs]
     [./neumann]
         type = NeumannBC
         boundary = 'left right'
-        variable = 'c w c0 c1 c2 c3 eta0 eta1 eta2 eta3'
+        variable = 'c w c0 c1 c2 eta0 eta1 eta2'
         value = 0
     [../]
     [./Periodic]
       [./y]
-        auto_direction = 'y z'
-        variable = 'c w c0 c1 c2 c3 eta0 eta1 eta2 eta3'
+        auto_direction = y
+        variable = 'c w c0 c1 c2 eta0 eta1 eta2'
       [../]
     [../]
 []
@@ -85,17 +47,8 @@
         #initial_condition = 0.10569
         #scaling = 1e3
     [../]
-
-    # phase concentration  Sn in Cu3Sn
-    [./c1]
-        order = FIRST
-        family = LAGRANGE
-        #initial_condition = 0.2484
-        initial_condition = 0.2433
-        #scaling = 1e3
-    [../]
     # phase concentration  Sn in Cu6Sn5
-    [./c2]
+    [./c1]
         order = FIRST
         family = LAGRANGE
         #initial_condition = 0.435
@@ -104,7 +57,7 @@
     [../]
 
     # phase concentration  Sn in Sn
-    [./c3]
+    [./c2]
         order = FIRST
         family = LAGRANGE
         #initial_condition = 0.95
@@ -118,23 +71,16 @@
         family = LAGRANGE
         #scaling = 1e3
     [../]
-    # order parameter Cu3Sn
+    # order parameter Cu6Sn5
     [./eta1]
         order = FIRST
         family = LAGRANGE
-        initial_condition = 0
-        #scaling = 1e3
-    [../]
-    # order parameter Cu6Sn5
-    [./eta2]
-        order = FIRST
-        family = LAGRANGE
-        initial_condition = 0
+        initial_condition = 0 #this should nucleate
         #scaling = 1e3
     [../]
 
     # order parameter Sn
-    [./eta3]
+    [./eta2]
         order = FIRST
         family = LAGRANGE
         #scaling = 1e3
@@ -145,30 +91,19 @@
     [./eta_cu] #Cu
       type = FunctionIC
       variable = eta0
-      function = 'if(x<=15000,1,0)'
+      function = 'if(y<=400,1,0)'
     [../]
-    #[./eta_imc1] #Cu3Sn
-    #  type = FunctionIC
-    #  variable = eta1
-    #  function = 'if(x>10000&x<=12600,1,0)'
-    #[../]
-    #[./eta_imc2] #Cu6Sn5
-    #  type = FunctionIC
-    #  variable = eta2
-    #  function = 'if(x>10000&x<=19800,1,0)'
-    #[../]
-    [./eta_sn] #Sn
+    [./eta_sn] #Cu6Sn5
       type = FunctionIC
-      variable = eta3
-      #function = 'if(x>19800,1,0)'
-      function = 'if(x>15000,1,0)'
+      variable = eta2
+      function = 'if(y>400,1,0)'
     [../]
 
     [./c] #Concentration of Sn
       type = VarDepIC
       variable = c
-      cis = 'c0 c1 c2 c3'
-      etas = 'eta0 eta1 eta2 eta3'
+      cis = 'c0 c1 c2'
+      etas = 'eta0 eta1 eta2'
     [../]
 []
 
@@ -221,9 +156,7 @@
   [./diffusion_constants]
     type = GenericConstantMaterial
     prop_names = 'D_cu D_eps D_eta D_sn'
-    #prop_values = '1e-20 6e-16 1.5e-14 1e-13' # m^2/s #D12 best slightly slow
-    #prop_values = '1e-20 9.5e-16 3e-14 1e-13' # m^2/s #D15
-    prop_values = '1e-20 1.25e-15 3.1e-14 1e-13' # m^2/s #D16 BEST
+    prop_values = '1e-20 6e-16 1.5e-14 1e-13' # m^2/s #D12 best slightly slow
     outputs = exodus_out
   [../]
   [./D_gb]
@@ -298,56 +231,42 @@
       function = '(energy_scale/length_scale^3)*(0.5*A_cu*(c0-chat_cu)^2+B_cu*(c0-chat_cu)+C_cu)' #eV/nm^3
       derivative_order = 2
   [../]
-  [./fch_imc1] #Chemical energy Cu3Sn phase
+  [./fch_imc] #Chemical energy Cu6Sn5 phase grain 2
       type = DerivativeParsedMaterial
       f_name = fch1
       args = 'c1'
-      material_property_names = 'A_eps B_eps C_eps chat_eps length_scale energy_scale'
-      function = '(energy_scale/length_scale^3)*(0.5*A_eps*(c1-chat_eps)^2+B_eps*(c1-chat_eps)+C_eps)' #eV/nm^3
-      derivative_order = 2
-  [../]
-  [./fch_imc2] #Chemical energy Cu6Sn5 phase grain 2
-      type = DerivativeParsedMaterial
-      f_name = fch2
-      args = 'c2'
       material_property_names = 'A_eta B_eta C_eta chat_eta length_scale energy_scale'
-      function = '(energy_scale/length_scale^3)*(0.5*A_eta*(c2-chat_eta)^2+B_eta*(c2-chat_eta)+C_eta)' #eV/nm^3
+      function = '(energy_scale/length_scale^3)*(0.5*A_eta*(c1-chat_eta)^2+B_eta*(c1-chat_eta)+C_eta)' #eV/nm^3
       derivative_order = 2
   [../]
   [./fch_sn] #Chemical energy Sn phase
       type = DerivativeParsedMaterial
-      f_name = fch3
-      args = 'c3'
+      f_name = fch2
+      args = 'c2'
       material_property_names = 'A_sn B_sn C_sn chat_sn length_scale energy_scale'
-      function = '(energy_scale/length_scale^3)*(0.5*A_sn*(c3-chat_sn)^2+B_sn*(c3-chat_sn)+C_sn)' #eV/nm^3
+      function = '(energy_scale/length_scale^3)*(0.5*A_sn*(c2-chat_sn)^2+B_sn*(c2-chat_sn)+C_sn)' #eV/nm^3
       derivative_order = 2
   [../]
     #SwitchingFunction
     [./h_cu]
         type = SwitchingFunctionMultiPhaseMaterial
         h_name = h0
-        all_etas = 'eta0 eta1 eta2 eta3'
+        all_etas = 'eta0 eta1 eta2'
         phase_etas = eta0
     [../]
 
     [./h_imc1]
         type = SwitchingFunctionMultiPhaseMaterial
         h_name = h1
-        all_etas = 'eta0 eta1 eta2 eta3'
+        all_etas = 'eta0 eta1 eta2'
         phase_etas = eta1
-    [../]
-    [./h_imc2]
-        type = SwitchingFunctionMultiPhaseMaterial
-        h_name = h2
-        all_etas = 'eta0 eta1 eta2 eta3'
-        phase_etas = eta2
     [../]
 
     [./h_sn]
         type = SwitchingFunctionMultiPhaseMaterial
         h_name = h3
-        all_etas = 'eta0 eta1 eta2 eta3'
-        phase_etas = eta3
+        all_etas = 'eta0 eta1 eta2'
+        phase_etas = eta2
     [../]
 
     #Double well, not used MAYBE USE TO KEEP THE ORDER PARAMETERS IN [0:1]
@@ -366,37 +285,27 @@
       well_only = True
       function_name = g1
     [../]
-    [./g_imc2]
+    #Double well, not used
+    [./g_sn]
       type = BarrierFunctionMaterial
       g_order = SIMPLE
       eta=eta2
       well_only = True
       function_name = g2
     [../]
-    #Double well, not used
-    [./g_sn]
-      type = BarrierFunctionMaterial
-      g_order = SIMPLE
-      eta=eta3
-      well_only = True
-      function_name = g3
-    [../]
     [./Mgb]
       type=ParsedMaterial
-      material_property_names = 'D_gb delta delta_real h0(eta0,eta1,eta2,eta3) h1(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2,eta3) h3(eta0,eta1,eta2,eta3) A_cu A_eps A_eta A_sn length_scale energy_scale time_scale'
+      material_property_names = 'D_gb delta delta_real h0(eta0,eta1,eta2) h1(eta0,eta1,eta2) h2(eta0,eta1,eta2) h3(eta0,eta1,eta2) A_cu A_eta A_sn length_scale energy_scale time_scale'
       f_name = Mgb
-      function = '(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h0*A_cu+h1*A_eps+h2*A_eta+h3*A_sn)*delta)'
+      function = '(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h0*A_cu+h1*A_eta+h2*A_sn)*delta)'
       #function = '4e-5'
     [../]
     [./CHMobility]
         type = DerivativeParsedMaterial
         f_name = M
-        args = 'eta0 eta1 eta2 eta3'
-        material_property_names = 'h0(eta0,eta1,eta2,eta3) h1(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2,eta3) h3(eta0,eta1,eta2,eta3) D_cu D_eps D_eta D_sn A_cu A_eps A_eta A_sn Mgb length_scale energy_scale time_scale'
-        #function = 's:=eta_cu^2+eta_imc1^2+eta_imc2^2+eta_sn^2;p:=eta_imc1^2*eta_imc2^2;(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn+p*Mgb/s)' #nm^5/eVs
-        #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc1*D_imc/A_imc+h_imc2*D_imc/A_imc+h_sn*D_sn/A_sn)+if(h_imc1*h_imc2>1./16.,0,Mgb)' #nm^5/eVs
-        function = '(length_scale^5/(energy_scale*time_scale))*(h0*D_cu/A_cu+h1*D_eps/A_eps+h2*D_eta/A_eta+h3*D_sn/A_sn)' #'+h_imc1*h_imc2*Mgb' #nm^5/eVs
-        #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_sn/A_sn+h_imc*D_sn/A_sn+h_sn*D_sn/A_sn)' #nm^5/eVs
+        args = 'eta0 eta1 eta2'
+        material_property_names = 'h0(eta0,eta1,eta2) h1(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2) h3(eta0,eta1,eta2) D_cu D_eta D_sn A_cu A_eta A_sn Mgb length_scale energy_scale time_scale'
+        function = '(length_scale^5/(energy_scale*time_scale))*(h0*D_cu/A_cu+h1*D_eta/A_eta+h2*D_sn/A_sn)' #'+h_imc1*h_imc2*Mgb' #nm^5/eVs
         derivative_order = 2
         outputs = exodus_out
     [../]
@@ -404,75 +313,14 @@
     [./ACMobility]
         type = DerivativeParsedMaterial
         f_name = L
-        args = 'eta0 eta1 eta2 eta3'
-        #material_property_names = 'L_cu_eps L_cu_eta L_cu_sn L_eps_eta L_eps_sn L_eta_sn'
-        material_property_names = 'L_cu_eps L_cu_eta L_cu_sn L_eps_eta L_eps_sn L_eta_sn'
+        args = 'eta0 eta1 eta2'
+        material_property_names = 'L_cu_eta L_cu_sn L_eta_sn'
         # Added epsilon to prevent division by 0 (Larry Aagesen)
-        #function ='pf:=1e5;eps:=0.01;(L_cu_eps*(pf*eta_cu^2+eps)*(pf*eta_imc1^2+eps)+L_cu_eta*(pf*eta_cu^2+eps)*(pf*eta_imc2^2+eps)+L_eps_sn*(pf*eta_imc1^2+eps)*(pf*eta_sn^2+eps)+L_eps_eta*(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps)+L_eta_sn*(pf*eta_imc2^2+eps)*(pf*eta_sn^2+eps)+L_cu_sn*(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps))/((pf*eta_cu^2+eps)*((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))+((pf*eta_imc1^2+eps)+(pf*eta_imc2^2+eps))*(pf*eta_sn^2+eps)+(pf*eta_cu^2+eps)*(pf*eta_sn^2+eps)+(pf*eta_imc1^2+eps)*(pf*eta_imc2^2+eps))'
-        function ='pf:=1e5;eps:=1e-5;(L_cu_eps*(pf*eta0^2+eps)*(pf*eta1^2+eps)+L_cu_eta*(pf*eta0^2+eps)*(pf*eta2^2+eps)+L_cu_sn*(pf*eta0^2+eps)*(pf*eta3^2+eps)+L_eps_eta*(pf*eta1^2+eps)*(pf*eta2^2+eps)+L_eps_sn*(pf*eta1^2+eps)*(pf*eta3^2+eps)+L_eta_sn*(pf*eta2^2+eps)*(pf*eta3^2+eps))/((pf*eta0^2+eps)*(pf*eta1^2+eps)+(pf*eta0^2+eps)*(pf*eta2^2+eps)+(pf*eta0^2+eps)*(pf*eta3^2+eps)+(pf*eta1^2+eps)*(pf*eta2^2+eps)+(pf*eta1^2+eps)*(pf*eta3^2+eps)+(pf*eta2^2+eps)*(pf*eta3^2+eps))'
-        #function ='L_imc_sn'
-
-        # Conditional function (Daniel Schwen)
-        #function ='numer:=L_cu_eps*eta0^2*eta1^2+L_eps_eta*eta1^2*eta2^2+L_eta_sn*eta2^2*eta3^2;denom:=eta0^2*eta1^2+eta1^2*eta2^2+eta2^2*eta3^2;if(denom!=0,numer/denom,0.)'
-        #function ='numer:=L_cu_eps*eta0^2*eta1^2+L_eps_eta*eta1^2*eta2^2+L_eta_sn*eta2^2*eta3^2;denom:=eta0^2*eta1^2+eta1^2*eta2^2+eta2^2*eta3^2;if(denom>0.0001,numer/denom,0.)'
+        function ='pf:=1e5;eps:=1e-5;(L_cu_eta*(pf*eta0^2+eps)*(pf*eta1^2+eps)+L_cu_sn*(pf*eta0^2+eps)*(pf*eta2^2+eps)+L_eta_sn*(pf*eta1^2+eps)*(pf*eta2^2+eps))/((pf*eta0^2+eps)*(pf*eta1^2+eps)+(pf*eta0^2+eps)*(pf*eta2^2+eps)+(pf*eta1^2+eps)*(pf*eta2^2+eps))'
 
         derivative_order = 2
         outputs = exodus_out
     [../]
-
-    [./time]
-      type = TimeStepMaterial
-      prop_time = time
-      prop_dt = dt
-    [../]
-    [./noise_constants]
-      type = GenericConstantMaterial
-      prop_names = 'T kb lambda dim' #temperature Boltzmann gridsize dimensionality
-      prop_values = '493 8.6173303e-5 50 3'
-    [../]
-    [./nuc_eps]
-      type =  DerivativeParsedMaterial
-      f_name = nuc_eps
-      #args = 'eta0 eta1 eta2 eta3'
-      material_property_names = 'time dt T kb lambda dim L h0 h2' #'h0(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2,eta3)'
-      #function = '20*h0*h2'
-      function = 'if(time>28800,sqrt(2*kb*T*L/(lambda^dim*dt))*h0*h2,0)' #expression from Shen (2007) (without h0*h2)
-      #function = '100'
-      outputs = exodus_out
-    [../]
-    [./nuc_eta]
-      type =  DerivativeParsedMaterial
-      f_name = nuc_eta
-      #args = 'eta0 eta1 eta2 eta3'
-      material_property_names = 'dt T kb lambda dim L h0 h3' #'h0(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2,eta3)'
-      #function = '20*h0*h2'
-      function = 'sqrt(2*kb*T*L/(lambda^dim*dt))*h0*h3' #expression from Shen (2007) (without h0*h2)
-      #function = '100'
-      outputs = exodus_out
-    [../]
-
-
-
-    #[./nuc_eps]
-    #  type =  DerivativeParsedMaterial
-    #  f_name = nuc_eps
-    #  #args = 'eta0 eta1 eta2 eta3'
-    #  material_property_names = 'h0 h2 time' #'h0(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2,eta3)'
-    #  function = 'if(time>28800,20*h0*h2,0)'
-    #  #function = '1'
-    #  #function = '100'
-    #  outputs = exodus_out
-    #[../]
-    #[./nuc_eta]
-    #  type =  DerivativeParsedMaterial
-    #  f_name = nuc_eta
-    #  #args = 'eta0 eta1 eta2 eta3'
-    #  material_property_names = 'h0 h3' #'h0(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2,eta3)'
-    #  function = '20*h0*h3'
-    #  #function = '1'
-    #  #function = '100'
-    #  outputs = exodus_out
-    #[../]
 []
 
 [Kernels]
@@ -481,12 +329,12 @@
     [./CHBulk] # Gives the residual for the concentration, dF/dc-mu
         type = KKSSplitCHCRes
         variable = c
-        ca       = c2
-        cb       = c3
-        fa_name  = fch2 #only fa is used
-        fb_name  = fch3
+        ca       = c1
+        cb       = c2
+        fa_name  = fch1 #only fa is used
+        fb_name  = fch2
         w        = w
-        h_name   = h2
+        h_name   = h1
     [../]
 
     [./dcdt] # Gives dc/dt
@@ -498,7 +346,7 @@
         type = SplitCHWRes
         mob_name = M
         variable = w
-        args = 'eta0 eta1 eta2 eta3'
+        args = 'eta0 eta1 eta2'
     [../]
 
     #KKS conditions
@@ -510,53 +358,36 @@
       fa_name  = fch0
       fb_name  = fch1
     [../]
-    [./chempot_imc_imc]
+    [./chempot_imc_sn]
       type = KKSPhaseChemicalPotential
       variable = c1
       cb       = c2
       fa_name  = fch1
       fb_name  = fch2
     [../]
-    [./chempot_sn_cu]
-      type = KKSPhaseChemicalPotential
-      variable = c2
-      cb       = c3
-      fa_name  = fch2
-      fb_name  = fch3
-    [../]
     [./phaseconcentration] # enforce c = sum h_i*c_i
       type = KKSMultiPhaseConcentration
-      variable = c3
-      cj = 'c0 c1 c2 c3'
-      hj_names = 'h0 h1 h2 h3'
-      etas = 'eta0 eta1 eta2 eta3'
+      variable = c2
+      cj = 'c0 c1 c2'
+      hj_names = 'h0 h1 h2'
+      etas = 'eta0 eta1 eta2'
       c = c
     [../]
 
     #Kernels for Allen-Cahn equations
     [./KKSMultiACKernel]
-      op_num = 4
+      op_num = 3
       op_name_base = 'eta'
       ci_name_base = 'c'
       wi = 10.
     [../]
 
     #Nucleation Kernel
-    [./nucleation_eps]
-      type = LangevinNoise # TODO: This draws random number from a uniform distribution, it should be from a standard gaussian instead(?)
+    [./nucleation]
+      type = LangevinNoise
       variable = eta1
       amplitude = 1
       seed = 123456789
-      multiplier = nuc_eps
-    [../]
-
-    #Nucleation Kernel
-    [./nucleation_eta]
-      type = LangevinNoise
-      variable = eta2
-      amplitude = 1
-      seed = 987654321
-      multiplier = nuc_eta
     [../]
 []
 
@@ -579,30 +410,29 @@
     [./f_density]
         type = KKSMultiFreeEnergy
         variable = f_density
-        hj_names = 'h0 h1 h2 h3'
-        Fj_names = 'fch0 fch1 fch2 fch3'
-        gj_names = 'g0 g1 g2 g3'
+        hj_names = 'h0 h1 h2'
+        Fj_names = 'fch0 fch1 fch2'
+        gj_names = 'g0 g1 g2'
         additional_free_energy = f_int
-        interfacial_vars = 'eta0 eta1 eta2 eta3'
-        kappa_names = 'kappa kappa kappa kappa'
+        interfacial_vars = 'eta0 eta1 eta2'
+        kappa_names = 'kappa kappa kappa'
         w = 10.
         execute_on = 'initial timestep_end'
     [../]
     [./f_int]
         type = ParsedAux
         variable = f_int
-        args = 'eta0 eta1 eta2 eta3'
+        args = 'eta0 eta1 eta2'
         constant_names = 'sigma delta gamma length_scale energy_scale'
-        constant_expressions = '0.5 0.2e-6 1.5 1e9 6.24150943e18'
-        function ='mu:=(6*sigma/delta)*(energy_scale/length_scale^3); mu*(0.25*eta0^4-0.5*eta0^2+0.25*eta1^4-0.5*eta1^2+0.25*eta2^4-0.5*eta2^2+0.25*eta3^4-0.5*eta3^2+gamma*(eta0^2*(eta1^2+eta2^2+eta3^2)+eta1^2*(eta2^2+eta3^2)+eta2^2*eta3^2)+0.25)'
+        constant_expressions = '0.5 0.4e-6 1.5 1e9 6.24150943e18'
+        function ='mu:=(6*sigma/delta)*(energy_scale/length_scale^3); mu*(0.25*eta0^4-0.5*eta0^2+0.25*eta1^4-0.5*eta1^2+0.25*eta2^4-0.5*eta2^2+gamma*(eta0^2*(eta1^2+eta2^2)+eta1^2*eta2^2)+0.25)'
         execute_on = 'initial timestep_end'
     [../]
     [./s]
       type = ParsedAux
       variable = s
-      args = 'eta0 eta1 eta2 eta3'
-      #function = 'eta_cu^2*eta_imc^2+eta_imc^2*eta_sn^2+eta_cu^2*eta_sn^2'
-      function = 'eta0+eta1+eta2+eta3'
+      args = 'eta0 eta1 eta2'
+      function = 'eta0+eta1+eta2'
     [../]
 []
 [Postprocessors]
@@ -621,14 +451,9 @@
       mat_prop = h1
       execute_on = 'Initial TIMESTEP_END'
     [../]
-    [./imc2_area_h]
-      type = ElementIntegralMaterialProperty
-      mat_prop = h2
-      execute_on = 'Initial TIMESTEP_END'
-    [../]
     [./sn_area_h]
       type = ElementIntegralMaterialProperty
-      mat_prop = h3
+      mat_prop = h2
       execute_on = 'Initial TIMESTEP_END'
     [../]
     #Monitoring the progress
@@ -643,7 +468,6 @@
 [Debug]
   show_var_residual_norms = true
   show_material_props = false
-
 []
 [Executioner]
   type = Transient
@@ -651,7 +475,6 @@
   line_search = default
   petsc_options_iname = '-pc_type -sub_pc_type   -sub_pc_factor_shift_type'
   petsc_options_value = 'asm       ilu            nonzero'
-
 
   petsc_options = '-snes_converged_reason -ksp_converged_reason'
   l_max_its = 30
@@ -662,12 +485,12 @@
   nl_abs_tol = 1.0e-7#1.0e-11
 
   #num_steps = 2000
-  end_time = 180000 #50 hours
+  end_time = 2000
   #very simple adaptive time stepper
   [./TimeStepper]
       # Turn on time stepping
       type = IterationAdaptiveDT
-      dt = 1e-2
+      dt = 1e-4
       cutback_factor = 0.2
       growth_factor = 2.
       optimal_iterations = 5
@@ -688,11 +511,10 @@
 []
 
 [Outputs]
-  file_base = 3d-50nm-50h-bothnuc-D16
-  print_linear_residuals = false
+  file_base = nucleationtest
   [./exodus_out]
     type = Exodus
-    interval = 5
+    interval = 1
   [../]
   #exodus = true
   csv = true

@@ -57,6 +57,7 @@ Kernels/*
 Kernels/CHPFCRFFSplitKernel
 Kernels/DynamicTensorMechanics
 Kernels/HHPFCRFFSplitKernel
+Kernels/KKSMultiACKernel
 Kernels/PFCRFFKernel
 Kernels/PolycrystalElasticDrivingForce
 Kernels/PolycrystalKernel
