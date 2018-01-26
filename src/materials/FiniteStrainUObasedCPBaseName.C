@@ -311,6 +311,8 @@ FiniteStrainUObasedCPBaseName::postSolveQp()
   // Calculate material rotation
   _deformation_gradient[_qp].getRUDecompositionRotation(rot);
   _update_rot[_qp] = rot * _crysrot[_qp];
+
+
 }
 
 void

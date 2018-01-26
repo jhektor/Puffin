@@ -44,7 +44,13 @@ ComputeElasticityTensorCPBaseName::assignEulerAngles()
     _Euler_angles_mat_prop[_qp](2) = _read_prop_user_object->getData(_current_elem, 2);
   }
   else
+  {
+    _Euler_angles(0) = getParam<Real>("euler_angle_1");
+    _Euler_angles(1) = getParam<Real>("euler_angle_2");
+    _Euler_angles(2) = getParam<Real>("euler_angle_3");
+
     _Euler_angles_mat_prop[_qp] = _Euler_angles;
+  }
 }
 
 void
@@ -57,5 +63,5 @@ ComputeElasticityTensorCPBaseName::computeQpElasticityTensor()
 
   _crysrot[_qp] = _R.transpose();
   _elasticity_tensor[_qp] = _Cijkl;
-  _elasticity_tensor[_qp].rotate(_crysrot[_qp]);
+  // _elasticity_tensor[_qp].rotate(_crysrot[_qp]); // THIS IS NOT COMMENTED IN COMPUTEELASTICITYTENSORCP BUT I THINK THAT IS INCORRECT
 }
