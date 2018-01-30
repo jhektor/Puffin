@@ -32,6 +32,10 @@ ComputeElasticityTensorCPBaseName::ComputeElasticityTensorCPBaseName(const Input
   // the base class guarantees constant in time, but in this derived class the
   // tensor will rotate over time once plastic deformation sets in
   revokeGuarantee(_elasticity_tensor_name, Guarantee::CONSTANT_IN_TIME);
+
+  // the base class performs a passive rotation, but the crystal plasticity
+  // materials use active rotation: recover unrotated _Cijkl here
+  _Cijkl.rotate(_R.transpose());
 }
 
 void
@@ -45,9 +49,9 @@ ComputeElasticityTensorCPBaseName::assignEulerAngles()
   }
   else
   {
-    _Euler_angles(0) = getParam<Real>("euler_angle_1");
-    _Euler_angles(1) = getParam<Real>("euler_angle_2");
-    _Euler_angles(2) = getParam<Real>("euler_angle_3");
+    // _Euler_angles(0) = getParam<Real>("euler_angle_1");
+    // _Euler_angles(1) = getParam<Real>("euler_angle_2");
+    // _Euler_angles(2) = getParam<Real>("euler_angle_3");
 
     _Euler_angles_mat_prop[_qp] = _Euler_angles;
   }
@@ -63,5 +67,5 @@ ComputeElasticityTensorCPBaseName::computeQpElasticityTensor()
 
   _crysrot[_qp] = _R.transpose();
   _elasticity_tensor[_qp] = _Cijkl;
-  // _elasticity_tensor[_qp].rotate(_crysrot[_qp]); // THIS IS NOT COMMENTED IN COMPUTEELASTICITYTENSORCP BUT I THINK THAT IS INCORRECT
+  _elasticity_tensor[_qp].rotate(_crysrot[_qp]);
 }
