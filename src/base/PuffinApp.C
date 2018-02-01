@@ -15,6 +15,19 @@
 //Actions
 #include "KKSMultiACKernelAction.h"
 
+//Kernels
+#include "LangevinNoisePositive.h"
+
+//Materials
+#include "ComputeElasticityTensorCPBaseName.h"
+#include "FiniteStrainUObasedCPBaseName.h"
+
+//UserObjects
+#include "CrystalPlasticitySlipRateGSSBaseName.h"
+#include "CrystalPlasticitySlipRateBaseName.h"
+// #include "CrystalPlasticitySlipResistanceGSSBaseName.h"
+// #include "CrystalPlasticitySlipResistanceBaseName.h"
+
 template<>
 InputParameters validParams<PuffinApp>()
 {
@@ -55,6 +68,12 @@ PuffinApp::registerObjects(Factory & factory)
   registerPostprocessor(IMCFraction);
   registerInitialCondition(VarDepIC);
   registerInitialCondition(UnitySubVarIC);
+  registerKernel(LangevinNoisePositive);
+  registerMaterial(ComputeElasticityTensorCPBaseName);
+  registerMaterial(FiniteStrainUObasedCPBaseName);
+  registerUserObject(CrystalPlasticitySlipRateGSSBaseName);
+  // registerUserObject(CrystalPlasticitySlipResistanceGSSBaseName);
+
 }
 
 // External entry point for dynamic syntax association
