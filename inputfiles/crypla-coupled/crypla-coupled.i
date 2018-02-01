@@ -1,11 +1,12 @@
+
 [Mesh]
   type = GeneratedMesh
   dim = 3
-  nx = 10
+  nx = 4
   ny = 50
   nz = 1
   xmin = 0
-  xmax = 125 #[nm]
+  xmax = 50 #[nm]
   ymin = -300
   ymax = 325
   zmin = 0
@@ -25,7 +26,7 @@
   [./Periodic]
     [./x]
       auto_direction = 'x z'
-      variable = 'c w c0 c1 c2  eta0 eta1 eta2'
+      variable = 'c w c0 c1 c2 eta0 eta1 eta2'
     [../]
   [../]
   [./disp_y]
@@ -37,13 +38,13 @@
   [./disp_x]
     type = PresetBC
     variable = disp_x
-    boundary = 'left'
+    boundary = 'left right'
     value = 0
   [../]
   [./disp_z]
     type = PresetBC
     variable = disp_z
-    boundary = 'back'
+    boundary = 'back front'
     value = 0
   [../]
 []

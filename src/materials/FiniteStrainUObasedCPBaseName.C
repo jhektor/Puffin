@@ -306,6 +306,7 @@ FiniteStrainUObasedCPBaseName::postSolveQp()
 
   _lag_e[_qp] = _deformation_gradient[_qp].transpose() * _deformation_gradient[_qp] - iden;
   _lag_e[_qp] = _lag_e[_qp] * 0.5;
+  // TODO Calculate _elastic_strain from _fe
 
   RankTwoTensor rot;
   // Calculate material rotation

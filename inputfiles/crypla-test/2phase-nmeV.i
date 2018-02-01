@@ -1,3 +1,8 @@
+# TODO: Elastic energy is not calculated for Sn, it doesn't have _elastic_strain
+# TODO: Elastic energy should be T*E^e not sigma*eps^e for finte strain?
+# TODO: Plastic energy is not included
+# TODO: Check how eigenstrain is applied in finite strains: Eigenstrain are subtracted from strain increment, maybe should use F=F^eF^* as in plasticity?
+# TODO: ComputeFiniteStrain does not compute Lagrange strain?
 [Mesh]
   type = GeneratedMesh
   dim = 3
@@ -47,6 +52,7 @@
     displacements = 'disp_x disp_y disp_z'
     use_displaced_mesh = true
     base_name = global
+    strain = FINITE #this also sets incremental strain =true
   [../]
 
   #[./faketime_x]
