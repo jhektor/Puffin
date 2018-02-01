@@ -21,7 +21,7 @@ protected:
   /// base name for the order parameter variables
   const std::string _op_name_base;
   const std::string _ci_name_base;
-  const std::string _fch_name_base;
+  const std::string _f_name_base;
   const std::string _h_name_base;
   const std::string _g_name_base;
 

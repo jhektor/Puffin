@@ -5,7 +5,7 @@
 /*             See LICENSE for full restrictions                */
 /****************************************************************/
 #ifndef COMPUTEELASTICITYTENSORCPBASENAME_H
-#define COMPUTEELASTICITYTENSORCPSENAME_H
+#define COMPUTEELASTICITYTENSORCPBASENAME_H
 
 #include "ComputeElasticityTensor.h"
 #include "ElementPropertyReadFile.h"
