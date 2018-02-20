@@ -38,6 +38,8 @@
 \providecommand{\inte}[4]{\int_{#1}^{#2}{#3}\,\mathrm{d}{#4}}
 \providecommand{\nablat}{\widetilde{\gradient}}
 \providecommand{\tr}[1]{\mathrm{tr}\left(#1\right)}
+\DeclareMathOperator{\sgn}{sgn}
+
 
 \providecommand{\vint}[2]{\left(#1,#2\right)}
 \providecommand{\sint}[2]{\left<#1,#2\right>}
@@ -92,7 +94,7 @@ For the phases where plasticity is included (\ce{Sn}) the deformation energy is
 \begin{equation}
   f^d = \frac{1}{2}\vbf{T}:\vbf{E}^e+\frac{1}{2}Q\sum_\alpha^n\sum_\beta^n q_{\alpha\beta}s^\alpha s^\beta
 \end{equation}
-where $\vbf{T}$ is the second Piola-Kirchoff stress tensor, $\vbf{E}^e$ is the elastic Green strain tensor, $Q$ is a hardening parameter, $q_{\alpha\beta}=1+0.4\delta_{\alpha\beta}$ controls the ratio between self ($\alpha=\beta$) and cross ($\alpha\neq\beta$) hardening, and $s^\alpha$ is the slip resistance on the $\alpha$ slip system and the sum is taken over all $n$ slip systems. \hl{It would be nicer to have the same elastic energy for all phases}
+where $\vbf{T}$ is the second Piola-Kirchoff stress tensor, $\vbf{E}^e$ is the elastic Green strain tensor, $Q$ is a hardening parameter, and $s^\alpha$ is the slip resistance on the $\alpha$ slip system and the sum is taken over all $n$ slip systems. \hl{It would be nicer to have the same elastic energy for all phases} \hl{$Q$ should be related to something in the equations for $\gamma$ or $s$}
 More details on the mechanical model are given in \cref{sec:crypla}.
 
 \subsection{Governing equations}
@@ -239,8 +241,18 @@ The evolution of the plastic velocity gradient is given by
 where $\dot{\gamma}^\alpha$, $\vbf{m}^\alpha$, and $\vbf{n}^\alpha$ denotes the slip rate, slip direction, and slip plane normal on slip system $\alpha$.
 The flow rule for the slip rate is 
 \begin{equation}
-  \dot{\gamma}^\alpha=\dot{\gamma}_0\abs{\frac{\tau^\alpha}{s^\alpha}}^{1/m}
+  \dot{\gamma}^\alpha=\dot{\gamma}_0\abs{\frac{\tau^\alpha}{s^\alpha}}^{1/m}\sgn{(\tau^\alpha)}
 \end{equation}
+where $\gamma_0$ is a reference slip rate, $\tau^\alpha$ is the resolved shear stress, $s^\alpha$ is the slip resistance, and $m$ controls the strain rate sensitivity.
+The evolution of the slip resistance is described by
+\begin{equation}
+  \dot{s}^\alpha=\sum_\beta^nh^{\alpha\beta}\abs{\dot{\gamma}^\beta},
+\end{equation}
+with the hardening matrix taken as
+\begin{equation}
+  h^{\alpha\beta}=q^{\alpha\beta}h_0\abs{1-\frac{s^\beta}{s_s}}^c\sgn(1-\frac{s^\beta}{s_s}),
+\end{equation}
+where $s_s$ is the saturation value for the slip resistance, $h_0$ and $c$ are constants, and $q_{\alpha\beta}=1+0.4\delta_{\alpha\beta}$ controls the ratio between self ($\alpha=\beta$) and cross ($\alpha\neq\beta$) hardening.
 
 \subsection{Weak form residual equations}
 The weak form of the residual equation for $\eta_i$ is constructed from \cref{eq:AC1} by multiplication with a test function $\psi$ and integrating over the domain:
