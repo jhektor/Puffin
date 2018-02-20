@@ -1,0 +1,440 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage{fontspec}
+\defaultfontfeatures{Mapping=tex-text}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+%\setmainfont{???}
+\usepackage{polyglossia}
+\setdefaultlanguage{english}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{hyperref}
+\usepackage[capitalise]{cleveref}
+\usepackage{showlabels}
+\usepackage[version=3]{mhchem}
+\usepackage{pdfpages}
+\usepackage{siunitx}
+\usepackage{cancel}
+\usepackage{booktabs}
+\usepackage{tablefootnote}
+\usepackage{todonotes}
+\usepackage{physics}
+
+\newcommand{\degs}{\,^{\circ}}
+\providecommand{\abs}[1]{\lvert#1\rvert}
+\newcommand{\vardiff}[2]{\frac{\delta#1}{\delta#2}}
+\newcommand{\partdiff}[2]{\frac{\partial#1}{\partial#2}}
+\providecommand{\diff}[2]{\frac{\mathrm{d}#1}{\mathrm{d}#2}}
+\providecommand{\secdiff}[2]{\frac{\mathrm{d}^2#1}{\mathrm{d}#2^2}}
+\providecommand{\vbf}[1]{\boldsymbol{#1}}
+\providecommand{\gradient}[0]{\vbf{\nabla}}
+\newcommand{\unit}[1]{\ensuremath{\, \mathrm{#1}}}
+\newcommand{\code}[1]{\texttt{#1}}
+%\DeclareMathOperator{\Tr}{Tr}
+\providecommand{\norm}[1]{\left\lVert#1\right\rVert}
+\providecommand{\inte}[4]{\int_{#1}^{#2}{#3}\,\mathrm{d}{#4}}
+\providecommand{\nablat}{\widetilde{\gradient}}
+\providecommand{\tr}[1]{\mathrm{tr}\left(#1\right)}
+
+\providecommand{\vint}[2]{\left(#1,#2\right)}
+\providecommand{\sint}[2]{\left<#1,#2\right>}
+
+\begin{document}
+
+\title{Multiphase KKS model with crystal plasticity in Moose}
+\author{Johan Hektor}
+\maketitle
+
+\section{Introduction}
+This document contain notes on the implementation of the phase field model presented in \cite{hektor2016coupled} in Moose.
+The following special notation of volume and surface integrals will be used, in accordance with the official Moose documentation;
+\begin{equation}
+  \inte{}{}{a\cdot b}{V}=\vint{a}{b}, \qquad \inte{}{}{a\cdot b}{S}=\sint{a}{b}
+\end{equation}
+The sets of phase field variables and phase compositions are denoted $\vbf{\eta}$ and $\vbf{x}$, respectively. 
+The global concentration field is denoted $c$ and $h$ denotes the switching functions.
+The phase fields, phase compositions and the global concentration are all dimensionless fields in the range $[0,1]$.
+
+\section{Model}
+
+\subsection{Free energy}
+The free energy is given by
+\begin{equation}
+  F = f^{ch}(\vbf{\eta},\vbf{x})+f^{int}(\vbf{\eta})+f^d(\vbf{\eta},\dots) ,
+  \label{eq:F}
+\end{equation}
+with $f^{ch}$ and $f^{int}$ representing the chemical and interface energies respectively. 
+$f^d$ represents the contribution from any other physics included in the model e.g. deformation, temperature, electric field etc.
+
+Here we take
+\begin{equation}
+  f^{ch}=\sum_ih_i(\vbf{\eta})f_i(x_i,\vbf{\eta}),
+  \label{eq:fch}
+\end{equation}
+with $f_i(x_i,\vbf{\eta})=\frac{G_i(x_i)}{V^m}$ where $G_i$ is a representation of the Gibbs energy of phase $i$ and $V^m$ denotes the molar volume which is assumed to be constant.
+The interface energy is taken as
+\begin{equation}
+  f^{int}=m\left(\sum_i\left(\frac{\eta_i^4}{4}-\frac{\eta_i^2}{2}\right)+\sum_i\sum_{j\ne i}\frac{\beta}{2}\eta_i^2\eta_j^2+\frac{1}{4}\right)+\frac{\alpha}{2}\sum_i\left(\gradient\eta_i\right)^2,
+  \label{eq:fint}
+\end{equation}
+with $m$, $\alpha$ and $\beta$ being parameters.
+
+The energy due to deformation is taken as 
+\begin{equation}
+  f^d = \frac{1}{2}\vbf{\sigma}:\vbf{\varepsilon}^e
+\end{equation}
+for the elastic phases (\ce{Cu} and \ce{Cu6Sn5}).
+Here, $\vbf{\sigma}$ and $\vbf{\varepsilon}^e$ denotes the Cauchy stress and the elastic part of the true strain tensor respectively.
+For the phases where plasticity is included (\ce{Sn}) the deformation energy is
+\begin{equation}
+  f^d = \frac{1}{2}\vbf{T}:\vbf{E}^e+\frac{1}{2}Q\sum_\alpha^n\sum_\beta^n q_{\alpha\beta}s^\alpha s^\beta
+\end{equation}
+where $\vbf{T}$ is the second Piola-Kirchoff stress tensor, $\vbf{E}^e$ is the elastic Green strain tensor, $Q$ is a hardening parameter, $q_{\alpha\beta}=1+0.4\delta_{\alpha\beta}$ controls the ratio between self ($\alpha=\beta$) and cross ($\alpha\neq\beta$) hardening, and $s^\alpha$ is the slip resistance on the $\alpha$ slip system and the sum is taken over all $n$ slip systems. \hl{It would be nicer to have the same elastic energy for all phases}
+More details on the mechanical model are given in \cref{sec:crypla}.
+
+\subsection{Governing equations}
+\subsubsection{KKS conditions}
+KKS models require the chemical potential to be equal in all coexisting phases, i.e.
+\begin{equation}
+  \partdiff{F}{c}=\partdiff{f_1}{x_1}+\partdiff{f^d_1}{x_1}=\dots=\partdiff{f_n}{x_n}+\partdiff{f^d_n}{x_n}=\mu_1\dots=\mu_n.
+  \label{eq:KKS}
+\end{equation}
+Furthermore, mass conservation is fulfilled by
+\begin{equation}
+  c=\sum_ih_ix_i.
+  \label{eq:mass}
+\end{equation}
+\subsubsection{Cahn-Hilliard equation}
+The evolution of the concentration field follows the Cahn-Hilliard equation
+\begin{equation}
+  \partdiff{c}{t}=\gradient\cdot M(\vbf{\eta},c)\gradient \vardiff{F}{c}=\gradient\cdot M(\vbf{\eta},c)\gradient\left(\partdiff{F}{c}-\gradient\cdot\partdiff{F}{\gradient c}\right),
+  \label{eq:CH1}
+\end{equation}
+where $M$ is the mobility.
+Since there is no dependence on $\gradient c$ in the free energy the divergence term of \cref{eq:CH1} vanishes.\footnote{This is only true for KKS models, in other multiphase models a term like $\kappa\left(\gradient c\right)^2$ is included.
+This term will make the Cahn-Hilliard a fourth order PDE.}
+
+Using \cref{eq:F}, \cref{eq:fch} and \cref{eq:fint} the derivative become
+\begin{equation}
+  \partdiff{F}{c}=\partdiff{f^{ch}}{c}+\partdiff{f^d}{c}=\sum_i h_i\partdiff{f_i}{x_i}\partdiff{x_i}{c}+\cancelto{0}{\partdiff{h_i}{c}f_i}+\partdiff{f^d}{c}.
+  \label{eq:dFdc1}
+\end{equation}
+By taking the derivative of the mass conservation \cref{eq:mass} we get
+\begin{equation}
+  \partdiff{c}{c}=\sum_i h_i\partdiff{x_i}{c}=1.
+\end{equation}
+Inserting into \cref{eq:dFdc1} and taking into account \cref{eq:KKS} we end up with
+\begin{equation}
+  \partdiff{F}{c}=\mu,
+\end{equation} 
+where we can arbitrarily choose $\mu=\mu_i$ based on the KKS condition.\todo{Check how $f^d$ affects this. $\partdiff{f_i}{x_i}\neq\mu_i$}
+With this \cref{eq:CH1} can be written as
+\begin{equation}
+  \partdiff{c}{t}=\gradient\cdot M(\vbf{\eta},c)\gradient\mu_i
+  \label{eq:CH}
+\end{equation}
+The mobility $M$ is taken as
+\begin{equation}
+  M = \sum_i h_i\frac{D_i}{\secdiff{f_i}{x_i}}.
+\end{equation}
+The units of \cref{eq:CH} are
+\begin{equation}
+\si[per-mode=fraction]{\per\second}=\si[per-mode=fraction]{\per\meter}\frac{\si[per-mode=fraction]{\square\meter\per\second}}{\si[per-mode=fraction]{\joule\per\cubic\meter}}\si[per-mode=fraction]{\per\meter}\si[per-mode=fraction]{\joule\per\cubic\meter}=\si[per-mode=fraction]{\per\second}.
+\end{equation}
+
+
+\subsubsection{Allen-Cahn equation}
+The evolution of each order parameter field follow the Allen-Cahn equation
+\begin{equation}
+\begin{aligned}
+  \partdiff{\eta_i}{t}&=-L(\vbf{\eta})\vardiff{F}{\eta_i}+\xi(\vbf{x},t)=-L\left(\partdiff{F}{\eta_i}-\gradient\cdot\partdiff{F}{\gradient\eta_i}\right)+\xi(\vbf{x},t)\\
+  &=-L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}-\gradient\cdot\partdiff{f^{int}}{\gradient\eta_i}-\gradient\cdot\partdiff{f^d}{\gradient\eta_i}\right)+\xi(\vbf{x},t),
+\end{aligned}
+\label{eq:AC1}
+\end{equation}
+where $\xi(\vbf{x},t)$ is a Langevin force term used to simulate nucleation, see \cref{sec:nuc}.
+The derivatives of the interface energy are easy to calculate from \cref{eq:fint}
+\begin{equation}
+  \partdiff{f^{int}}{\eta_i}-\gradient\partdiff{f^{int}}{\gradient\eta_i}=m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i.
+\end{equation}
+
+The derivative of the chemical energy is
+\begin{equation}
+  \partdiff{f^{ch}}{\eta_i}=\sum_j\left(\partdiff{h_j}{\eta_i}f_j+h_j\partdiff{f_j}{\eta_i}\right),
+  \label{eq:dfchdeta}
+\end{equation}
+where
+\begin{equation}
+  h_j\partdiff{f_j}{\eta_i}=h_j\underbrace{\partdiff{f_j}{G_j}\partdiff{G_j}{x_j}}_{\mu_j}\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i} =\mu_jh_j\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i}.
+\label{eq:dfjdetai}
+\end{equation}\todo{\cref{eq:dfjdetai} will change with $f^d$}
+Using that $\partdiff{c}{\eta_i}=0$, equation \cref{eq:mass} then gives
+\begin{equation}
+\begin{aligned}
+  \partdiff{c}{\eta_i}&=\sum_j\left(\partdiff{h_j}{\eta_i}x_j+h_j\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i}\right)=\sum_j\partdiff{h_j}{\eta_i}\left(x_j+h_j\partdiff{x_j}{h_j}\right)=0 \\
+  &\iff \sum_jh_j\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i}=-\sum_j\partdiff{h_j}{\eta_i}x_j.
+\end{aligned}
+\end{equation} 
+By making use of the KKS condition \cref{eq:dfchdeta} can then be written
+\begin{equation}
+  \partdiff{f^{ch}}{\eta_i}=\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j\right)
+\end{equation}\todo{will change with $f^d$}
+
+Equation \cref{eq:AC1} now becomes
+\begin{multline}
+  \partdiff{\eta_i}{t}=-L\left(\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j\right)\right. \\
+  \left.+m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i+\partdiff{f^d}{\eta_i}-\gradient\cdot\partdiff{f^d}{\gradient\eta_i}\right).
+  \label{eq:AC}
+\end{multline}
+The mobility $L$ is taken as
+\begin{equation}
+  L(\vbf{\eta})=\frac{\sum_i\sum_{j\ne i}L_{ij}\eta_i^2\eta_j^2}{\sum_i\sum_{j\ne i}\eta_i^2\eta_j^2}.
+\end{equation} 
+$L_{ij}$ is taken as 
+\begin{equation}
+  L_{ij}=\frac{2m}{3\alpha\left(x_i^{eq}-x_j^{eq}\right)^2}\frac{M_i+M_j}{2},
+  \label{eq:lab}
+\end{equation}
+where $M_i=\frac{D_i}{\secdiff{f_i}{x_i}}$ and $M_j=\frac{D_j}{\secdiff{f_j}{x_j}}$ are the mobilities and $x_i^{eq}$ and $x_j^{eq}$ are the equilibrium molar fractions of phases $i$ and $j$ respectively.  
+
+The units of \cref{eq:AC} are
+\begin{equation}
+\si[per-mode=fraction]{\per\second}=\frac{\si[per-mode=fraction]{\joule\per\cubic\meter}}{\si[per-mode=fraction]{\joule\per\meter}}\frac{\si[per-mode=fraction]{\square\meter\per\second}}{\si[per-mode=fraction]{\joule\per\cubic\meter}}\si[per-mode=fraction]{\joule\per\cubic\meter}=\si[per-mode=fraction]{\per\second}.
+\end{equation}
+\subsection{Nucleation}\label{sec:nuc}
+Nucleation of the intermetallic phases is achieved using the so called Langevin force approach where a small pertubation, $\xi$, is added to the Allen-Cahn equations to initiate the evolution of the phase fields.
+Following \cite{shen2007effect} the pertubation is taken as
+\begin{equation}
+  \xi(\vbf{x},t)=\sqrt{\frac{2k_BTL}{\lambda^d\Delta t}}\rho,
+\end{equation}
+where $k_B$ is the Boltzmann constant, $T$ is temperature, $\lambda$ is the grid spacing, $d$ is the dimensionality of the grid (1, 2 or 3 for 1D, 2D or 3D), $\Delta t$ is the timestep, and $\rho$ is a random number drawn from a Gaussian distribution that satisfies $\langle\rho_i\rangle=0$ and $\langle\rho_i\rho_j\rangle=\delta_{ij}$. \todo{Check what the second requirement means and if it is fulfilled by Moose}
+\subsection{Non-constant molar volume}
+I'm not sure it is possible to easily remove the assumption of constant molar volume.
+It is certainly not as easy as I thought before.
+For non-constant molar volume \cref{eq:mass} becomes $c=\sum_ih_i\frac{x_i}{V^m_i}$ which converts $c$ to units of \si{\mol\per\cubic\meter}.
+The problem is that the free energy is formulated in units of \si{\joule\per\cubic\meter}, which means that $\partdiff{F}{c}$ get the units \si{\joule\per\mole}.
+I don't think this is good neither for the KKS conditions nor for the Cahn-Hilliard equation.
+Perhaps we can formulate the \cref{eq:CH} as
+\begin{equation}
+  \frac{1}{V^m}\partdiff{c}{t}=\gradient\cdot M(\vbf{\eta},c)\gradient\mu_i
+\end{equation}
+together with the mass balance in \cref{eq:mass} and still have $c$ dimensionless.
+Then the question is how to choose $V^m$?
+
+Another way is maybe to formulate the energies in \si{\joule\per\mol} but then I guess the mesh will represent a certain number of moles instead of a certain volume? 
+
+\subsection{Crystal plasticity}\label{sec:crypla}
+The crystal plasticity model implemented in Moose is from Zhao et al. \cite{zhao2017plastic}.
+The deformation gradient $\vbf{F}$ is decomposed into an elastic part $\vbf{F}^e$ and a plastic part $\vbf{F}^p$ according to
+\begin{equation}
+\vbf{F}=\vbf{F}^e\vbf{F}^p.
+\end{equation}
+The evolution of the plastic velocity gradient is given by
+\begin{equation}
+  \dot{\vbf{F}}^p\vbf{F}^{p-1}=\sum_\alpha^n\dot{\gamma}^\alpha\vbf{m}^\alpha\otimes\vbf{n}^\alpha,
+\end{equation}
+where $\dot{\gamma}^\alpha$, $\vbf{m}^\alpha$, and $\vbf{n}^\alpha$ denotes the slip rate, slip direction, and slip plane normal on slip system $\alpha$.
+The flow rule for the slip rate is 
+\begin{equation}
+  \dot{\gamma}^\alpha=\dot{\gamma}_0\abs{\frac{\tau^\alpha}{s^\alpha}}^{1/m}
+\end{equation}
+
+\subsection{Weak form residual equations}
+The weak form of the residual equation for $\eta_i$ is constructed from \cref{eq:AC1} by multiplication with a test function $\psi$ and integrating over the domain:
+\begin{equation}
+\begin{aligned}
+  \vbf{R}_{\eta_i}&=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}-\vint{L\gradient\cdot\alpha\gradient\eta_i}{\psi}+\vint{\xi}{\psi} \\
+  &=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi}\\
+  &+\vint{\xi}{\psi}-\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi},
+\end{aligned}
+\end{equation}\todo{term with $\partdiff{f^d}{\gradient\eta_i}$ is missing}
+with the divergence theorem used on the gradient term.
+Inserting the derivatives calculated above gives
+\begin{equation}
+\begin{aligned}
+  \vbf{R}_{\eta_i}=&\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\sum_j\partdiff{h_j}{\eta_i}f_j}{\psi}-\vint{L\partdiff{h_j}{\eta_i}\mu_jx_j}{\psi}\\
+  &+\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi} \\
+  &+\vint{L\partdiff{f^d}{\eta_i}}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi} -\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}+\vint{\xi}{\psi}
+ \end{aligned}
+\end{equation}
+
+
+The Cahn-Hilliard equation \cref{eq:CH} can be solved in two ways.
+Either you can solve it directly using the residual
+\begin{multline}
+  \vbf{R}_c=\vint{\partdiff{c}{t}}{\psi}-\vint{\gradient\cdot M\gradient\mu}{\psi}=\\ \vint{\partdiff{c}{t}}{\psi}+\vint{M\gradient\mu}{\gradient\psi}-\sint{M\gradient\mu\cdot\vbf{n}}{\psi}.
+\end{multline}
+This seems to be fairly straight forward, but for some reason it is ``not fully implemented'' in Moose.
+Instead, the equation is split into two and solved for the concentration $c$ as well as for the chemical potential $\mu$.
+The residuals for this are
+\begin{align}
+  &\vbf{R}_\mu=\vint{\partdiff{c}{t}}{\psi}+\vint{M\gradient\mu}{\gradient\psi}-\sint{M\gradient\mu\cdot\vbf{n}}{\psi} \\
+  &\vbf{R}_c=\vint{\partdiff{F}{c}-\mu}{\psi}.
+\end{align}
+
+\section{Implementation}
+This section describes the input file used to run the simulation.
+Moose input files consists of different blocks which together defines the model.
+All necessary blocks are described below.
+\subsection{Mesh}
+The mesh block can be used to create meshes of simple geometries.
+It can also be used to read the mesh from a file.
+A rectangular 2D mesh is created like this:
+\begin{verbatim}
+[Mesh]
+  type = GeneratedMesh
+  dim = 2
+  nx = 100
+  ny = 10
+  xmax = 0.304 # Length 
+  ymax = 0.0257 # Height
+[]
+\end{verbatim}
+\subsection{Variables}
+The \texttt{Variables} block declares the variables of the model.
+A variables is defined like this:
+\begin{verbatim}
+[Variables]
+  # concentration Sn
+  [./c] # Variable name
+      order = FIRST
+      family = LAGRANGE
+  [../]
+[]
+\end{verbatim}
+To solve the model the following variables are needed: $c$,$\mu$,$x_i$,$\eta_i$, i.e. a simulation with three grains of different phases contains $8$ variables.
+\subsection{ICs and BCs}
+Initial conditions can be set in the \texttt{ICs} block. 
+For simple initial conditions the type \texttt{FunctionIC} can be used.
+The following code will initiate the variable $\eta_{imc}$ as a ring with radius $8$ centered at $(20,20)$.
+\begin{verbatim}
+[ICs]
+    [./eta2] #Cu6Sn5
+        variable = eta_imc
+        type = FunctionIC
+        function = 'r:=sqrt((x-20)^2+(y-20)^2);if(r>8&r<=16,1,0)'
+    [../]
+[]
+\end{verbatim}
+There are some more complicated initial conditions already implemented but probably I'll have to make something myself.
+
+Boundary conditions are set in the \texttt{BCs} block using a very similar syntax as the ICs.
+\subsection{Kernels}
+In Moose each part of the residual equations are implemented in separate kernels. 
+Each kernel is responsible for evaluating the residual and (optionally) calculate the Jacobian. 
+For each of the Allen-Cahn equations the kernels in \cref{tab:AC} is needed.
+For the Cahn-Hilliard equation and the KKS conditions the kernels in \cref{tab:CH} are needed.
+
+\begin{table}
+\caption{Kernels needed for the Allen-Cahn equation}
+\label{tab:AC}
+\begin{tabular}{lll}
+  \toprule
+  Residual term & Parameters &  Kernel name \\
+  \midrule
+  $\vint{\partdiff{\eta_i}{t}}{\psi}$ & & \texttt{TimeDerivative} \\
+  $\vint{L\sum_j\partdiff{h_j}{\eta_i}f_j+w\partdiff{g}{\eta_i}}{\psi}$ & $L$, $w=0$ & \texttt{KKSMultiACBulkF}\tablefootnote{This kernel includes a double well that can be use to constrain the order parameters to $[0,1]$, turn off the double well by setting $w=0$.} \\
+  $-\vint{L\partdiff{h_j}{\eta_i}\mu_jx_j}{\psi}$ & $L$ & \texttt{KKSMultiACBulkC} \\
+  $\vint{L\partdiff{f^d}{\eta_i}}{\psi}$ & & \\
+  $\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi}$ & $m$, $\beta$ &  \texttt{ACGrGrMulti} \\
+  $\vint{\alpha\gradient\eta_i}{\gradient L\psi}$ & $L$, $\alpha$ & \texttt{ACInterface}\\
+  $\vint{\xi}{\psi}$ & & \texttt{LangevinNoise} \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}
+\caption{Kernels needed for the split version of the Cahn-Hilliard equation and the KKS conditions}
+\label{tab:CH}
+\begin{tabular}{lll}
+  \toprule
+  Residual term & Parameters &  Kernel name \\
+  \midrule
+  $\vint{\partdiff{c}{t}}{\psi}$ & & \texttt{CoupledTimeDerivative} \\
+  $\vint{M\gradient\mu}{\gradient\psi}$ & $M$ & \texttt{SplitCHWRes} \\
+  $\vint{\partdiff{F}{c}-\mu}{\psi}$ &  & \texttt{KKSSplitCHCRes} \\
+  \midrule
+  $\mu=\mu_i=\mu_j$ & & \texttt{KKSPhaseChemicalPotential} \\
+  $c=\sum_ih_ix_i$ & & \texttt{KKSMultiPhaseConcentration} \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Materials}
+The free energies and the switching functions are defined in the \texttt{Materials} block of the input file.
+The chemical free energy of each phase can be described using the type \texttt{DerivativeParsedMaterial}.
+This type uses automatic differentiation to calculate the derivatives.
+\begin{verbatim}
+[Materials]
+  [./fch_cu] #Chemical energy Cu phase
+        type = DerivativeParsedMaterial
+        f_name = fch_cu
+        args = 'c_cu'
+        function = '20*(c_cu-0.1)^2'
+  [../]
+[]
+\end{verbatim}
+
+The switching functions are set like
+\begin{verbatim}
+  [./h_cu]
+        type = SwitchingFunctionMultiPhaseMaterial
+        h_name = h_cu
+        all_etas = 'eta_cu eta_imc eta_sn'
+        phase_etas = eta_cu
+  [../]
+\end{verbatim}
+The same switching function can be used to describe all grain of the same phase (I think).
+
+The materials block can also be used to define constants. For example
+\begin{verbatim}
+  [./constants]
+      type = GenericConstantMaterial
+      prop_names  = 'L kappa gamma mu tgrad_corr_mult'
+      prop_values = '1. 0.5 0.5 1. 0.'
+  [../]
+\end{verbatim}
+\subsection{Executioner, Preconditioning and Outputs}
+The parameters of the solver are set in the \texttt{Executioner, Preconditioning and Outputs} blocks, here you can also set options for the behavior of the underlying PETSc commands.
+The blocks can look something like this
+\begin{verbatim}
+[Executioner]
+  type = Transient
+  solve_type = 'PJFNK'
+  petsc_options_iname = '-pc_type -sub_pc_type   -sub_pc_factor_shift_type'
+  petsc_options_value = 'asm       ilu            nonzero'
+  l_max_its = 30
+  nl_max_its = 10
+  l_tol = 1.0e-4
+  nl_rel_tol = 1.0e-10
+  nl_abs_tol = 1.0e-11
+
+  num_steps = 100
+  dt = 0.5
+[]
+
+[Preconditioning]
+  active = 'full'
+  [./full]
+    type = SMP
+    full = true
+  [../]
+  [./mydebug]
+    type = FDP
+    full = true
+  [../]
+[]
+
+[Outputs]
+  exodus = true
+[]
+\end{verbatim}
+These settings will solve the equations using the Pre-Conditioned Jacobian-Free Newton-Krylow method which is the standard way in Moose.
+The results will be written to a file that can be viewed in e.g. Peacock or Paraview.
+
+\bibliographystyle{plain}
+\bibliography{ref}
+\end{document}
