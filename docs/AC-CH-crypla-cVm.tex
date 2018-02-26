@@ -86,22 +86,26 @@ with $m$, $\alpha$ and $\beta$ being parameters.
 
 The energy due to deformation is taken as 
 \begin{equation}
-  f^d = \frac{1}{2}\vbf{\sigma}:\vbf{\varepsilon}^e
+  f^d=\sum_i h_if^d_i
+\end{equation}
+where
+\begin{equation}
+  f^d_i = \frac{1}{2}\vbf{\sigma}_i:\vbf{\varepsilon}^e_i
 \end{equation}
 for the elastic phases (\ce{Cu} and \ce{Cu6Sn5}).
 Here, $\vbf{\sigma}$ and $\vbf{\varepsilon}^e$ denotes the Cauchy stress and the elastic part of the true strain tensor respectively.
 For the phases where plasticity is included (\ce{Sn}) the deformation energy is
 \begin{equation}
-  f^d = \frac{1}{2}\vbf{T}:\vbf{E}^e+\frac{1}{2}Q\sum_\alpha^n\sum_\beta^n q_{\alpha\beta}s^\alpha s^\beta
+  f^d_i = \frac{1}{2}\vbf{T}_i:\vbf{E}^e_i+\frac{1}{2}Q_i\sum_\alpha^n\sum_\beta^n q_{\alpha\beta}s^\alpha_i s^\beta_i
 \end{equation}
-where $\vbf{T}$ is the second Piola-Kirchoff stress tensor, $\vbf{E}^e$ is the elastic Green strain tensor, $Q$ is a hardening parameter, and $s^\alpha$ is the slip resistance on the $\alpha$ slip system and the sum is taken over all $n$ slip systems. \hl{It would be nicer to have the same elastic energy for all phases} \hl{$Q$ should be related to something in the equations for $\gamma$ or $s$}
+where $\vbf{T}$ is the second Piola-Kirchoff stress tensor, $\vbf{E}^e$ is the elastic Green strain tensor, $Q$ is a hardening parameter, and $s^\alpha$ is the slip resistance on the $\alpha$ slip system and the sum is taken over all $n$ slip systems. \todo{It should be the same elastic energy for all phases} \todo{$Q$ should be related to something in the equations for $\gamma$ or $s$}
 More details on the mechanical model are given in \cref{sec:crypla}.
 
 \subsection{Governing equations}
 \subsubsection{KKS conditions}
 KKS models require the chemical potential to be equal in all coexisting phases, i.e.
 \begin{equation}
-  \partdiff{F}{c}=\partdiff{f_1}{x_1}+\partdiff{f^d_1}{x_1}=\dots=\partdiff{f_n}{x_n}+\partdiff{f^d_n}{x_n}=\mu_1\dots=\mu_n.
+  \partdiff{F}{c}=\partdiff{f_1^{ch}}{x_1}+\partdiff{f^d_1}{x_1}=\dots=\partdiff{f_n^{ch}}{x_n}+\partdiff{f^d_n}{x_n}=\mu_1\dots=\mu_n.
   \label{eq:KKS}
 \end{equation}
 Furthermore, mass conservation is fulfilled by
@@ -132,7 +136,7 @@ Inserting into \cref{eq:dFdc1} and taking into account \cref{eq:KKS} we end up w
 \begin{equation}
   \partdiff{F}{c}=\mu,
 \end{equation} 
-where we can arbitrarily choose $\mu=\mu_i$ based on the KKS condition.\todo{Check how $f^d$ affects this. $\partdiff{f_i}{x_i}\neq\mu_i$}
+where we can arbitrarily choose $\mu=\mu_i$ based on the KKS condition.\todo{This only works if $\partdiff{f_i^d}{x_i}=0$}
 With this \cref{eq:CH1} can be written as
 \begin{equation}
   \partdiff{c}{t}=\gradient\cdot M(\vbf{\eta},c)\gradient\mu_i
@@ -172,7 +176,7 @@ where
 \begin{equation}
   h_j\partdiff{f_j}{\eta_i}=h_j\underbrace{\partdiff{f_j}{G_j}\partdiff{G_j}{x_j}}_{\mu_j}\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i} =\mu_jh_j\partdiff{x_j}{h_j}\partdiff{h_j}{\eta_i}.
 \label{eq:dfjdetai}
-\end{equation}\todo{\cref{eq:dfjdetai} will change with $f^d$}
+\end{equation}\todo{Only works for $\partdiff{f_i^d}{x_i}=0$}
 Using that $\partdiff{c}{\eta_i}=0$, equation \cref{eq:mass} then gives
 \begin{equation}
 \begin{aligned}
@@ -183,12 +187,17 @@ Using that $\partdiff{c}{\eta_i}=0$, equation \cref{eq:mass} then gives
 By making use of the KKS condition \cref{eq:dfchdeta} can then be written
 \begin{equation}
   \partdiff{f^{ch}}{\eta_i}=\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j\right)
-\end{equation}\todo{will change with $f^d$}
+\end{equation}\todo{for $\partdiff{f^d}{x_i}=0$}
+
+For the deformation energy we get
+\begin{equation}
+  \partdiff{f^d}{\eta_i}=\sum_j\partdiff{h_j}{\eta_i}f^d_j+\cancelto{0}{h_j\partdiff{f^d_j}{\eta_i}}
+\end{equation}
 
 Equation \cref{eq:AC1} now becomes
 \begin{multline}
-  \partdiff{\eta_i}{t}=-L\left(\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j\right)\right. \\
-  \left.+m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i+\partdiff{f^d}{\eta_i}-\gradient\cdot\partdiff{f^d}{\gradient\eta_i}\right).
+  \partdiff{\eta_i}{t}=-L\left(\sum_j\partdiff{h_j}{\eta_i}\left(f_j-\mu_jx_j+f^d_j\right)\right. \\
+  \left.+m\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)-\gradient\cdot\alpha\gradient\eta_i\right)+\xi(\vbf{x},t).
   \label{eq:AC}
 \end{multline}
 The mobility $L$ is taken as
@@ -200,7 +209,7 @@ $L_{ij}$ is taken as
   L_{ij}=\frac{2m}{3\alpha\left(x_i^{eq}-x_j^{eq}\right)^2}\frac{M_i+M_j}{2},
   \label{eq:lab}
 \end{equation}
-where $M_i=\frac{D_i}{\secdiff{f_i}{x_i}}$ and $M_j=\frac{D_j}{\secdiff{f_j}{x_j}}$ are the mobilities and $x_i^{eq}$ and $x_j^{eq}$ are the equilibrium molar fractions of phases $i$ and $j$ respectively.  
+where $M_i=\frac{D_i}{\secdiff{f_i}{x_i}}$ and $M_j=\frac{D_j}{\secdiff{f_j}{x_j}}$ are the mobilities and $x_i^{eq}$ and $x_j^{eq}$ are the equilibrium molar fractions of phases $i$ and $j$ respectively. \todo{Constant mobility works better}  
 
 The units of \cref{eq:AC} are
 \begin{equation}
@@ -212,7 +221,7 @@ Following \cite{shen2007effect} the pertubation is taken as
 \begin{equation}
   \xi(\vbf{x},t)=\sqrt{\frac{2k_BTL}{\lambda^d\Delta t}}\rho,
 \end{equation}
-where $k_B$ is the Boltzmann constant, $T$ is temperature, $\lambda$ is the grid spacing, $d$ is the dimensionality of the grid (1, 2 or 3 for 1D, 2D or 3D), $\Delta t$ is the timestep, and $\rho$ is a random number drawn from a Gaussian distribution that satisfies $\langle\rho_i\rangle=0$ and $\langle\rho_i\rho_j\rangle=\delta_{ij}$. \todo{Check what the second requirement means and if it is fulfilled by Moose}
+where $k_B$ is the Boltzmann constant, $T$ is temperature, $\lambda$ is the grid spacing, $d$ is the dimensionality of the grid (1, 2 or 3 for 1D, 2D or 3D), $\Delta t$ is the timestep, and $\rho$ is a random number drawn from a Gaussian distribution that satisfies $\langle\rho_i\rangle=0$ and $\langle\rho_i\rho_j\rangle=\delta_{ij}$. \todo{In Moose the RND is drawn from a uniform distribution}
 \subsection{Non-constant molar volume}
 I'm not sure it is possible to easily remove the assumption of constant molar volume.
 It is certainly not as easy as I thought before.
@@ -254,38 +263,45 @@ with the hardening matrix taken as
 \end{equation}
 where $s_s$ is the saturation value for the slip resistance, $h_0$ and $c$ are constants, and $q_{\alpha\beta}=1+0.4\delta_{\alpha\beta}$ controls the ratio between self ($\alpha=\beta$) and cross ($\alpha\neq\beta$) hardening.
 
+
 \subsection{Weak form residual equations}
 The weak form of the residual equation for $\eta_i$ is constructed from \cref{eq:AC1} by multiplication with a test function $\psi$ and integrating over the domain:
 \begin{equation}
 \begin{aligned}
-  \vbf{R}_{\eta_i}&=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}-\vint{L\gradient\cdot\alpha\gradient\eta_i}{\psi}+\vint{\xi}{\psi} \\
+  \vbf{R}_{\eta_i}&=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}-\vint{L\gradient\cdot\alpha\gradient\eta_i}{\psi}-\vint{\xi}{\psi} \\
   &=\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\left(\partdiff{f^{ch}}{\eta_i}+\partdiff{f^{int}}{\eta_i}+\partdiff{f^d}{\eta_i}\right)}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi}\\
-  &+\vint{\xi}{\psi}-\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi},
+  &-\vint{\xi}{\psi}-\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}=\vbf{0},
 \end{aligned}
-\end{equation}\todo{term with $\partdiff{f^d}{\gradient\eta_i}$ is missing}
+\end{equation}
 with the divergence theorem used on the gradient term.
 Inserting the derivatives calculated above gives
 \begin{equation}
 \begin{aligned}
   \vbf{R}_{\eta_i}=&\vint{\partdiff{\eta_i}{t}}{\psi}+\vint{L\sum_j\partdiff{h_j}{\eta_i}f_j}{\psi}-\vint{L\partdiff{h_j}{\eta_i}\mu_jx_j}{\psi}\\
-  &+\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi} \\
-  &+\vint{L\partdiff{f^d}{\eta_i}}{\psi}+\vint{\alpha\gradient\eta_i}{\gradient L\psi} -\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}+\vint{\xi}{\psi}
+  &+\vint{Lm\left(\eta_i^3-\eta_i+2\beta\eta_i\sum_{j\ne i}\eta_j^2\right)}{\psi}+\vint{L\sum_j\partdiff{h_j}{\eta_i}f^d_j}{\psi} \\
+  &+\vint{\alpha\gradient\eta_i}{\gradient L\psi} -\sint{(\alpha\gradient\eta_i)\cdot\vbf{n}}{L\psi}-\vint{\xi}{\psi}=\vbf{0}
  \end{aligned}
 \end{equation}
-
 
 The Cahn-Hilliard equation \cref{eq:CH} can be solved in two ways.
 Either you can solve it directly using the residual
 \begin{multline}
-  \vbf{R}_c=\vint{\partdiff{c}{t}}{\psi}-\vint{\gradient\cdot M\gradient\mu}{\psi}=\\ \vint{\partdiff{c}{t}}{\psi}+\vint{M\gradient\mu}{\gradient\psi}-\sint{M\gradient\mu\cdot\vbf{n}}{\psi}.
+  \vbf{R}_c=\vint{\partdiff{c}{t}}{\psi}-\vint{\gradient\cdot M\gradient\mu}{\psi}=\\ \vint{\partdiff{c}{t}}{\psi}+\vint{M\gradient\mu}{\gradient\psi}-\sint{M\gradient\mu\cdot\vbf{n}}{\psi}=\vbf{0}.
 \end{multline}
 This seems to be fairly straight forward, but for some reason it is ``not fully implemented'' in Moose.
 Instead, the equation is split into two and solved for the concentration $c$ as well as for the chemical potential $\mu$.
 The residuals for this are
 \begin{align}
-  &\vbf{R}_\mu=\vint{\partdiff{c}{t}}{\psi}+\vint{M\gradient\mu}{\gradient\psi}-\sint{M\gradient\mu\cdot\vbf{n}}{\psi} \\
-  &\vbf{R}_c=\vint{\partdiff{F}{c}-\mu}{\psi}.
+  &\vbf{R}_\mu=\vint{\partdiff{c}{t}}{\psi}+\vint{M\gradient\mu}{\gradient\psi}-\sint{M\gradient\mu\cdot\vbf{n}}{\psi}=\vbf{0} \\
+  &\vbf{R}_c=\vint{\partdiff{F}{c}-\mu}{\psi}=\vbf{0}.
 \end{align}
+
+The residual for the mechanical equilibrium equations are given by
+\begin{equation}
+  \vint{\rho_0\secdiff{\vbf{u}}{t}}{\psi}-\vint{\vbf{\sigma}}{\gradient\psi}+\sint{\vbf{\sigma}\cdot\vbf{n}}{\psi}=\vbf{0},
+\end{equation}
+where $\vbf{u}$ denotes displacements and $\vbf{\sigma}=\sum_jh_j\vbf{\sigma}_j$ is the global Cauchy stress calculated from the stress in each phase.
+
 
 \section{Implementation}
 This section describes the input file used to run the simulation.
@@ -303,8 +319,12 @@ A rectangular 2D mesh is created like this:
   ny = 10
   xmax = 0.304 # Length 
   ymax = 0.0257 # Height
-[]
+  displacements = 'disp_x disp_y'
+[].
 \end{verbatim}
+By specifying the displacements in the mesh block results can be visualized in the deformed configuration.
+For this to work the displacement variables must be called \texttt{disp\_}.
+
 \subsection{Variables}
 The \texttt{Variables} block declares the variables of the model.
 A variables is defined like this:
@@ -317,7 +337,8 @@ A variables is defined like this:
   [../]
 []
 \end{verbatim}
-To solve the model the following variables are needed: $c$,$\mu$,$x_i$,$\eta_i$, i.e. a simulation with three grains of different phases contains $8$ variables.
+To solve the model the following variables are needed: $c$, $\mu$, $x_i$, $\eta_i$, $u_x$, $u_y$, and $u_z$ i.e. a 3D simulation with three grains of different phases contains $11$ variables.
+
 \subsection{ICs and BCs}
 Initial conditions can be set in the \texttt{ICs} block. 
 For simple initial conditions the type \texttt{FunctionIC} can be used.
@@ -337,7 +358,7 @@ Boundary conditions are set in the \texttt{BCs} block using a very similar synta
 \subsection{Kernels}
 In Moose each part of the residual equations are implemented in separate kernels. 
 Each kernel is responsible for evaluating the residual and (optionally) calculate the Jacobian. 
-For each of the Allen-Cahn equations the kernels in \cref{tab:AC} is needed.
+For each of the Allen-Cahn equations the kernels are \cref{tab:AC} is needed.
 For the Cahn-Hilliard equation and the KKS conditions the kernels in \cref{tab:CH} are needed.
 
 \begin{table}
