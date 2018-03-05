@@ -244,6 +244,7 @@ protected:
   MaterialProperty<RankTwoTensor> & _pk2;
   const MaterialProperty<RankTwoTensor> & _pk2_old;
   MaterialProperty<RankTwoTensor> & _lag_e;
+  MaterialProperty<RankTwoTensor> & _lag_e_e;
   MaterialProperty<RankTwoTensor> & _update_rot;
   const MaterialProperty<RankTwoTensor> & _update_rot_old;
 
