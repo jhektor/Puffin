@@ -90,15 +90,14 @@ The energy due to deformation is taken as
 \end{equation}
 where
 \begin{equation}
-  f^d_i = \frac{1}{2}\vbf{\sigma}_i:\vbf{\varepsilon}^e_i
+  f^d_i = \frac{1}{2}\vbf{T}_i:\vbf{E}^e_i
 \end{equation}
 for the elastic phases (\ce{Cu} and \ce{Cu6Sn5}).
-Here, $\vbf{\sigma}$ and $\vbf{\varepsilon}^e$ denotes the Cauchy stress and the elastic part of the true strain tensor respectively.
 For the phases where plasticity is included (\ce{Sn}) the deformation energy is
 \begin{equation}
   f^d_i = \frac{1}{2}\vbf{T}_i:\vbf{E}^e_i+\frac{1}{2}Q_i\sum_\alpha^n\sum_\beta^n q_{\alpha\beta}s^\alpha_i s^\beta_i
 \end{equation}
-where $\vbf{T}$ is the second Piola-Kirchoff stress tensor, $\vbf{E}^e$ is the elastic Green strain tensor, $Q$ is a hardening parameter, and $s^\alpha$ is the slip resistance on the $\alpha$ slip system and the sum is taken over all $n$ slip systems. \todo{It should be the same elastic energy for all phases} \todo{$Q$ should be related to something in the equations for $\gamma$ or $s$}
+where $\vbf{T}$ is the second Piola-Kirchoff stress tensor, $\vbf{E}^e$ is the elastic Green strain tensor, $Q$ is a hardening parameter, and $s^\alpha$ is the slip resistance on the $\alpha$ slip system and the sum is taken over all $n$ slip systems.\todo{$Q$ should be related to something in the equations for $\gamma$ or $s$}
 More details on the mechanical model are given in \cref{sec:crypla}.
 
 \subsection{Governing equations}
