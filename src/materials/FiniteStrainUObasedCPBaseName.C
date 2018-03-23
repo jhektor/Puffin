@@ -86,6 +86,7 @@ FiniteStrainUObasedCPBaseName::FiniteStrainUObasedCPBaseName(const InputParamete
     _pk2_old(getMaterialPropertyOld<RankTwoTensor>(
         _base_name+"pk2")), // 2nd Piola Kirchoff Stress of previous increment
     _lag_e(declareProperty<RankTwoTensor>(_base_name + "lage")), // Lagrangian strain
+    _lag_e_e(declareProperty<RankTwoTensor>(_base_name + "lage_elastic")), // Lagrangian elastic strain
     _update_rot(declareProperty<RankTwoTensor>(_base_name +
         "update_rot")), // Rotation tensor considering material rotation and crystal orientation
     _update_rot_old(getMaterialPropertyOld<RankTwoTensor>(_base_name + "update_rot")),
@@ -306,7 +307,6 @@ FiniteStrainUObasedCPBaseName::postSolveQp()
 
   _lag_e[_qp] = _deformation_gradient[_qp].transpose() * _deformation_gradient[_qp] - iden;
   _lag_e[_qp] = _lag_e[_qp] * 0.5;
-  // TODO Calculate _elastic_strain from _fe
 
   RankTwoTensor rot;
   // Calculate material rotation
@@ -545,6 +545,10 @@ FiniteStrainUObasedCPBaseName::calcResidual()
   ce = _fe.transpose() * _fe;
   ee = ce - iden;
   ee *= 0.5;
+
+  // update elastic strain, THIS SHOULD BE THE TRUE STRAIN NOT GREEN
+  _lag_e_e[_qp] = ee;
+  // _elastic_strain[_qp] = ee;
 
   pk2_new = _elasticity_tensor[_qp] * ee;
 
