@@ -57,9 +57,9 @@
   [../]
   [./loading]
     type = FunctionPresetBC
-    variable = disp_y
-    boundary = top
-    function = '0.007*t'
+    variable = disp_z
+    boundary = front
+    function = '-0.005*t' #should give 1e-4 strain rate
   [../]
 
 []
@@ -67,28 +67,35 @@
   #Crystal plasticity for central Sn grain
   [./slip_rate_gss]
     type = CrystalPlasticitySlipRateGSSBaseName
+    #variable_size =10# 32
     variable_size = 32
-    slip_sys_file_name = slip_systems_bct.txt
+    slip_sys_file_name = slip_systems_bct_v2.txt
     num_slip_sys_flowrate_props = 2
     #flowprops = '1 4 0.001 0.1 5 8 0.001 0.1 9 12 0.001 0.1' #start_ss end_ss gamma0 1/m
     flowprops = '1 32 0.001 0.05' #start_ss end_ss gamma0 1/m
+    #flowprops = '1 10 0.001 0.05' #start_ss end_ss gamma0 1/m
     uo_state_var_name = state_var_gss
   [../]
   [./slip_resistance_gss]
     type = CrystalPlasticitySlipResistanceGSS
+    #variable_size = 10 #32
     variable_size = 32
     uo_state_var_name = state_var_gss
   [../]
   [./state_var_gss]
     type = CrystalPlasticityStateVariable
-    variable_size = 32
-    groups = '0 32'
-    group_values = '0.144' # 23 MPa in eV/nm^3 initial values of slip resistance
+    variable_size = 32# 32
+    groups = '0 2 4 6 10 12 16 18 20 24 32'
+    group_values = ''
+    #variable_size = 10# 32
+    #groups = '0 10'
+    #group_values = '0.144 0.07 0.01' # 23 MPa in eV/nm^3 initial values of slip resistance
     uo_state_var_evol_rate_comp_name = state_var_evol_rate_comp_gss
     scale_factor = 1.0
   [../]
   [./state_var_evol_rate_comp_gss]
     type = CrystalPlasticityStateVarRateComponentGSS
+    #variable_size = 10 #32
     variable_size = 32
     #hprops = '1.4 100 40 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
     hprops = '1.4 0.624 0.250 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
@@ -108,7 +115,7 @@
     uo_slip_resistances = 'slip_resistance_gss'
     uo_state_vars = 'state_var_gss'
     uo_state_var_evol_rate_comps = 'state_var_evol_rate_comp_gss'
-    maximum_substep_iteration = 10
+    maximum_substep_iteration = 20
     tan_mod_type = exact
   [../]
   #[./strain]
@@ -120,7 +127,7 @@
     #C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 24e3 22e3 22e3' #MPa #From Darbandi 2013 table III
     C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 149.8022 137.31 137.31' #eV/nm^3 #From Darbandi 2013 table III
     fill_method = symmetric9
-    euler_angle_1 = 60
+    euler_angle_1 = 45
     euler_angle_2 = 90
     euler_angle_3 = 0
   [../]
@@ -132,50 +139,64 @@
   [./block1]
     strain = FINITE
     add_variables = true
-    generate_output = 'stress_yy stress_xz strain_yy strain_xz vonmises_stress'
+    generate_output = 'stress_zz stress_xy strain_zz strain_xy vonmises_stress'
   [../]
 []
 
 
 [Postprocessors]
-  [./stress_center_yy]
+  [./stress_center_zz]
     type = PointValue
-    variable = stress_yy
+    variable = stress_zz
     point = '25 25 25'
   [../]
-  [./strain_center_yy]
+  [./strain_center_zz]
     type = PointValue
-    variable = strain_yy
+    variable = strain_zz
     point = '25 25 25'
   [../]
-  [./stress_center_xz]
+  [./stress_center_xy]
     type = PointValue
-    variable = stress_xz
+    variable = stress_xy
     point = '25 25 25'
   [../]
-  [./strain_center_xz]
+  [./strain_center_xy]
     type = PointValue
-    variable = strain_xz
+    variable = strain_xy
     point = '25 25 25'
   [../]
 []
 [Debug]
-  show_var_residual_norms = true
+  show_var_residual_norms = false
   #show_material_props = true
 []
 
 [Executioner]
   type = Transient
-  end_time = 16
-  dt = 0.25
+  end_time = 1200 #Should give 12% strain
+  #dt = 12
   solve_type = 'PJFNK'
   petsc_options_iname = '-pc_type -sub_pc_type -pc_asm_overlap -ksp_gmres_restart'
   petsc_options_value = 'asm lu 1 101'
+  nl_max_its = 20
+  [./TimeStepper]
+      # Turn on time stepping
+      type = IterationAdaptiveDT
+      dt = 24
+
+      cutback_factor = 0.5
+      growth_factor = 1.5
+      optimal_iterations = 10
+      linear_iteration_ratio = 10
+      #postprocessor_dtlim = 5
+  [../]
 []
 
 [Outputs]
   file_base = calibrationSn
-  exodus = true
+  exodus = false
   csv = true
-  print_perf_log = true
+  console = true
+  print_linear_residuals = false
+  print_perf_log = false
 []
