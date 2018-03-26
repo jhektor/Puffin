@@ -8,7 +8,6 @@
 #define ELASTICENERGYMATERIALGREENPK2_H
 
 #include "DerivativeFunctionMaterialBase.h"
-#include "DerivativeFunctionMaterialBase.h"
 #include "RankTwoTensor.h"
 
 // Forward Declaration
@@ -17,7 +16,7 @@ class ElasticEnergyMaterialGreenPK2;
 class RankFourTensor;
 
 template <>
-InputParameters validParams<DerivativeFunctionMaterialBase>();
+InputParameters validParams<ElasticEnergyMaterialGreenPK2>();
 
 /**
  * Material class to compute the elastic free energy based on Green-Lagrange strain and PK2 stress

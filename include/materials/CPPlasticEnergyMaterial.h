@@ -13,7 +13,7 @@
 class CPPlasticEnergyMaterial;
 
 template <>
-InputParameters validParams<DerivativeFunctionMaterialBase>();
+InputParameters validParams<CPPlasticEnergyMaterial>();
 
 /**
  * Material class to compute the elastic free energy and its derivatives

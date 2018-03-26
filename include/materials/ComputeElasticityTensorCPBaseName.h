@@ -12,6 +12,11 @@
 #include "RankTwoTensor.h"
 #include "RotationTensor.h"
 
+class ComputeElasticityTensorCPBaseName;
+
+template <>
+InputParameters validParams<ComputeElasticityTensorCPBaseName>();
+
 /**
  * ComputeElasticityTensorCPBaseName defines an elasticity tensor material object for crystal plasticity. This version adds the base_name option to _crysrot
  */
