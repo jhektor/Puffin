@@ -52,7 +52,8 @@ CPPlasticEnergyMaterial::computeF()
       jplane = j / 3;
 
       // Not sure why not if i==j
-      if (iplane == jplane) // Kalidindi
+      // if (iplane == jplane) // Kalidindi
+      if (i == j)
         qab = 1.0;
       else
         qab = _q;

@@ -34,7 +34,12 @@ protected:
   const MaterialProperty<std::vector<Real>> & _mat_prop_state_var;
   const Real _Q;
   const Real _q;
-  const Real _s0;
+  // const Real _s0;
+
+  std::vector<unsigned int> _groups;
+  std::vector<Real> _group_values;
+
+
 };
 
 #endif // CPPLASTICENERGYMATERIAL_H
