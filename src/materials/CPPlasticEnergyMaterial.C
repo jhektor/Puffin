@@ -20,9 +20,16 @@ validParams<CPPlasticEnergyMaterial>()
   params.addRequiredCoupledVar("args", "Arguments of F() - use vector coupling");
   params.addParam<Real>("Q", 1, "Hardening parameter SHOULD BE ALREADY USED SOMEWHERE...");
   params.addParam<Real>("q", 1.4, "Cross-hardening parameter");
-  params.addParam<Real>("s0", 0, "Initial value of slip resistance"); //Should make a vector
+  // params.addParam<Real>("s0", 0, "Initial value of slip resistance"); //Should make a vector
   params.addRequiredParam<unsigned int>("variable_size", "Number of slip systems.");
-
+  params.addParam<std::vector<unsigned int>>("groups",
+                                             "To group the initial values on different "
+                                             "slip systems 'format: [start end)', i.e.'0 "
+                                             "4 8 11' groups 0-3, 4-7 and 8-11 ");
+  params.addParam<std::vector<Real>>("group_values",
+                                     "The initial values correspoinding to each "
+                                     "group, i.e. '0.0 1.0 2.0' means 0-4 = 0.0, "
+                                     "4-8 = 1.0 and 8-12 = 2.0 ");
   return params;
 }
 
@@ -33,13 +40,36 @@ CPPlasticEnergyMaterial::CPPlasticEnergyMaterial(const InputParameters & paramet
     getMaterialProperty<std::vector<Real>>(parameters.get<std::string>("uo_state_var_name"))),
   _Q(getParam<Real>("Q")),
   _q(getParam<Real>("q")),
-  _s0(getParam<Real>("s0"))
+  // _s0(getParam<Real>("s0")),
+  _groups(getParam<std::vector<unsigned int>>("groups")),
+  _group_values(getParam<std::vector<Real>>("group_values"))
 {
 
 }
 Real
 CPPlasticEnergyMaterial::computeF()
 {
+  std::vector<Real> s0;
+  s0.resize(_variable_size);
+  for (unsigned int i = 0; i < _groups.size() - 1; ++i)
+  {
+    unsigned int is, ie;
+
+    is = _groups[i];
+    ie = _groups[i + 1] - 1;
+
+    if (is > ie)
+      mooseError("CPPlasticEnergyMaterial: Start index is = ",
+                 is,
+                 " should be greater than end index ie = ",
+                 ie,
+                 " in state variable read");
+
+    for (unsigned int j = is; j <= ie; ++j)
+      s0[j] = _group_values[i];
+  }
+
+
   Real sum, qab;
   sum = 0;
   // Loop over all slip systems
@@ -59,7 +89,7 @@ CPPlasticEnergyMaterial::computeF()
         qab = _q;
       sum += qab * _mat_prop_state_var[_qp][i] * _mat_prop_state_var[_qp][j];
       // This will not give sum = 0 for purely elastic so must subtract initial value of _mat_prop_state_var
-      sum -= qab * _s0 * _s0;
+      sum -= qab * s0[i] * s0[j];
     }
   }
 
