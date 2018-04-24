@@ -54,7 +54,7 @@
     family = MONOMIAL
     block = 0
   [../]
-  [./fp_yy]
+  [./fp_xx]
     order = CONSTANT
     family = MONOMIAL
     block = 0
@@ -129,6 +129,15 @@
     rank_two_tensor =global_stress
     execute_on = timestep_end
     scalar_type = VonMisesStress
+  [../]
+  [./fp_xx]
+    type = RankTwoAux
+    variable = fp_xx
+    rank_two_tensor = eta1_fp
+    index_j = 0
+    index_i = 0
+    execute_on = timestep_end
+    block = 0
   [../]
   [./stress_yy1]
     type = RankTwoAux

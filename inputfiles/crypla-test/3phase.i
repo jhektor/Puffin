@@ -5,16 +5,16 @@
 [Mesh]
   type = GeneratedMesh
   dim = 3
-  elem_type = HEX8
+  elem_type = TET4
   nx = 50
-  ny = 100
+  ny = 50
   nz = 1
-  xmin = -250
-  xmax = 250
-  ymin = -400
-  ymax = 600
+  xmin = 0
+  xmax = 2500 #400
+  ymin = 0
+  ymax = 2500 #400
   zmin = 0
-  zmax = 10
+  zmax = 50 #8
   displacements = 'disp_x disp_y disp_z'
 []
 [GlobalParams]
@@ -25,21 +25,22 @@
 []
 [Variables]
   [./disp_x]
-    #scaling = 1e-2
+    #scaling = 1e-1
   [../]
   [./disp_y]
-    #scaling = 1e-2
+    #scaling = 1e-1
   [../]
   [./disp_z]
-    #scaling = 1e-2
+    #scaling = 1e-1
   [../]
 
   [./c]
-    #scaling = 1e3
+    #scaling = 1e2
   [../]
   # chemical potential
   [./w]
     #scaling = 1e1
+    #initial_condition = -0.7405
   [../]
 
   [./eta0]
@@ -56,25 +57,34 @@
 
   [./c0]
     initial_condition = 0.02
-    #scaling = 1e3
+    #initial_condition = 0.1617
+    #scaling = 1e2
   [../]
   [./c1]
     initial_condition = 0.9745
-    #scaling = 1e3
+    #scaling = 1e2
   [../]
   [./c2]
     initial_condition = 0.4350
-    #scaling = 1e3
+    #scaling = 1e2
   [../]
 []
 
 [ICs]
   [./eta0]
-    type = FunctionIC
+    #type = FunctionIC
+    type = SmoothCircleIC
     variable = eta0
+    radius = 1250 #200
+    int_width = 200 #60
+    invalue = 1
+    outvalue = 0
+    x1 = 0
+    y1 = 0
+    z1 = 0
     #function = 'if(y<=0,1,0)'
     #function = '1-0.5*(1+tanh(y/100))' #close to equlibrium shape
-    function = '1-0.5*(1+tanh(y/40))' #close to equlibrium shape
+    #function = '1-0.5*(1+tanh(y/40))' #close to equlibrium shape
   [../]
   [./eta1]
     type = UnitySubVarIC
@@ -87,15 +97,31 @@
     cis = 'c0 c1 c2'
     etas = 'eta0 eta1 eta2'
   [../]
+  [./w]
+    #type = FunctionIC
+    type = SmoothCircleIC
+    variable = w
+    radius = 1250 #200
+    int_width = 200 #60
+    invalue = -16.4486
+    outvalue = -0.74034
+    x1 = 0
+    y1 = 0
+    z1 = 0
+    #function = 'if(y<=0,1,0)'
+    #function = '1-0.5*(1+tanh(y/100))' #close to equlibrium shape
+    #function = '1-0.5*(1+tanh(y/40))' #close to equlibrium shape
+  [../]
 []
 
 [BCs]
   [./Periodic]
-    [./xz]
-      auto_direction = 'x z'
+    [./z]
+      auto_direction = 'z'
       variable = 'eta0 eta1 eta2 c w c0 c1 c2'
     [../]
   [../]
+
   [./symmy]
     type = PresetBC
     variable = disp_y
@@ -172,7 +198,7 @@
     base_name = eta0
   [../]
   [./fel_cu]
-    type = ElasticEnergyMaterial
+    type = ElasticEnergyMaterialGreenPK2
     args = ' '
     base_name = eta0
     f_name = fe0
@@ -191,7 +217,7 @@
     uo_state_vars = 'state_var_gss1'
     uo_state_var_evol_rate_comps = 'state_var_evol_rate_comp_gss1'
     base_name = 'eta1'
-    maximum_substep_iteration = 5
+    maximum_substep_iteration = 8
     tan_mod_type = exact
   [../]
   [./strain]
@@ -206,7 +232,7 @@
     #C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 24e3 22e3 22e3' #MPa #From Darbandi 2013 table III
     C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 149.8022 137.31 137.31' #eV/nm^3 #From Darbandi 2013 table III
     fill_method = symmetric9
-    euler_angle_1 = 0
+    euler_angle_1 = 45
     euler_angle_2 = 60
     euler_angle_3 = 0
     base_name = 'eta1'
@@ -217,6 +243,7 @@
     f_name = fe1
     base_name = eta1
     use_displaced_mesh = true #Not sure
+    plasticity = true
     outputs = exodus
     output_properties = fe1
   [../]
@@ -268,11 +295,13 @@
     outputs = exodus
   [../]
   [./fe2]
-    type = ElasticEnergyMaterial
-    args = 'eta0 eta1 eta2'
-    #args = ' '
+    type = ElasticEnergyMaterialGreenPK2
+    #args = 'eta0 eta1 eta2'
+    args = ' '
     f_name = fe2
     base_name = eta2
+    eigenstrain = true
+    eigenstrain_name = eT_eta
     use_displaced_mesh = true #Not sure
     outputs = exodus
     output_properties = fe2
@@ -294,7 +323,8 @@
   [./model_constants]
     type = GenericConstantMaterial
     prop_names = 'sigma delta gamma tgrad_corr_mult'
-    prop_values = '0.5 60e-9 1.5 0' #J/m^2 m - ?
+    prop_values = '0.5 200e-9 1.5 0' #J/m^2 m - ?
+    #prop_values = '0.5 60e-9 1.5 0' #J/m^2 m - ?
   [../]
   [./kappa]
     type = ParsedMaterial
@@ -363,12 +393,13 @@
   [./ACMobility]
       type = GenericConstantMaterial
       prop_names = L
-      prop_values = 2.7
+      prop_values = 2.7 #2.7
   [../]
   [./noise_constants]
     type = GenericConstantMaterial
     prop_names = 'T kb lambda dim' #temperature Boltzmann gridsize dimensionality
-    prop_values = '493 8.6173303e-5 10 3'
+    prop_values = '493 8.6173303e-5 50 3'
+    #prop_values = '493 8.6173303e-5 10 3'
   [../]
   [./nuc]
     type =  DerivativeParsedMaterial
@@ -451,7 +482,7 @@
       outputs = exodus
       output_properties = fch1
   [../]
-  [./fch_cu] #Chemical energy Sn phase
+  [./fch_cu] #Chemical energy cu phase
       type = DerivativeParsedMaterial
       f_name = fch0
       args = 'c0'
@@ -472,7 +503,8 @@
       function = '(length_scale^5/(energy_scale*time_scale))*(h2*D_eta/A_eta+h1*D_sn/A_sn+h0*D_cu/A_cu)' #'+h_imc1*h_imc2*Mgb' #nm^5/eVs
       #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_sn/A_sn+h_imc*D_sn/A_sn+h_sn*D_sn/A_sn)' #nm^5/eVs
       derivative_order = 2
-      #outputs = exodus
+      outputs = exodus
+      output_properties = M
       use_displaced_mesh = true
   [../]
 
@@ -528,7 +560,8 @@
 
   #Nucleation of Cu6Sn5
   [./nuceta2]
-    type = LangevinNoisePositive
+    #type = LangevinNoisePositive
+    type = LangevinNoise
     variable = eta2
     amplitude = 1
     seed = 123456789
@@ -683,6 +716,19 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+
+  [./sxx]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./szz]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./sbiax]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [AuxKernels]
@@ -788,6 +834,29 @@
     execute_on = timestep_end
   [../]
 
+  [./sxx]
+    type = RankTwoAux
+    variable = sxx
+    rank_two_tensor = eta1_stress
+    index_i = 0
+    index_j = 0
+  [../]
+  [./szz]
+    type = RankTwoAux
+    variable = szz
+    rank_two_tensor = eta1_stress
+    index_i = 2
+    index_j = 2
+  [../]
+  [./sbiax]
+    type = ParsedAux
+    variable = sbiax
+    args = 'h1 sxx szz'
+    constant_names = 'to_MPa'
+    constant_expressions = '160.217662'
+    function = 'h1*0.5*(sxx+szz)*to_MPa'
+  [../]
+
   [./f_density]
     type = KKSMultiFreeEnergy
     variable = f_density
@@ -809,7 +878,8 @@
     variable = f_int
     args = 'eta0 eta1 eta2'
     constant_names = 'sigma delta gamma length_scale energy_scale'
-    constant_expressions = '0.5 60e-9 1.5 1e9 6.24150943e18'
+    constant_expressions = '0.5 200e-9 1.5 1e9 6.24150943e18'
+    #constant_expressions = '0.5 60e-9 1.5 1e9 6.24150943e18'
     function ='mu:=(6*sigma/delta)*(energy_scale/length_scale^3); mu*(0.25*eta0^4-0.5*eta0^2+0.25*eta1^4-0.5*eta1^2+0.25*eta2^4-0.5*eta2^2+gamma*(eta0^2*(eta1^2+eta2^2)+eta1^2*eta2^2)+0.25)'
     execute_on = 'initial timestep_end'
     use_displaced_mesh = true
@@ -823,6 +893,12 @@
     mat_prop = h2
     execute_on = 'INITIAL TIMESTEP_END'
     use_displaced_mesh = true
+  [../]
+  [./sbiax_mean]
+    type = ElementAverageValue
+    variable = sbiax
+    use_displaced_mesh = true
+    execute_on = 'INITIAL TIMESTEP_END'
   [../]
   #[./e_yy1]
   #  type = PointValue
@@ -884,7 +960,7 @@
 []
 [Debug]
   show_var_residual_norms = true
-  show_material_props = false
+  #show_material_props = true
 []
 [Preconditioning]
   [./smp]
@@ -895,6 +971,12 @@
 
     #petsc_options_iname = '-ksp_gmres_restart -snes_atol  -snes_rtol -ksp_rtol -pc_type -sub_pc_type  -pc_factor_shift_type  -sub_pc_factor_shift_type'
     #petsc_options_value = '     121              1e-10     1e-8     1e-5          asm       ilu             nonzero             nonzero'
+
+    #petsc_options_iname = '-pc_type -sub_pc_type   -sub_pc_factor_shift_type'
+    #petsc_options_value = 'asm       ilu            nonzero'
+
+    #petsc_options_iname = '-pc_type -pc_hypre_type   -pc_factor_shift_type  -ksp_gmres_restart'
+    #petsc_options_value = 'hypre       boomeramg            nonzero    150'
   [../]
 []
 
@@ -913,7 +995,7 @@
   nl_abs_tol = 1.0e-10#1.0e-11
 
   #num_steps = 2000
-  end_time = 1000 #50 hours
+  end_time = 60 #50 hours
   scheme = implicit-euler
 
   [./TimeStepper]
@@ -922,7 +1004,7 @@
       dt = 1e-3
 
       cutback_factor = 0.5
-      growth_factor = 1.25
+      growth_factor = 1.5
       optimal_iterations = 10
       linear_iteration_ratio = 25
       #postprocessor_dtlim = 5
@@ -931,6 +1013,7 @@
 []
 
 [Outputs]
-  file_base = 3phase-c_coupled-eigenstrain-10nm-50x100x1-nuc-fp-noscaling
+  file_base = 3phase-50nm-50x50x1tet-nuc-fp-circle-45-60-0-greenPK2
   exodus = true
+  csv = true
 []

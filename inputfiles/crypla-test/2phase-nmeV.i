@@ -99,9 +99,41 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./lage1]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./e1]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./diff]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [AuxKernels]
+  [./e1]
+    type = RankTwoAux
+    variable = e1
+    rank_two_tensor = eta1_total_strain
+    index_i = 1
+    index_j = 1
+  [../]
+  [./lage1]
+    type = RankTwoAux
+    variable = lage1
+    rank_two_tensor = eta1_lage
+    index_i = 1
+    index_j = 1
+  [../]
+  [./diff]
+    type = ParsedAux
+    variable = diff
+    args = 'e1 lage1'
+    function = 'sqrt((e1-lage1)^2)'
+  [../]
   [./bnd1]
     type = FunctionAux
     variable = eta1
@@ -419,4 +451,5 @@
 [Outputs]
   file_base = 2phase-eigenstrain-eVnm
   exodus = true
+  csv = true
 []

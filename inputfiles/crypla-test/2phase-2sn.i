@@ -348,7 +348,7 @@
     f_name = pre_eps
     material_property_names = 'h3 time'
     function = '0.02*h3' #*if(time>1,1,time)'
-    #outputs = exodus
+    outputs = exodus
     output_properties = pre_eps
   [../]
   #[./pre_eps]
@@ -356,7 +356,7 @@
   #  prop_names = pre_eps
   #  prop_values = tdisp
   #  #prop_values = 0.02
-  #  #outputs = exodus
+  #  outputs = exodus
   #  output_properties = pre_eps
   #[../]
   [./h1]
@@ -365,7 +365,7 @@
       all_etas = 'eta1 eta2 eta3'
       phase_etas = eta1
       use_displaced_mesh = true
-      #outputs = exodus
+      outputs = exodus
       output_properties = h1
   [../]
   [./h2]
@@ -374,7 +374,7 @@
       all_etas = 'eta1 eta2 eta3'
       phase_etas = eta2
       use_displaced_mesh = true
-      #outputs = exodus
+      outputs = exodus
       output_properties = h2
   [../]
   [./h3]
@@ -383,7 +383,7 @@
       all_etas = 'eta1 eta2 eta3'
       phase_etas = eta3
       use_displaced_mesh = true
-      #outputs = exodus
+      outputs = exodus
       output_properties = h3
   [../]
   # Generate the global stress from the phase stresses
@@ -405,16 +405,16 @@
 []
 
 [Preconditioning]
-  #[./smp]
-  #  type = SMP
-  #  full = true
-  #  petsc_options_iname = '-ksp_gmres_restart -snes_atol  -snes_rtol -ksp_rtol -pc_type -sub_pc_type  -pc_factor_shift_type  -sub_pc_factor_shift_type pc_factor_mat_solver_package'
-  #  petsc_options_value = '     121              1e-10     1e-8     1e-5          lu       ilu             nonzero             nonzero            superlu_dist'
-  #
-  #  #petsc_options_iname = '-ksp_gmres_restart -snes_atol  -snes_rtol -ksp_rtol -pc_type -sub_pc_type  -sub_pc_factor_shift_type -pc_factor_shift_type'
-  #  #petsc_options_value = '     121              1e-10     1e-8     1e-5          asm       ilu             nonzero                     nonzero'
-  #
-  #[../]
+  [./smp]
+    type = SMP
+    full = true
+    petsc_options_iname = '-ksp_gmres_restart -snes_atol  -snes_rtol -ksp_rtol -pc_type -sub_pc_type  -pc_factor_shift_type  -sub_pc_factor_shift_type pc_factor_mat_solver_package'
+    petsc_options_value = '     121              1e-10     1e-8     1e-5          lu       ilu             nonzero             nonzero            superlu_dist'
+
+    #petsc_options_iname = '-ksp_gmres_restart -snes_atol  -snes_rtol -ksp_rtol -pc_type -sub_pc_type  -sub_pc_factor_shift_type -pc_factor_shift_type'
+    #petsc_options_value = '     121              1e-10     1e-8     1e-5          asm       ilu             nonzero                     nonzero'
+
+  [../]
 []
 
 [Executioner]
@@ -450,6 +450,6 @@
 []
 
 [Outputs]
-  file_base = 2phase-2sn-eigenstrain-(120-90-0)-(60-120-180)
-  exodus = false
+  file_base = 2phase-2sn-eigenstrain-(120-90-0)-(180-90-0)
+  exodus = true
 []
