@@ -63,6 +63,7 @@
   [../]
 
 []
+
 [UserObjects]
   #Crystal plasticity for central Sn grain
   [./slip_rate_gss]
@@ -86,7 +87,7 @@
     type = CrystalPlasticityStateVariable
     variable_size = 32# 32
     groups = '0 2 4 6 10 12 16 18 20 24 32'
-    group_values = ''
+    group_values = '0.05331709 0.02615524 0.064912 0.0281 0.034952 0.031832 0.046187 0.093623 0.041194 0.074898'
     #variable_size = 10# 32
     #groups = '0 10'
     #group_values = '0.144 0.07 0.01' # 23 MPa in eV/nm^3 initial values of slip resistance
@@ -102,15 +103,14 @@
     uo_slip_rate_name = slip_rate_gss
     uo_state_var_name = state_var_gss
   [../]
-  []
-
+[]
 [Materials]
   #central Sn
   [./crysp]
     type = FiniteStrainUObasedCPBaseName
     rtol = 1e-6
     abs_tol = 1e-6
-    stol = 1e-2
+    stol = 1e-3
     uo_slip_rates = 'slip_rate_gss'
     uo_slip_resistances = 'slip_resistance_gss'
     uo_state_vars = 'state_var_gss'
@@ -143,29 +143,6 @@
   [../]
 []
 
-
-[Postprocessors]
-  [./stress_center_zz]
-    type = PointValue
-    variable = stress_zz
-    point = '25 25 25'
-  [../]
-  [./strain_center_zz]
-    type = PointValue
-    variable = strain_zz
-    point = '25 25 25'
-  [../]
-  [./stress_center_xy]
-    type = PointValue
-    variable = stress_xy
-    point = '25 25 25'
-  [../]
-  [./strain_center_xy]
-    type = PointValue
-    variable = strain_xy
-    point = '25 25 25'
-  [../]
-[]
 [Debug]
   show_var_residual_norms = false
   #show_material_props = true
@@ -194,9 +171,516 @@
 
 [Outputs]
   file_base = calibrationSn
-  exodus = false
+  exodus = true
   csv = true
   console = true
   print_linear_residuals = false
   print_perf_log = false
+[]
+
+[AuxVariables]
+  [./slip0]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip1]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip2]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip3]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip4]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip5]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip6]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip7]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip8]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip9]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip10]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip11]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip12]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip13]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip14]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip15]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip16]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip17]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip18]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip19]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip20]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip21]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip22]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip23]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip24]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip25]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip26]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip27]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip28]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip29]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip30]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+  [./slip31]
+    family = MONOMIAL
+    order = CONSTANT
+  [../]
+[]
+[AuxKernels]
+  [./slip0]
+    type = MaterialStdVectorAux
+    variable = slip0
+    index = 0
+    property = slip_rate_gss
+  [../]
+  [./slip1]
+    type = MaterialStdVectorAux
+    variable = slip1
+    index = 1
+    property = slip_rate_gss
+  [../]
+  [./slip2]
+    type = MaterialStdVectorAux
+    variable = slip2
+    index = 2
+    property = slip_rate_gss
+  [../]
+  [./slip3]
+    type = MaterialStdVectorAux
+    variable = slip3
+    index = 3
+    property = slip_rate_gss
+  [../]
+  [./slip4]
+    type = MaterialStdVectorAux
+    variable = slip4
+    index = 4
+    property = slip_rate_gss
+  [../]
+  [./slip5]
+    type = MaterialStdVectorAux
+    variable = slip5
+    index = 5
+    property = slip_rate_gss
+  [../]
+  [./slip6]
+    type = MaterialStdVectorAux
+    variable = slip6
+    index = 6
+    property = slip_rate_gss
+  [../]
+  [./slip7]
+    type = MaterialStdVectorAux
+    variable = slip7
+    index = 7
+    property = slip_rate_gss
+  [../]
+  [./slip8]
+    type = MaterialStdVectorAux
+    variable = slip8
+    index = 8
+    property = slip_rate_gss
+  [../]
+  [./slip9]
+    type = MaterialStdVectorAux
+    variable = slip9
+    index = 9
+    property = slip_rate_gss
+  [../]
+  [./slip10]
+    type = MaterialStdVectorAux
+    variable = slip10
+    index = 10
+    property = slip_rate_gss
+  [../]
+  [./slip11]
+    type = MaterialStdVectorAux
+    variable = slip11
+    index = 11
+    property = slip_rate_gss
+  [../]
+  [./slip12]
+    type = MaterialStdVectorAux
+    variable = slip12
+    index = 12
+    property = slip_rate_gss
+  [../]
+  [./slip13]
+    type = MaterialStdVectorAux
+    variable = slip13
+    index = 13
+    property = slip_rate_gss
+  [../]
+  [./slip14]
+    type = MaterialStdVectorAux
+    variable = slip14
+    index = 14
+    property = slip_rate_gss
+  [../]
+  [./slip15]
+    type = MaterialStdVectorAux
+    variable = slip15
+    index = 15
+    property = slip_rate_gss
+  [../]
+  [./slip16]
+    type = MaterialStdVectorAux
+    variable = slip16
+    index = 16
+    property = slip_rate_gss
+  [../]
+  [./slip17]
+    type = MaterialStdVectorAux
+    variable = slip17
+    index = 17
+    property = slip_rate_gss
+  [../]
+  [./slip18]
+    type = MaterialStdVectorAux
+    variable = slip18
+    index = 18
+    property = slip_rate_gss
+  [../]
+  [./slip19]
+    type = MaterialStdVectorAux
+    variable = slip19
+    index = 19
+    property = slip_rate_gss
+  [../]
+  [./slip20]
+    type = MaterialStdVectorAux
+    variable = slip20
+    index = 20
+    property = slip_rate_gss
+  [../]
+  [./slip21]
+    type = MaterialStdVectorAux
+    variable = slip21
+    index = 21
+    property = slip_rate_gss
+  [../]
+  [./slip22]
+    type = MaterialStdVectorAux
+    variable = slip22
+    index = 22
+    property = slip_rate_gss
+  [../]
+  [./slip23]
+    type = MaterialStdVectorAux
+    variable = slip23
+    index = 23
+    property = slip_rate_gss
+  [../]
+  [./slip24]
+    type = MaterialStdVectorAux
+    variable = slip24
+    index = 24
+    property = slip_rate_gss
+  [../]
+  [./slip25]
+    type = MaterialStdVectorAux
+    variable = slip25
+    index = 25
+    property = slip_rate_gss
+  [../]
+  [./slip26]
+    type = MaterialStdVectorAux
+    variable = slip26
+    index = 26
+    property = slip_rate_gss
+  [../]
+  [./slip27]
+    type = MaterialStdVectorAux
+    variable = slip27
+    index = 27
+    property = slip_rate_gss
+  [../]
+  [./slip28]
+    type = MaterialStdVectorAux
+    variable = slip28
+    index = 28
+    property = slip_rate_gss
+  [../]
+  [./slip29]
+    type = MaterialStdVectorAux
+    variable = slip29
+    index = 29
+    property = slip_rate_gss
+  [../]
+  [./slip30]
+    type = MaterialStdVectorAux
+    variable = slip30
+    index = 30
+    property = slip_rate_gss
+  [../]
+  [./slip31]
+    type = MaterialStdVectorAux
+    variable = slip31
+    index = 31
+    property = slip_rate_gss
+  [../]
+[]
+[Postprocessors]
+  [./slip0]
+    type = PointValue
+    variable = slip0
+    point = '25 25 25'
+  [../]
+  [./slip1]
+    type = PointValue
+    variable = slip1
+    point = '25 25 25'
+  [../]
+  [./slip2]
+    type = PointValue
+    variable = slip2
+    point = '25 25 25'
+  [../]
+  [./slip3]
+    type = PointValue
+    variable = slip3
+    point = '25 25 25'
+  [../]
+  [./slip4]
+    type = PointValue
+    variable = slip4
+    point = '25 25 25'
+  [../]
+  [./slip5]
+    type = PointValue
+    variable = slip5
+    point = '25 25 25'
+  [../]
+  [./slip6]
+    type = PointValue
+    variable = slip6
+    point = '25 25 25'
+  [../]
+  [./slip7]
+    type = PointValue
+    variable = slip7
+    point = '25 25 25'
+  [../]
+  [./slip8]
+    type = PointValue
+    variable = slip8
+    point = '25 25 25'
+  [../]
+  [./slip9]
+    type = PointValue
+    variable = slip9
+    point = '25 25 25'
+  [../]
+  [./slip10]
+    type = PointValue
+    variable = slip10
+    point = '25 25 25'
+  [../]
+  [./slip11]
+    type = PointValue
+    variable = slip11
+    point = '25 25 25'
+  [../]
+  [./slip12]
+    type = PointValue
+    variable = slip12
+    point = '25 25 25'
+  [../]
+  [./slip13]
+    type = PointValue
+    variable = slip13
+    point = '25 25 25'
+  [../]
+  [./slip14]
+    type = PointValue
+    variable = slip14
+    point = '25 25 25'
+  [../]
+  [./slip15]
+    type = PointValue
+    variable = slip15
+    point = '25 25 25'
+  [../]
+  [./slip16]
+    type = PointValue
+    variable = slip16
+    point = '25 25 25'
+  [../]
+  [./slip17]
+    type = PointValue
+    variable = slip17
+    point = '25 25 25'
+  [../]
+  [./slip18]
+    type = PointValue
+    variable = slip18
+    point = '25 25 25'
+  [../]
+  [./slip19]
+    type = PointValue
+    variable = slip19
+    point = '25 25 25'
+  [../]
+  [./slip20]
+    type = PointValue
+    variable = slip20
+    point = '25 25 25'
+  [../]
+  [./slip21]
+    type = PointValue
+    variable = slip21
+    point = '25 25 25'
+  [../]
+  [./slip22]
+    type = PointValue
+    variable = slip22
+    point = '25 25 25'
+  [../]
+  [./slip23]
+    type = PointValue
+    variable = slip23
+    point = '25 25 25'
+  [../]
+  [./slip24]
+    type = PointValue
+    variable = slip24
+    point = '25 25 25'
+  [../]
+  [./slip25]
+    type = PointValue
+    variable = slip25
+    point = '25 25 25'
+  [../]
+  [./slip26]
+    type = PointValue
+    variable = slip26
+    point = '25 25 25'
+  [../]
+  [./slip27]
+    type = PointValue
+    variable = slip27
+    point = '25 25 25'
+  [../]
+  [./slip28]
+    type = PointValue
+    variable = slip28
+    point = '25 25 25'
+  [../]
+  [./slip29]
+    type = PointValue
+    variable = slip29
+    point = '25 25 25'
+  [../]
+  [./slip30]
+    type = PointValue
+    variable = slip30
+    point = '25 25 25'
+  [../]
+  [./slip31]
+    type = PointValue
+    variable = slip31
+    point = '25 25 25'
+  [../]
+  [./stress_center_zz]
+    type = PointValue
+    variable = stress_zz
+    point = '25 25 25'
+  [../]
+  [./strain_center_zz]
+    type = PointValue
+    variable = strain_zz
+    point = '25 25 25'
+  [../]
+  [./stress_center_xy]
+    type = PointValue
+    variable = stress_xy
+    point = '25 25 25'
+  [../]
+  [./strain_center_xy]
+    type = PointValue
+    variable = strain_xy
+    point = '25 25 25'
+  [../]
 []

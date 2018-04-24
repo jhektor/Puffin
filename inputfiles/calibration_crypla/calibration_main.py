@@ -17,7 +17,7 @@ ax2.set_title('110 loading')
 ax2.set_ylim([0,30])
 
 #Define the objective function, minimize the 2-norm or simulation-experiment
-def calibfcn(x, finished = False):
+def calibfcn(x, pltstring = '--'):
     error = 0
     for loadcase in [0,1]:
         #Read experimental data from mat files
@@ -51,6 +51,7 @@ def calibfcn(x, finished = False):
 
         #Run moose simulation
         print 'Load case:', loadcase
+        print "\033[94mCurrent material parameters [MPa]:" + "\033[94m{}\033[0m".format(x*160.217662)
         print "\033[95mCurrent material parameters:" + "\033[95m{}\033[0m".format(x)
         runcmd = 'mpirun -n 1 ../../puffin-opt -i ' + inputfile + slip_rate_props_name + slip_rate_props + state_var_props_name + state_var_props + state_var_rate_props_name + state_var_rate_props + eul2 + ' > mooselog.txt'
         print 'Running this command:\n' + runcmd + "\033[0m"
@@ -59,7 +60,9 @@ def calibfcn(x, finished = False):
         #Get stress strain curve from csv file
         # aa = np.recfromcsv('calibrationSn.csv')
         aa = np.loadtxt('calibrationSn.csv',delimiter = ',', skiprows = 1)
-        strain_sim = -aa[:,2] #eps_yy
+        # idx = (np.abs(-aa[:,-3] - 0.12)).argmin()
+        #idx = -1
+        strain_sim = -aa[:,-3] #eps_yy
         stress_sim = -aa[:,-1]*160.217662 #sigma_yy in MPa (compression positive)
 
         if np.max(strain_sim) < 0.12: #this means the simulation failed
@@ -73,10 +76,10 @@ def calibfcn(x, finished = False):
         if loadcase is 0:
             # error = np.linalg.norm((stress_sim-stress_exp_interp)/stress_exp_interp)
             ax1.plot(strain_exp,stress_exp,'ko')
-            ax1.plot(strain_sim,stress_sim)
+            ax1.plot(strain_sim,stress_sim,pltstring)
         elif loadcase is 1:
             ax2.plot(strain_exp,stress_exp,'ko')
-            ax2.plot(strain_sim,stress_sim)
+            ax2.plot(strain_sim,stress_sim,pltstring)
 
         plt.pause(0.05)
 
@@ -85,25 +88,40 @@ def calibfcn(x, finished = False):
     return error
 # Minimize the objective function
 # x = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-bounds = ((5e-3, None),(5e-3,None),(5e-3,None),(5e-3,None),(5e-3,None),(5e-3,None),(5e-3,None),(5e-3,None),(5e-3,None),(5e-3,None),(5e-3,None),(5e-3,None))
+bounds = ((5e-3, 1),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75))
 
 #Initial values of parameter to calibrate (from Darbandi2012) [h0, ss, s0] used to scale x
 #Add more s0 varibles. Take initial values from table 8.4 and 8.5 in Darbandis thesis
 # mpar = [0.468, 0.075, 0.053, 0.0268, 0.0649, 0.0281, 0.0350, 0.0318, 0.0462, 0.0936, 0.0412, 0.0749]
 # mpar = [0.44401723, 0.01013415, 0.05331709, 0.02615524, 0.06898327, 0.02759656, 0.03323911, 0.01238013, 0.04818832, 0.09332103, 0.6712851, 0.02919173]
-mpar = [0.44401723, 0.075, 0.05331709, 0.02615524, 0.064912, 0.0281, 0.034952, 0.031832, 0.046187, 0.093623, 0.041194, 0.074898]
+# mpar = [0.44401723, 0.075, 0.05331709, 0.02615524, 0.064912, 0.0281, 0.034952, 0.031832, 0.046187, 0.093623, 0.041194, 0.074898]
 # x = mpar*x
+
+#Results of optimization on 001 to 12% strain
+mpar001 = [0.39584498,0.11386226,0.05122774,0.03452174,0.064912,0.01450561,0.034952,0.03256501,0.04525029,0.08612754,0.0749127,0.04518588]
+
+#Results of optimization on 110 only
+mpar110 = [0.17458343,0.05236679,0.05122774,0.03452174,0.03696807,0.00912421,0.02046358,0.01612225,0.04525029,0.08612754,0.29181706,0.02277457]
+
+mpar = 0.5*(np.array(mpar001)+np.array(mpar110))
+mpar[2] = mpar001[2]
+mpar[3] = mpar001[3]
+mpar[4] = mpar110[4]
+mpar[6] = mpar110[6]
+mpar[8] = mpar001[8]
+# mpar[10] = 0.04
+
+
+# mpar = np.array(mpar110)
+# mpar[1] = 23/160.217662
 result = spo.minimize(calibfcn,mpar,bounds=bounds)
-print result
+print mpar*160.217662 #result
 
 #Run simulation with the calibrated parameters
-# calibfcn(results.x)
-# calibfcn(mpar)
+calibfcn(results.x,pltstring='-')
+# calibfcn(mpar,pltstring='-')
 # plt.pause()
 # ax.plot(strain_exp,stress_exp,strain_sim,stress_sim,strain_sim,stress_exp_interp)
-
-
-
 
 plt.show(block=True)
 # calibfcn(mpar,(strain_exp, stress_exp))
