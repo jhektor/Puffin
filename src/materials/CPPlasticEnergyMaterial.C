@@ -78,18 +78,19 @@ CPPlasticEnergyMaterial::computeF()
     for (unsigned int j = 0; j < _variable_size; ++j)
     {
       unsigned int iplane, jplane;
-      iplane = i / 3;
-      jplane = j / 3;
+      iplane = i / 2;
+      jplane = j / 2;
 
       // Not sure why not if i==j
-      // if (iplane == jplane) // Kalidindi
-      if (i == j)
+      if (iplane == jplane) // Kalidindi
+      // if (i == j)
         qab = 1.0;
       else
         qab = _q;
       sum += qab * _mat_prop_state_var[_qp][i] * _mat_prop_state_var[_qp][j];
       // This will not give sum = 0 for purely elastic so must subtract initial value of _mat_prop_state_var
-      sum -= qab * s0[i] * s0[j];
+      // sum -= qab * s0[i] * s0[j];
+
     }
   }
 
