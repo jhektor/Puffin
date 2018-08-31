@@ -12,11 +12,11 @@ template <>
 InputParameters
 validParams<CrystalPlasticitySlipRateGSSBaseName>()
 {
-  InputParameters params = validParams<CrystalPlasticitySlipRateBaseName>();
+  InputParameters params = validParams<CrystalPlasticitySlipRateBaseName>(); // all parameters from here as well.
   params.addParam<std::string>("uo_state_var_name",
                                "Name of state variable property: Same as "
                                "state variable user object specified in input "
-                               "file.");
+                               "file."); // plus this one
   params.addClassDescription("Phenomenological constitutive model slip rate class.  Override the "
                              "virtual functions in your class");
   return params;

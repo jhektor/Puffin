@@ -27,6 +27,7 @@
 //UserObjects
 #include "CrystalPlasticitySlipRateGSSBaseName.h"
 #include "CrystalPlasticitySlipRateBaseName.h"
+#include "CrystalPlasticityStateVarRateComponentVoce.h"
 // #include "CrystalPlasticitySlipResistanceGSSBaseName.h"
 // #include "CrystalPlasticitySlipResistanceBaseName.h"
 
@@ -76,6 +77,7 @@ PuffinApp::registerObjects(Factory & factory)
   registerMaterial(ElasticEnergyMaterialGreenPK2);
   registerMaterial(CPPlasticEnergyMaterial);
   registerUserObject(CrystalPlasticitySlipRateGSSBaseName);
+  // registerUserObject(CrystalPlasticityStateVarRateComponentVoce);
   // registerUserObject(CrystalPlasticitySlipResistanceGSSBaseName);
 
 }
