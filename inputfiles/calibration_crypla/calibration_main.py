@@ -10,24 +10,25 @@ plt.ion() #interactive plotting
 
 fig = plt.figure()
 ax1 = fig.add_subplot(121)
-ax1.set_title('001 loading')
-ax1.set_ylim([0,30])
+ax1.set_title('010 loading')
+ax1.set_ylim([0,35])
 ax2 = fig.add_subplot(122)
-ax2.set_title('110 loading')
-ax2.set_ylim([0,30])
+ax2.set_title('100 loading')
+ax2.set_ylim([0,35])
 
 #Define the objective function, minimize the 2-norm or simulation-experiment
 def calibfcn(x, pltstring = '--'):
     error = 0
-    for loadcase in [0,1]:
+    
+    for loadcase in [1]:
         #Read experimental data from mat files
         if loadcase is 0:
-            data_file = '/home/johan/projects/Puffin/inputfiles/calibration_crypla/data/philippi2016extra001.mat'
-            eul2 = 'Materials/elasticity_tensor/euler_angle_1=0 Materials/elasticity_tensor/euler_angle_2=0 Materials/elasticity_tensor/euler_angle_3=0' #changes the rotation of crystal to 001 along loading in input file
+            data_file = '/home/viktor/projects/Puffin/inputfiles/calibration_crypla/data/5compDirTest_010.mat'
+            eul2 = 'Materials/elasticity_tensor/euler_angle_1=90 Materials/elasticity_tensor/euler_angle_2=90 Materials/elasticity_tensor/euler_angle_3=0' #changes the rotation of crystal to 001 along loading in input file            
             # eul2 = 'Materials/elasticity_tensor/euler_angle_1=60 Materials/elasticity_tensor/euler_angle_2=90' #changes the rotation of crystal to 001 along loading in input file
         elif loadcase is 1:
-            data_file = '/home/johan/projects/Puffin/inputfiles/calibration_crypla/data/philippi2016extra110v2.mat'
-            eul2 = 'Materials/elasticity_tensor/euler_angle_1=0 Materials/elasticity_tensor/euler_angle_2=90 Materials/elasticity_tensor/euler_angle_3=45' #changes the rotation of crystal to 110 along loading in input file
+            data_file = '/home/viktor/projects/Puffin/inputfiles/calibration_crypla/data/5compDirTest_100.mat'
+            eul2 = 'Materials/elasticity_tensor/euler_angle_1=180 Materials/elasticity_tensor/euler_angle_2=90 Materials/elasticity_tensor/euler_angle_3=90' #changes the rotation of crystal to 100 along loading in input file
             # eul2 = 'Materials/elasticity_tensor/euler_angle_1=45 Materials/elasticity_tensor/euler_angle_2=60' #changes the rotation of crystal to 110 along loading in input file
         data = sio.loadmat(data_file)
         strain_exp = data['xx'][:,0]
@@ -38,22 +39,29 @@ def calibfcn(x, pltstring = '--'):
         # names of properties to calibrate
         slip_rate_props_name = 'UserObjects/slip_rate_gss/flowprops='
         state_var_props_name = 'UserObjects/state_var_gss/group_values='
-        state_var_rate_props_name = 'UserObjects/state_var_evol_rate_comp_gss/hprops='
+        state_var_rate_h0_name = 'UserObjects/state_var_evol_rate_comp_gss/h0_group_values='
+        state_var_rate_tauSat_name = 'UserObjects/state_var_evol_rate_comp_gss/tauSat_group_values='
+        state_var_rate_hardeningExponent_name = 'UserObjects/state_var_evol_rate_comp_gss/hardeningExponent_group_values='
 
         # initial values (from Darbandi2012)
-        slip_rate_props_vals = [1, 32, 0.001, 0.05] #start_ss end_ss gamma0 1/m
-        state_var_rate_props_vals = [1.4, x[0], x[1], 2] #qab h0 ss c see eq (9) in Zhao 2017
-        state_var_vals = [x[2], x[3], x[4], x[5], x[6], x[7], x[8], x[9], x[10], x[11]] #slip resistance
+        slip_rate_props_vals = [1, 32, 0.001, 0.05] #start_ss end_ss gamma0 1/m m = 20??
+        state_var_props_vals = [x[6]] * 6# initial slip resistance values of each ss
+        state_var_rate_h0_vals =  [x[0], x[1], x[2], x[3], x[4], x[5]] #  h0 of each ss
+        state_var_rate_tauSat_vals = [x[7], x[8], x[9], x[10], x[11], x[12]] # assume different saturation values
+        state_var_rate_hardeningExponent_vals = [x[13]]*6 #[x[13], x[14], x[15], x[16], x[17], x[18]] # the hardening exponent c
 
         slip_rate_props = '\''+" ".join(str(x) for x in slip_rate_props_vals)+'\' '
-        state_var_props = '\''+" ".join(str(x) for x in state_var_vals)+'\' '
-        state_var_rate_props = '\''+" ".join(str(x) for x in state_var_rate_props_vals)+'\' '
+        state_var_props = '\''+" ".join(str(x) for x in state_var_props_vals)+'\' '
+        state_var_rate_h0 = '\''+" ".join(str(x) for x in state_var_rate_h0_vals)+'\' '
+        state_var_rate_tauSat = '\''+" ".join(str(x) for x in state_var_rate_tauSat_vals)+'\' '
+        state_var_rate_hardeningExponent = '\''+" ".join(str(x) for x in state_var_rate_hardeningExponent_vals)+'\' '
+
 
         #Run moose simulation
         print 'Load case:', loadcase
         print "\033[94mCurrent material parameters [MPa]:" + "\033[94m{}\033[0m".format(x*160.217662)
         print "\033[95mCurrent material parameters:" + "\033[95m{}\033[0m".format(x)
-        runcmd = 'mpirun -n 1 ../../puffin-opt -i ' + inputfile + slip_rate_props_name + slip_rate_props + state_var_props_name + state_var_props + state_var_rate_props_name + state_var_rate_props + eul2 + ' > mooselog.txt'
+        runcmd = 'mpirun -n 1 ../../puffin-opt -i ' + inputfile + slip_rate_props_name + slip_rate_props + state_var_props_name + state_var_props + state_var_rate_h0_name + state_var_rate_h0 + state_var_rate_tauSat_name + state_var_rate_tauSat + state_var_rate_hardeningExponent_name + state_var_rate_hardeningExponent + eul2 + ' > mooselog.txt'
         print 'Running this command:\n' + runcmd + "\033[0m"
         call(runcmd, shell=True)
 
@@ -65,7 +73,7 @@ def calibfcn(x, pltstring = '--'):
         strain_sim = -aa[:,-3] #eps_yy
         stress_sim = -aa[:,-1]*160.217662 #sigma_yy in MPa (compression positive)
 
-        if np.max(strain_sim) < 0.12: #this means the simulation failed
+        if np.max(strain_sim) < 0.048: #this means the simulation failed ???
             error += 20
         else:
             #Interpolate experimental values to simulated times
@@ -88,7 +96,7 @@ def calibfcn(x, pltstring = '--'):
     return error
 # Minimize the objective function
 # x = [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
-bounds = ((5e-3, 1),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75))
+bounds = ((5e-3, 0.75),)*6 + ((0.01, 0.75),) + ((25e-3, 0.75),)*6 + ((1, 4),) # set bounds for all variables
 
 #Initial values of parameter to calibrate (from Darbandi2012) [h0, ss, s0] used to scale x
 #Add more s0 varibles. Take initial values from table 8.4 and 8.5 in Darbandis thesis
@@ -98,25 +106,34 @@ bounds = ((5e-3, 1),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),(5e-3,0.75),
 # x = mpar*x
 
 #Results of optimization on 001 to 12% strain
-mpar001 = [0.39584498,0.11386226,0.05122774,0.03452174,0.064912,0.01450561,0.034952,0.03256501,0.04525029,0.08612754,0.0749127,0.04518588]
+mpar001 = [0.39584498,0.11386226,0.05122774,0.03452174,0.064912,0.01450561,0.034952,0.03256501,0.04525029,0.08612754,0.0749127,0.04518588, 1, 1] # added 2 extra values hacks
 
 #Results of optimization on 110 only
-mpar110 = [0.17458343,0.05236679,0.05122774,0.03452174,0.03696807,0.00912421,0.02046358,0.01612225,0.04525029,0.08612754,0.29181706,0.02277457]
+mpar110 = [0.17458343,0.05236679,0.05122774,0.03452174,0.03696807,0.00912421,0.02046358,0.01612225,0.04525029,0.08612754,0.29181706,0.02277457, 1, 1]
 
-mpar = 0.5*(np.array(mpar001)+np.array(mpar110))
-mpar[2] = mpar001[2]
-mpar[3] = mpar001[3]
-mpar[4] = mpar110[4]
-mpar[6] = mpar110[6]
-mpar[8] = mpar001[8]
+#mpar = np.array([0]*14)
+#mpar = 0.5*(np.array(mpar001)+np.array(mpar110))
+#mpar[2] = mpar001[2]
+#mpar[3] = mpar001[3]
+#mpar[4] = mpar110[4]
+#mpar[6] = mpar110[6]
+#mpar[8] = mpar001[8]
 # mpar[10] = 0.04
 
+mpar = np.array([0.1]*14) # --- TODO insert result from an optimization
+mpar[0:6] = 0.625
+mpar[7:13] = 0.225 # saturation values
+mpar[13] = 1.8
+mpar[6] = 0.24
 
 # mpar = np.array(mpar110)
 # mpar[1] = 23/160.217662
-result = spo.minimize(calibfcn,mpar,bounds=bounds)
+results = spo.minimize(calibfcn,mpar,bounds=bounds)
 print mpar*160.217662 #result
-
+if not results.success:
+    print results.message
+else:
+    print "Successful optimization!, %5d, iterations" % (results.nit)
 #Run simulation with the calibrated parameters
 calibfcn(results.x,pltstring='-')
 # calibfcn(mpar,pltstring='-')

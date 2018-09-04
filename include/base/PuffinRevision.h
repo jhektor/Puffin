@@ -3,7 +3,7 @@
 #ifndef PUFFIN_REVISION_H
 #define PUFFIN_REVISION_H
 
-#define PUFFIN_REVISION "git commit 5c35617 on 2018-01-26"
-#define PUFFIN_VERSION "5c35617"
+#define PUFFIN_REVISION "git commit 6d4ec25 on 2018-05-07"
+#define PUFFIN_VERSION "6d4ec25"
 
 #endif // PUFFIN_REVISION_H

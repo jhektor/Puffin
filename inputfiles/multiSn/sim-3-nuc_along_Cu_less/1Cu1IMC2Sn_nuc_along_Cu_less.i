@@ -1,4 +1,3 @@
-# TODO: Not sure if plastic energy is correctly calculated
 [Mesh]
   type = GeneratedMesh
   dim = 3
@@ -8,12 +7,18 @@
   nz = 1
   xmin = 0
   xmax = 400
-  ymin = -80
-  ymax = 400
+  ymin = -150
+  ymax = 330
   zmin = 0
   zmax = 8 #8
   displacements = 'disp_x disp_y disp_z'
 []
+#[Mesh]
+#  type = FileMesh
+#  file = box-4x4x2um.inp
+#  displacements = 'disp_x disp_y disp_z'
+#  uniform_refine = 0
+#[]
 [GlobalParams]
   # CahnHilliard needs the third derivatives
   derivative_order = 3
@@ -22,13 +27,13 @@
 []
 [Variables]
   [./disp_x]
-    #scaling = 1e-1
+    scaling = 1e-2
   [../]
   [./disp_y]
-    #scaling = 1e-1
+    scaling = 1e-2
   [../]
   [./disp_z]
-    #scaling = 1e-1
+    scaling = 1e-2
   [../]
 
   [./c]
@@ -88,17 +93,26 @@
     variable = eta2
     inside = 1
     outside = 0
+    #for abaqus mesh
+    #x1 = -1000
+    #y1 = 1000
+    #z1 = 0
+    #x2 = 1000
+    #y2 = 3000
+    #z2 = 2000
+    #For generated mesh
     x1 = 100
-    y1 = 100
+    y1 = 0
     z1 = 0
     x2 = 300
-    y2 = 400
+    y2 = 330
     z2 = 8
   [../]
   [./eta0] #Cu grain
     type = FunctionIC
     variable = eta0
-    function = 'if(y<=100,1,0)'
+    #function = 'if(y<1000,1,0)' #abaqus
+    function = 'if(y<0,1,0)' #generated
   [../]
   [./eta3]
     type = UnitySubVarIC
@@ -114,16 +128,33 @@
   [./w]
     type = FunctionIC
     variable = w
-    function = 'if(y<=100,-16.4486,-0.74034)'
+    #function = 'if(y<1000,-16.4486,-0.74034)' #abaqus
+    function = 'if(y<0,-16.4486,-0.74034)' #generated
   [../]
 []
 
 [BCs]
   [./Periodic]
-    [./xz]
+    #generated mesh
+    [./xy]
       auto_direction = 'x z'
       variable = 'eta0 eta1 eta2 eta3 c w c0 c1 c2 c3 disp_x disp_y disp_z'
     [../]
+    #abaqus mesh
+    #[./x]
+    #  #auto_direction = 'x z' #this only works for generated meshes
+    #  primary = 'left'
+    #  secondary = 'right'
+    #  translation = '4000 0 0'
+    #  variable = 'eta0 eta1 eta2 eta3 c w c0 c1 c2 c3 disp_x disp_y disp_z'
+    #[../]
+    #[./z]
+    #  #auto_direction = 'x z' #this only works for generated meshes
+    #  primary = 'back'
+    #  secondary = 'front'
+    #  translation = '0 0 2000'
+    #  variable = 'eta0 eta1 eta2 eta3 c w c0 c1 c2 c3 disp_x disp_y disp_z'
+    #[../]
   [../]
 
   [./symmy]
@@ -153,7 +184,7 @@
     slip_sys_file_name = slip_systems_bct.txt
     num_slip_sys_flowrate_props = 2
     #flowprops = '1 4 0.001 0.1 5 8 0.001 0.1 9 12 0.001 0.1' #start_ss end_ss gamma0 1/m
-    flowprops = '1 32 0.001 0.05' #start_ss end_ss gamma0 1/m
+    flowprops = '1 32 0.001 0.16667' #start_ss end_ss gamma0 1/m
     uo_state_var_name = state_var_gss2
     base_name = 'eta2'
   [../]
@@ -165,16 +196,27 @@
   [./state_var_gss2]
     type = CrystalPlasticityStateVariable
     variable_size = 32
-    groups = '0 32'
-    group_values = '0.144' # 23 MPa in eV/nm^3 initial values of slip resistance
+    #groups = '0 32'
+    #group_values = '0.144' # 23 MPa in eV/nm^3 initial values of slip resistance
+    groups = '0 2 4 6 10 12 16 18 20 24 32'
+    group_values = '0.05306 0.02684 0.06492 0.02809 0.03496 0.03184 0.04619 0.09363 0.04120 0.07491'
     uo_state_var_evol_rate_comp_name = state_var_evol_rate_comp_gss2
     scale_factor = 1.0
   [../]
   [./state_var_evol_rate_comp_gss2]
-    type = CrystalPlasticityStateVarRateComponentGSS
+    # type = CrystalPlasticityStateVarRateComponentGSS //Johans
+    type = CrystalPlasticityStateVarRateComponentVoce
     variable_size = 32
-    #hprops = '1.4 100 40 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
-    hprops = '1.4 0.624 0.250 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
+    groups = '0 2 4 6 10 20 24 32'
+    h0_group_values = '0.12484 0.12484 0.12484 0.12484 0.12484 0.12484 0.12484'
+    tau0_group_values = '0.0 0.0 0.0 0.0 0.0 0.0 0.0'
+    tauSat_group_values = '0.06866 0.05618 0.06866 0.05618 0.06242 0.05618 0.08115'
+    hardeningExponent_group_values = '2.0 2.0 2.0 2.0 2.0 2.0 2.0'
+    coplanarHardening_group_values = '1.0 1.0 1.0 1.0 1.0 1.0 1.0' #q_aa = 1
+    selfHardening_group_values = '1.4 1.4 1.4 1.4 1.4 1.4 1.4'
+
+    crystal_lattice_type = BCT # default is BCT
+
     uo_slip_rate_name = slip_rate_gss2
     uo_state_var_name = state_var_gss2
   [../]
@@ -185,7 +227,7 @@
     slip_sys_file_name = slip_systems_bct.txt
     num_slip_sys_flowrate_props = 2
     #flowprops = '1 4 0.001 0.1 5 8 0.001 0.1 9 12 0.001 0.1' #start_ss end_ss gamma0 1/m
-    flowprops = '1 32 0.001 0.05' #start_ss end_ss gamma0 1/m
+    flowprops = '1 32 0.001 0.16667' #start_ss end_ss gamma0 1/m
     uo_state_var_name = state_var_gss3
     base_name = 'eta3'
   [../]
@@ -197,16 +239,31 @@
   [./state_var_gss3]
     type = CrystalPlasticityStateVariable
     variable_size = 32
-    groups = '0 32'
-    group_values = '0.144' # 23 MPa in eV/nm^3 initial values of slip resistance
+    #groups = '0 32'
+    #group_values = '0.144' # 23 MPa in eV/nm^3 initial values of slip resistance
+    groups = '0 2 4 6 10 12 16 18 20 24 32'
+    # initial slip resistances
+    group_values = '0.05306 0.02684 0.06492 0.02809 0.03496 0.03184 0.04619 0.09363 0.04120 0.07491'
     uo_state_var_evol_rate_comp_name = state_var_evol_rate_comp_gss3
     scale_factor = 1.0
   [../]
   [./state_var_evol_rate_comp_gss3]
-    type = CrystalPlasticityStateVarRateComponentGSS
+    #type = CrystalPlasticityStateVarRateComponentGSS // johans
+    type = CrystalPlasticityStateVarRateComponentVoce
     variable_size = 32
     #hprops = '1.4 100 40 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
-    hprops = '1.4 0.624 0.250 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
+    #hprops = '1.4 0.624 0.250 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
+    groups = '0 2 4 6 10 20 24 32'
+    h0_group_values = '0.12484 0.12484 0.12484 0.12484 0.12484 0.12484 0.12484'
+    tau0_group_values = '0.0 0.0 0.0 0.0 0.0 0.0 0.0'
+    tauSat_group_values = '0.06866 0.05618 0.06866 0.05618 0.06242 0.05618 0.08115'
+    hardeningExponent_group_values = '2.0 2.0 2.0 2.0 2.0 2.0 2.0'
+    coplanarHardening_group_values = '1.0 1.0 1.0 1.0 1.0 1.0 1.0' #q_aa = 1
+    selfHardening_group_values = '1.4 1.4 1.4 1.4 1.4 1.4 1.4'
+
+    crystal_lattice_type = BCT
+
+
     uo_slip_rate_name = slip_rate_gss3
     uo_state_var_name = state_var_gss3
   [../]
@@ -247,30 +304,29 @@
   #central Sn
   [./crysp2]
     type = FiniteStrainUObasedCPBaseName
-    block = 0
+    rtol = 1e-6
+    abs_tol = 1e-6
     stol = 1e-2
     uo_slip_rates = 'slip_rate_gss2'
     uo_slip_resistances = 'slip_resistance_gss2'
     uo_state_vars = 'state_var_gss2'
     uo_state_var_evol_rate_comps = 'state_var_evol_rate_comp_gss2'
     base_name = 'eta2'
-    maximum_substep_iteration = 8
+    maximum_substep_iteration = 10
     tan_mod_type = exact
   [../]
   [./strain2]
     type = ComputeFiniteStrain
-    block = 0
     #displacements = 'disp_x disp_y disp_z'
     base_name = 'eta2'
   [../]
   [./elasticity_tensor2]
     type = ComputeElasticityTensorCPBaseName #Allows for changes due to crystal re-orientation
-    block = 0
     #C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 24e3 22e3 22e3' #MPa #From Darbandi 2013 table III
-    C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 149.8022 137.31 137.31' #eV/nm^3 #From Darbandi 2013 table III
+    C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 137.31 137.31 149.8022' #eV/nm^3 #From Darbandi 2013 table I
     fill_method = symmetric9
-    euler_angle_1 = 75
-    euler_angle_2 = 45
+    euler_angle_1 = 60
+    euler_angle_2 = 90
     euler_angle_3 = 0
     base_name = 'eta2'
   [../]
@@ -286,43 +342,45 @@
   [../]
   [./fp2]
     type = CPPlasticEnergyMaterial
-    Q = 0.624 # Not sure what this should be
+    #Q = 0.624 # Not sure what this should be
+    Q = 0.17458343 # Not sure what this should be
     variable_size = 32
     uo_state_var_name = state_var_gss2
     f_name = fp2
     use_displaced_mesh = true
     args = ' '
-    s0 = 0.144
+    #s0 = 0.144
+    groups = '0 2 4 6 10 12 16 18 20 24 32' #values calibrated on 110
+    group_values = '0.05122774 0.03452174 0.03696807 0.00912421 0.02046358 0.01612225 0.04525029 0.08612754 0.29181706 0.02277457'
     outputs = exodus
     output_properties = fp2
   [../]
   #Side Sn
   [./crysp3]
     type = FiniteStrainUObasedCPBaseName
-    block = 0
+    rtol = 1e-6
+    abs_tol = 1e-6
     stol = 1e-2
     uo_slip_rates = 'slip_rate_gss3'
     uo_slip_resistances = 'slip_resistance_gss3'
     uo_state_vars = 'state_var_gss3'
     uo_state_var_evol_rate_comps = 'state_var_evol_rate_comp_gss3'
     base_name = 'eta3'
-    maximum_substep_iteration = 8
+    maximum_substep_iteration = 10
     tan_mod_type = exact
   [../]
   [./strain3]
     type = ComputeFiniteStrain
-    block = 0
     #displacements = 'disp_x disp_y disp_z'
     base_name = 'eta3'
   [../]
   [./elasticity_tensor3]
     type = ComputeElasticityTensorCPBaseName #Allows for changes due to crystal re-orientation
-    block = 0
     #C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 24e3 22e3 22e3' #MPa #From Darbandi 2013 table III
-    C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 149.8022 137.31 137.31' #eV/nm^3 #From Darbandi 2013 table III
+    C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 137.31 137.31 149.8022' #eV/nm^3 #From Darbandi 2013 table I
     fill_method = symmetric9
-    euler_angle_1 = 45
-    euler_angle_2 = 60
+    euler_angle_1 = 75
+    euler_angle_2 = 45
     euler_angle_3 = 0
     base_name = 'eta3'
   [../]
@@ -338,13 +396,15 @@
   [../]
   [./fp3]
     type = CPPlasticEnergyMaterial
-    Q = 0.624 # Not sure what this should be
+    Q = 0.17458343 # Not sure what this should be
     variable_size = 32
     uo_state_var_name = state_var_gss3
     f_name = fp3
     use_displaced_mesh = true
     args = ' '
-    s0 = 0.144
+    #s0 = 0.144
+    groups = '0 2 4 6 10 12 16 18 20 24 32' #values calibrated on 110
+    group_values = '0.05122774 0.03452174 0.03696807 0.00912421 0.02046358 0.01612225 0.04525029 0.08612754 0.29181706 0.02277457'
     outputs = exodus
     output_properties = fp3
   [../]
@@ -378,7 +438,8 @@
   [../]
   [./pre]
     type = DerivativeParsedMaterial
-    material_property_names = 'h1(eta0,eta1,eta2,eta3)'
+    args = 'eta0 eta1 eta2 eta3'
+    material_property_names = 'h1'
     function = '0.02*h1'
     f_name = pre
     outputs = exodus
@@ -509,9 +570,10 @@
   [../]
   [./nuc]
     type =  DerivativeParsedMaterial
+    args = 'eta0 eta1 eta2 eta3'
     f_name = nuc
-    material_property_names = 'time dt T kb lambda dim L h0(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2,eta3) h3(eta0,eta1,eta2,eta3)'
-    function = 'if(time<1&h0*(h2+h3)>0.09,sqrt(2*kb*T*L/(lambda^dim*dt)),0)' #expression from Shen (2007)
+    material_property_names = 'time dt T kb lambda dim L h0 h2 h3'
+    function = 'if(time<1&(h0*h2 | h0*h3)>0.15,sqrt(2*kb*T*L/(lambda^dim*dt)),0)' #expression from Shen (2007), changed from h0*(h2+h3)
     outputs = exodus
     output_properties = nuc
     use_displaced_mesh = true
@@ -612,8 +674,9 @@
   [../]
 
   [./Mgb]
-    type=ParsedMaterial
-    material_property_names = 'D_gb delta delta_real h0(eta0,eta1,eta2,eta3) h1(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2,eta3) h3(eta0,eta1,eta2,eta3) A_cu A_imc A_sn length_scale energy_scale time_scale'
+    type=DerivativeParsedMaterial
+    args = 'eta0 eta1 eta2 eta3'
+    material_property_names = 'D_gb delta delta_real h0 h1 h2 h3 A_cu A_imc A_sn length_scale energy_scale time_scale'
     f_name = Mgb
     #function = '(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h0*A_cu+h1*A_imc+(h2+h3)*A_sn)*delta)'
     function = 'if(h2*h3>0.09,(length_scale^5/(energy_scale*time_scale))*3.*D_gb*delta_real/((h0*A_cu+h1*A_imc+(h2+h3)*A_sn)*delta),0)'
@@ -621,21 +684,29 @@
     outputs = exodus
     output_properties = Mgb
   [../]
-  [./CHMobility]
+  [./Mbulk]
       type = DerivativeParsedMaterial
-      f_name = M
+      f_name = Mbulk
       args = 'eta0 eta1 eta2 eta3'
-      material_property_names = 'h0(eta0,eta1,eta2,eta3) h1(eta0,eta1,eta2,eta3) h2(eta0,eta1,eta2,eta3) h3(eta0,eta1,eta2,eta3) D_cu D_eta D_sn A_cu A_eta A_sn Mgb length_scale energy_scale time_scale'
+      material_property_names = 'h0 h1 h2 h3 D_cu D_eta D_sn A_cu A_eta A_sn Mgb length_scale energy_scale time_scale'
       #function = 's:=eta_cu^2+eta_imc2^2+eta_imc1^2+eta_sn^2;p:=eta_imc2^2*eta_imc1^2;(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc2*D_imc/A_imc+h_imc1*D_imc/A_imc+h_sn*D_sn/A_sn+p*Mgb/s)' #nm^5/eVs
       #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_cu/A_cu+h_imc2*D_imc/A_imc+h_imc1*D_imc/A_imc+h_sn*D_sn/A_sn)+if(h_imc2*h_imc1>1./16.,0,Mgb)' #nm^5/eVs
-      function = '(length_scale^5/(energy_scale*time_scale))*(h0*D_cu/A_cu+h1*D_eta/A_eta+(h2+h3)*D_sn/A_sn)+Mgb' #nm^5/eVs
+      function = '(length_scale^5/(energy_scale*time_scale))*(h0*D_cu/A_cu+h1*D_eta/A_eta+(h2+h3)*D_sn/A_sn)' #nm^5/eVs
       #function = '(length_scale^5/(energy_scale*time_scale))*(h_cu*D_sn/A_sn+h_imc*D_sn/A_sn+h_sn*D_sn/A_sn)' #nm^5/eVs
       derivative_order = 2
-      outputs = exodus
-      output_properties = M
+      #outputs = exodus
+      #output_properties = M
       use_displaced_mesh = true
   [../]
-
+  [./CHMobility]
+    type = DerivativeSumMaterial
+    f_name = M
+    sum_materials = 'Mgb Mbulk'
+    args = 'eta0 eta1 eta2 eta3'
+    outputs = exodus
+    output_properties = M
+    use_displaced_mesh = true
+  [../]
   [./F_cu]
     type = DerivativeSumMaterial
     f_name = F0
@@ -1019,7 +1090,7 @@
     use_displaced_mesh = true
   [../]
   [./sbiax_mean]
-    type = ElementAverageValue
+    type = ElementAverageValue # Should only calculate mean in Sn elements. Write a PhaseAverageValue maybe.
     variable = sbiax
     use_displaced_mesh = true
     execute_on = 'INITIAL TIMESTEP_END'
@@ -1090,14 +1161,23 @@
   [./smp]
     type = SMP
     full = true
-    petsc_options_iname = '-ksp_gmres_restart -snes_atol  -snes_rtol -ksp_rtol -pc_type -sub_pc_type  -pc_factor_shift_type  -sub_pc_factor_shift_type pc_factor_mat_solver_package'
-    petsc_options_value = '     121              1e-10     1e-8     1e-5          lu       ilu             nonzero             nonzero            superlu_dist'
+    solve_type = PJFNK
 
-    #petsc_options_iname = '-ksp_gmres_restart -snes_atol  -snes_rtol -ksp_rtol -pc_type -sub_pc_type  -pc_factor_shift_type  -sub_pc_factor_shift_type'
-    #petsc_options_value = '     121              1e-10     1e-8     1e-5          asm       ilu             nonzero             nonzero'
+    #petsc_options_iname = '-ksp_gmres_restart -snes_atol  -snes_rtol -ksp_rtol -pc_type -sub_pc_type  -pc_factor_shift_type  -sub_pc_factor_shift_type pc_factor_mat_solver_package'
+    #petsc_options_value = '     121              1e-10     1e-8     1e-5          lu       ilu             nonzero             nonzero            superlu_dist'
+    #
 
-    #petsc_options_iname = '-pc_type -sub_pc_type   -sub_pc_factor_shift_type'
-    #petsc_options_value = 'asm       ilu            nonzero'
+    #petsc_options_iname = '-pc_asm_overlap -ksp_gmres_restart -snes_atol  -snes_rtol -ksp_rtol -pc_type -sub_pc_type  -pc_factor_shift_type  -sub_pc_factor_shift_type'
+    #petsc_options_value = '1  121              1e-10     1e-8     1e-5          asm       ilu             nonzero             nonzero'
+    #petsc_options_iname = '-pc_asm_overlap -ksp_gmres_restart  -pc_type -sub_pc_type  -pc_factor_shift_type  -sub_pc_factor_shift_type'
+    #petsc_options_value = '     1               121                asm       ilu             nonzero             nonzero'
+
+    #Larrys suggestion
+    petsc_options_iname = '-pc_asm_overlap -pc_type -sub_pc_type  -pc_factor_shift_type  -sub_pc_factor_shift_type -sub_ksp_type'
+    petsc_options_value = '2                  asm       lu             nonzero             nonzero                    preonly'
+
+    #petsc_options_iname = '-pc_type -pc_factor_shift_type -sub_pc_factor_shift_type'
+    #petsc_options_value = 'bjacobi       nonzero  nonzero'
 
     #petsc_options_iname = '-pc_type -pc_hypre_type   -pc_factor_shift_type  -ksp_gmres_restart'
     #petsc_options_value = 'hypre       boomeramg            nonzero    150'
@@ -1107,19 +1187,24 @@
 [Executioner]
   type = Transient
   solve_type = 'PJFNK'
-  line_search = default
+  #solve_type = 'NEWTON'
+
+  #line_search = default
   #line_search = none
   #line_search = bt
+
   petsc_options = '-snes_converged_reason -ksp_converged_reason -snes_ksp_ew'
-  l_max_its = 100
-  nl_max_its = 20
-  l_tol = 1.0e-4
+
+  l_max_its = 120
+  nl_max_its = 25
+
+  l_tol = 1.0e-3
   #l_abs_step_tol = 1e-8
-  nl_rel_tol = 1.0e-7 #1.0e-10
+  nl_rel_tol = 1.0e-9 #1.0e-10
   nl_abs_tol = 1.0e-10#1.0e-11
 
   #num_steps = 2000
-  end_time = 60 #50 hours
+  end_time = 600 #50 hours
   #scheme = implicit-euler
   scheme = bdf2
 
@@ -1138,7 +1223,7 @@
 []
 
 [Outputs]
-  file_base = 1Cu1imc2sn-hex-e2-75-45-0-e3-45-60-0-bdf2-periodic-Mgb-noscaling
+  file_base = 1Cu1imc2sn-e2-60-90-0-e3-45-60-0-bdf2-asm-110calib
   exodus = true
   csv = true
 []

@@ -59,7 +59,8 @@
     type = FunctionPresetBC
     variable = disp_z
     boundary = front
-    function = '-0.005*t' #should give 1e-4 strain rate
+    function = '-0.05*t' #should give 1e-3 strain rate as in Y. Kariya et. al. 2012
+    #function = '-0.005*t' #should give 1e-4 strain rate
   [../]
 
 []
@@ -69,10 +70,12 @@
   [./slip_rate_gss]
     type = CrystalPlasticitySlipRateGSSBaseName
     #variable_size =10# 32
-    variable_size = 32
-    slip_sys_file_name = slip_systems_bct_v2.txt
+    #variable_size = 32
+    #slip_sys_file_name = slip_systems_bct_v2_sorted.txt
+    variable_size = 20
+    slip_sys_file_name = slip_systems_bct_v2_sortedRemoved.txt
     num_slip_sys_flowrate_props = 2
-    #flowprops = '1 4 0.001 0.1 5 8 0.001 0.1 9 12 0.001 0.1' #start_ss end_ss gamma0 1/m
+    # flowprops = '1 4 0.001 0.1 5 8 0.001 0.1 9 12 0.001 0.1 13 32 1 1' #start_ss end_ss gamma0 1/m
     flowprops = '1 32 0.001 0.05' #start_ss end_ss gamma0 1/m
     #flowprops = '1 10 0.001 0.05' #start_ss end_ss gamma0 1/m
     uo_state_var_name = state_var_gss
@@ -80,26 +83,45 @@
   [./slip_resistance_gss]
     type = CrystalPlasticitySlipResistanceGSS
     #variable_size = 10 #32
-    variable_size = 32
+    variable_size = 20
     uo_state_var_name = state_var_gss
   [../]
   [./state_var_gss]
     type = CrystalPlasticityStateVariable
-    variable_size = 32# 32
-    groups = '0 2 4 6 10 12 16 18 20 24 32'
-    group_values = '0.05331709 0.02615524 0.064912 0.0281 0.034952 0.031832 0.046187 0.093623 0.041194 0.074898'
-    #variable_size = 10# 32
-    #groups = '0 10'
+    variable_size = 20# 32
+    #groups = '0 4 8 12 16 20 32'
+    groups = '0 3 7 11 14 15 16 17 18 19'
+    group_values = '0.14 0.14 0.14 0.14 0.14 0.14 0.14 0.14 0.14 0.14' # '0.05331709 0.02615524 0.064912 0.0281 0.034952 0.031832 0.046187 0.093623 0.041194 0.074898' altered to fit with groups
+    #group_values = '0.05 0.05 0.05 0.05 0.05 0.05' # '0.05331709 0.02615524 0.064912 0.0281 0.034952 0.031832 0.046187 0.093623 0.041194 0.074898' altered to fit with groups
+    #group_values = '0.14 0.14 0.14 0.14 0.14 0.14' # '0.05331709 0.02615524 0.064912 0.0281 0.034952 0.031832 0.046187 0.093623 0.041194 0.074898' altered to fit with groups
     #group_values = '0.144 0.07 0.01' # 23 MPa in eV/nm^3 initial values of slip resistance
     uo_state_var_evol_rate_comp_name = state_var_evol_rate_comp_gss
     scale_factor = 1.0
   [../]
   [./state_var_evol_rate_comp_gss]
-    type = CrystalPlasticityStateVarRateComponentGSS
-    #variable_size = 10 #32
-    variable_size = 32
+    type = CrystalPlasticityStateVarRateComponentVoce
+    variable_size = 20
+    #groups = '0 4 8 12 16 20 32'
+    groups = '0 3 7 11 14 15 16 17 18 19'
+    #h0_group_values = '0.624 0.624 0.624 0.624 0.624 0.624'
+    h0_group_values = '0.78 0.78 0.78 0.78 0.78 0.78'
     #hprops = '1.4 100 40 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
-    hprops = '1.4 0.624 0.250 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
+    #hprops = '1.4 0.624 0.250 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
+    #tau0_group_values = '0.12 0.12 0.12 0.12 0.12 0.12' # shold be set to zero as default -> Kalidindi's
+    tau0_group_values = '0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0 0.0'
+    #tau0_group_values = '0.0 0.0 0.0 0.0 0.0 0.0' # shold be set to zero as default -> Kalidindi's formulation
+    tauSat_group_values = '0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25 0.25'
+    #tauSat_group_values = '0.25 0.25 0.25 0.25 0.25 0.25'
+    #tauSat_group_values = '0.40 0.40 0.40 0.40 0.40 0.40'
+    #tauSat_group_values = '0.05 0.05 0.05 0.05 0.05 0.05' # Roughly 40 MPa in ev/nm^3
+    hardeningExponent_group_values = '2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0 2.0'
+    coplanarHardening_group_values = '1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0 1.0' #q_aa = 1
+    selfHardening_group_values = '1.4 1.4 1.4 1.4 1.4 1.4 1.4 1.4 1.4 1.4'
+    #hardeningExponent_group_values = '2.0 2.0 2.0 2.0 2.0 2.0'
+    #coplanarHardening_group_values = '1.0 1.0 1.0 1.0 1.0 1.0' #q_aa = 1
+    #selfHardening_group_values = '1.4 1.4 1.4 1.4 1.4 1.4'
+    crystal_lattice_type = BCT
+
     uo_slip_rate_name = slip_rate_gss
     uo_state_var_name = state_var_gss
   [../]
@@ -124,12 +146,13 @@
   #[../]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCPBaseName #Allows for changes due to crystal re-orientation
-    #C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 24e3 22e3 22e3' #MPa #From Darbandi 2013 table III
-    C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 149.8022 137.31 137.31' #eV/nm^3 #From Darbandi 2013 table III
+    #C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 24e3 22e3 22e3' #MPa #From Darbandi 2013 table I
+    C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 149.8022 137.31 137.31' #eV/nm^3 #From Darbandi 2013 table I
     fill_method = symmetric9
-    euler_angle_1 = 45
+    euler_angle_1 = 90
     euler_angle_2 = 90
     euler_angle_3 = 0
+    # angles are ZX'Z'' rotations, proper euler, according to http://mooseframework.org/docs/doxygen/modules/RotationTensor_8C_source.html
   [../]
 
 []
@@ -150,7 +173,8 @@
 
 [Executioner]
   type = Transient
-  end_time = 1200 #Should give 12% strain
+  #end_time = 1200 #Should give 12% strain for Darbandi 2013?
+  end_time = 50 # Should give 5% strain for 5comp  dir Y. Kariya 2012
   #dt = 12
   solve_type = 'PJFNK'
   petsc_options_iname = '-pc_type -sub_pc_type -pc_asm_overlap -ksp_gmres_restart'
@@ -159,8 +183,7 @@
   [./TimeStepper]
       # Turn on time stepping
       type = IterationAdaptiveDT
-      dt = 24
-
+      dt = 0.1
       cutback_factor = 0.5
       growth_factor = 1.5
       optimal_iterations = 10

@@ -7,12 +7,12 @@
 []
 
 [BCs]
-    [./neumann]
-        type = NeumannBC
-        boundary = 'left right'
-        variable = 'c w c_cu c_imc c_sn eta_cu eta_imc eta_sn'
-        value = 0
-    [../]
+    # [./neumann]
+    #     type  = PresetBC
+    #     boundary = 'left right'
+    #     variable = 'c w c_cu c_imc c_sn eta_cu eta_imc eta_sn'
+    #     value = 0
+    # [../]
 []
 
 [Variables]
