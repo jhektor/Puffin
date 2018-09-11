@@ -217,23 +217,44 @@ CrystalPlasticityStateVarRateComponentVoce::initSlipSystem_PlaneID(
 
         break;
       case 2: // BCT, see 'slip_systems_bct_v2_sorted2.txt' for details
-        if (slipSystemIndex < 4)
+        // if (slipSystemIndex < 2)
+        //   _slipSystem_PlaneID[slipSystemIndex] = 0;
+        //
+        // else if (slipSystemIndex < 4)
+        //   _slipSystem_PlaneID[slipSystemIndex] = 1;
+        //
+        // else if (slipSystemIndex < 6)
+        //   _slipSystem_PlaneID[slipSystemIndex] = 2;
+        //
+        // else if (slipSystemIndex < 10)
+        //   _slipSystem_PlaneID[slipSystemIndex] = 3;
+        //
+        // else if (slipSystemIndex < 20)
+        //   _slipSystem_PlaneID[slipSystemIndex] = 4;
+        //
+        // else if (slipSystemIndex < 24)
+        //   _slipSystem_PlaneID[slipSystemIndex] = 5;
+        //
+        // else if (slipSystemIndex >= 24 && slipSystemIndex < 32)
+        //   _slipSystem_PlaneID[slipSystemIndex] = 6;
+        if (slipSystemIndex >=20 )
+          _slipSystem_PlaneID[slipSystemIndex] = slipSystemIndex;
+
+        else if ((slipSystemIndex == 0||slipSystemIndex==4)||(slipSystemIndex==14||slipSystemIndex==15))
           _slipSystem_PlaneID[slipSystemIndex] = 0;
 
-        else if (slipSystemIndex < 8)
+        else if ((slipSystemIndex == 1||slipSystemIndex==5)||(slipSystemIndex==12||slipSystemIndex==13))
           _slipSystem_PlaneID[slipSystemIndex] = 1;
 
-        else if (slipSystemIndex < 12)
+        else if ((slipSystemIndex==2||slipSystemIndex==6)||(slipSystemIndex==7||slipSystemIndex==10))
           _slipSystem_PlaneID[slipSystemIndex] = 2;
 
-        else if (slipSystemIndex < 16)
+        else if ((slipSystemIndex==3||slipSystemIndex==8)||(slipSystemIndex==9||slipSystemIndex==11))
           _slipSystem_PlaneID[slipSystemIndex] = 3;
 
-        else if (slipSystemIndex < 20)
+        else if (slipSystemIndex>=16&&slipSystemIndex<=19)
           _slipSystem_PlaneID[slipSystemIndex] = 4;
 
-        else if (slipSystemIndex >= 20 && slipSystemIndex < 32)
-          _slipSystem_PlaneID[slipSystemIndex] = slipSystemIndex;
         else
           mooseError("There is something shady in the system Sire! BCT slip systems are compromised");
 
