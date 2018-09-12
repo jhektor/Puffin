@@ -65,7 +65,7 @@ validParams<CrystalPlasticityStateVarRateComponentVoce>()
                                      "correspoinding to each group"
                                      " i.e. '1.0 2.0 3.0' means 0-11 = 1.0, "
                                      "12-23 = 2.0 and 24-48 = 3.0 ");
-  params.addParam<bool>("_check_for_errors", "Enables error check output in file.");
+  // params.addParam<bool>("_check_for_errors", "Enables error check output in file.");
   // params.addParam<std::vector<Real>>("GroupGroup_Hardening_group_values",
   //                                    "The group-to-group laten hardening coefficient q_ab"
   //                                    "This is a NxN vector"
@@ -95,12 +95,13 @@ CrystalPlasticityStateVarRateComponentVoce::CrystalPlasticityStateVarRateCompone
     _tauSat_group_values(getParam<std::vector<Real>>("tauSat_group_values")),
     _hardeningExponent_group_values(getParam<std::vector<Real>>("hardeningExponent_group_values")),
     _selfHardening_group_values(getParam<std::vector<Real>>("selfHardening_group_values")),
-    _coplanarHardening_group_values(getParam<std::vector<Real>>("coplanarHardening_group_values")),
-    _check_for_errors(false) // change if error check is neccessary
+    _coplanarHardening_group_values(getParam<std::vector<Real>>("coplanarHardening_group_values"))
+    // _check_for_errors(false) // change if error check is neccessary
     // _GroupGroup_Hardening_group_values(
     //     getParam<std::vector<Real>>("GroupGroup_Hardening_group_values"))
 {
   // perform input checks and initialize usefull variables
+  _check_for_errors=false;
   _n_groups = _groups.size() - 1;
   checkHardeningParametersSize();
   initSlipSystem_PlaneID(_slipSystem_PlaneID);
