@@ -3,14 +3,14 @@
   dim = 3
   elem_type = HEX8
   nx = 80
-  ny = 114 
-  nz = 1
+  ny = 114
+  nz = 80
   xmin = 0
   xmax = 1280
-  ymin = -824 #-150
-  ymax = 1000 #330
+  ymin = -824
+  ymax = 1000
   zmin = 0
-  zmax = 16 #8
+  zmax = 1280
   displacements = 'disp_x disp_y disp_z'
 []
 
@@ -89,7 +89,7 @@
     z1 = 0
     x2 = 960 #300
     y2 = 1000
-    z2 = 16
+    z2 = 1280
   [../]
   [./eta0] #Cu grain
     type = FunctionIC
@@ -302,8 +302,8 @@
     C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 137.31 137.31 149.8022' #eV/nm^3 #From Darbandi 2013 table I
     fill_method = symmetric9
     euler_angle_1 = 0
-    euler_angle_2 = 345
-    euler_angle_3 = 0
+    euler_angle_2 = 270
+    euler_angle_3 = 270
     base_name = 'eta2'
   [../]
   [./fe2]
@@ -2168,7 +2168,7 @@
 []
 
 [Outputs]
-  file_base = 1Cu1imc2sn-e2-0-345-0-e3-0-0-0-bdf2-asm-110calib
+  file_base = 1Cu1imc2sn-e2-0-270-270-e3-0-0-0-bdf2-asm-110calib
   exodus = true
   csv = true
   [./checkpoint]
@@ -2178,12 +2178,3 @@
     use_displaced = true
   [../]
 []
-
-# [Controls]
-#   [./A_cu_control]
-#     type = RealFunctionControl
-#     parameter = 'Materials/energy_A/coef'
-#     function = 'func_coef'
-#     execute_on = 'initial timestep_begin'
-#   [../]
-# []

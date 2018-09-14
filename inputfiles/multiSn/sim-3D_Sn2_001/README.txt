@@ -21,4 +21,4 @@
 						grow time reduced from 30 to 8 cooldown 4 s -> low temp at 12 s
 
 	**  14/9	added accum_L_2_slip_rate_gssi aux vars to store accumulated slip increments over time
-	
+						3D mesh - added layers in z-axis

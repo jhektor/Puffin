@@ -13,5 +13,12 @@
 			energy_A
 			ACMobility too???
 
-	**	12/9	use 80x114 [x, y] elems for the mesh; square 16nm elems 
+	**	12/9	use 80x114 [x, y] elems for the mesh; square 16nm elems
 						delta = 5x elem side_length
+
+	**	13/9	wrong unit on ABC constants Vm was used to bring them into [Jm^-3] from [Jmol^-1]
+						added postprocessing of the slip field TODO...
+						grow time reduced from 30 to 8 cooldown 4 s -> low temp at 12 s
+
+	**  14/9	added accum_L_2_slip_rate_gssi aux vars to store accumulated slip increments over time
+	

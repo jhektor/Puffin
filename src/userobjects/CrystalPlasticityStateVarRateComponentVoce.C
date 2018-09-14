@@ -310,7 +310,7 @@ CrystalPlasticityStateVarRateComponentVoce::getHardeningCoefficient(
 
   // retrieve appropriate coefficient
   if (same_slipSystem)
-    q_ab = _selfHardening_group_values[group_i];
+    q_ab = _coplanarHardening_group_values[group_i];
   else if (same_plane)
     q_ab = _coplanarHardening_group_values[group_i];
   // else // here for debugging purposes

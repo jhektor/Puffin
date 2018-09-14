@@ -3,14 +3,14 @@
   dim = 3
   elem_type = HEX8
   nx = 80
-  ny = 114 #60
+  ny = 114
   nz = 1
   xmin = 0
   xmax = 1280
-  ymin = -824 #-150
-  ymax = 1000 #330
+  ymin = -824
+  ymax = 1000
   zmin = 0
-  zmax = 16 #8
+  zmax = 16
   displacements = 'disp_x disp_y disp_z'
 []
 
@@ -152,7 +152,7 @@
     variable_size = 32
     slip_sys_file_name = slip_systems_bct.txt
     num_slip_sys_flowrate_props = 2
-    flowprops = '1 32 0.001 0.16667' #start_ss end_ss gamma0 1/m
+    flowprops = '1 32 0.001 0.166666667' #start_ss end_ss gamma0 1/m
     uo_state_var_name = state_var_gss2
     base_name = 'eta2'
   [../]
@@ -194,7 +194,7 @@
     slip_sys_file_name = slip_systems_bct.txt
     num_slip_sys_flowrate_props = 2
     #flowprops = '1 4 0.001 0.1 5 8 0.001 0.1 9 12 0.001 0.1' #start_ss end_ss gamma0 1/m
-    flowprops = '1 32 0.001 0.16667' #start_ss end_ss gamma0 1/m
+    flowprops = '1 32 0.001 0.166666667' #start_ss end_ss gamma0 1/m
     uo_state_var_name = state_var_gss3
     base_name = 'eta3'
   [../]
@@ -215,6 +215,7 @@
     scale_factor = 1.0
   [../]
   [./state_var_evol_rate_comp_gss3]
+    #type = CrystalPlasticityStateVarRateComponentGSS // johans
     type = CrystalPlasticityStateVarRateComponentVoce
     variable_size = 32
     #hprops = '1.4 100 40 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
@@ -247,6 +248,8 @@
     prop_time = time
     prop_dt = dt
     use_displaced_mesh = true
+    # output_properties = 'dt'
+    # outputs = exodus
   [../]
   # Cu
   [./elasticity_tensor_cu]
@@ -285,6 +288,8 @@
     base_name = 'eta2'
     maximum_substep_iteration = 10
     tan_mod_type = exact
+    # output_properties = 'slip_rate_gss2'
+    # outputs = exodus
   [../]
   [./strain2]
     type = ComputeFiniteStrain
@@ -296,7 +301,7 @@
     #C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 22e3 22e3 24e3' #MPa #From Darbandi 2014 table I
     C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 137.31 137.31 149.8022' #eV/nm^3 #From Darbandi 2013 table I
     fill_method = symmetric9
-    euler_angle_1 = 0
+    euler_angle_1 = 45
     euler_angle_2 = 0
     euler_angle_3 = 0
     base_name = 'eta2'
@@ -324,8 +329,8 @@
     #s0 = 0.144
     groups = '0 2 4 6 10 12 16 18 20 24 32' #values calibrated on 110
     group_values = '0.05122774 0.03452174 0.03696807 0.00912421 0.02046358 0.01612225 0.04525029 0.08612754 0.29181706 0.02277457'
-    outputs = exodus
-    output_properties = fp2
+    # outputs = exodus
+    # output_properties = fp2
   [../]
   #Side Sn
   [./crysp3]
@@ -340,6 +345,8 @@
     base_name = 'eta3'
     maximum_substep_iteration = 10
     tan_mod_type = exact
+    # output_properties = 'slip_rate_gss3'
+    # outputs = exodus
   [../]
   [./strain3]
     type = ComputeFiniteStrain
@@ -351,7 +358,7 @@
     #C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 24e3 22e3 22e3' #MPa #From Darbandi 2013 table III
     C_ijkl = '451.26 370.75 223.45 451.26 223.45 551.75 137.31 137.31 149.8022' #eV/nm^3 #From Darbandi 2013 table I
     fill_method = symmetric9
-    euler_angle_1 = 45
+    euler_angle_1 = 0
     euler_angle_2 = 0
     euler_angle_3 = 0
     base_name = 'eta3'
@@ -378,8 +385,8 @@
     #s0 = 0.144
     groups = '0 2 4 6 10 12 16 18 20 24 32' #values calibrated on 110
     group_values = '0.05122774 0.03452174 0.03696807 0.00912421 0.02046358 0.01612225 0.04525029 0.08612754 0.29181706 0.02277457'
-    outputs = exodus
-    output_properties = fp3
+    # outputs = exodus
+    # output_properties = fp3
   [../]
 
   [./elasticity_tensor_eta]
@@ -549,7 +556,7 @@
                   A_cu_25   A_eps_25    A_eta_25    A_sn_25'
     #prop_values = '1.0133e5/Vm 4e5/Vm 4.2059e6/Vm' #J/m^3
     prop_values = '1.7756e10  2.4555e11   2.4555e11   2.3033e10
-                   1.0133e5   4.0e5       4.0e5       4.2059e6' #J/m^3 Aeps=Aeta=2e6 prev. used
+                   6.2204e9   2.4555e10   2.4555e10   2.5819e11' #J/m^3 Aeps=Aeta=2e6 prev. used; Vm := molar vol = 16.29 [cm^3 mol^-1]
     #prop_values = '1.5929e10 2.4555e12 2.4555e12 2.3020e10' #J/m^3 Aeps = 2e7 Aeta = 2e7
   [../]
   [./energy_constants_B]
@@ -558,7 +565,7 @@
                   B_cu_25   B_eps_25  B_eta_25  B_sn_25'
     #prop_values = '-2.1146e4/Vm -6.9892e3/Vm 7.168e3/Vm' #J/m^3
     prop_values = '-2.6351e9  -1.4014e9   2.3251e7    2.14216e8
-                   -2.1146e4  -6.9892e3   -6.9892e3   7.1680e3' #J/m^3
+                   -1.2981e9  -4.2905e8   -4.2905e8   4.4002e8' #J/m^3
     #prop_values = '-2.5789e9 -1.3733e9 2.3175e7 2.1406e8' #J/m^3
   [../]
   [./energy_C]
@@ -567,14 +574,14 @@
                   C_cu_25   C_eps_25   C_eta_25   C_sn_25'
     #prop_values = '-1.2842e4/Vm -1.9185e4/Vm -1.5265e4/Vm' #J/m^3
     prop_values = '-1.1441e9  -1.7294e9   -1.7646e9   -1.646e9
-                   -1.2842e4  -1.9185e4   -1.9185e4   -1.5265e4' #J/m^3
+                   -7.8834e8  -1.1778e9   -1.1778e9   -9.3708e8' #J/m^3
     #prop_values = '-1.1529e9 -1.7330e9 -1.7646e9 -1.646e9' #J/m^3
   [../]
   [./sim_time_constants]
     type = GenericConstantMaterial
     #times for the ramping of mat. constants
     prop_names = 't_start_cool t_end_cool'
-    prop_values = '30 40' # [s]
+    prop_values = '8 12' # [s]
   [../]
   #====================== GIBBS ENERGY CONSTANTS ABC ===========================
   [./energy_A_cu]
@@ -1051,8 +1058,6 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-
-
   [./f_density]
     order = CONSTANT
     family = MONOMIAL
@@ -1061,16 +1066,14 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
-
-  [./hfp2]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-  [./hfp3]
-    order = CONSTANT
-    family = MONOMIAL
-  [../]
-
+  # [./hfp2]
+  #   order = CONSTANT
+  #   family = MONOMIAL
+  # [../]
+  # [./hfp3]
+  #   order = CONSTANT
+  #   family = MONOMIAL
+  # [../]
   [./sxx2]
     order = CONSTANT
     family = MONOMIAL
@@ -1091,24 +1094,305 @@
     order = CONSTANT
     family = MONOMIAL
   [../]
+  [./step_dt]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./accum_L_2_slip_rates_gss_2]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./L_2_slip_rates_gss_2]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss21]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss22]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss23]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss24]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss25]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss26]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss27]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss28]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss29]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss210]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss211]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss212]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss213]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss214]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss215]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss216]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss217]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss218]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss219]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss220]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss221]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss222]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss223]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss224]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss225]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss226]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss227]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss228]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss229]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss230]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss231]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss232]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./accum_L_2_slip_rates_gss_3] #\sum d\gamma
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./L_2_slip_rates_gss_3] #d\gamma
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss31]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss32]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss33]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss34]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss35]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss36]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss37]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss38]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss39]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss310]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss311]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss312]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss313]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss314]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss315]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss316]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss317]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss318]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss319]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss320]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss321]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss322]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss323]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss324]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss325]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss326]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss327]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss328]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss329]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss330]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss331]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
+  [./slip_rate_gss332]
+    order = CONSTANT
+    family = MONOMIAL
+  [../]
 []
 
 [AuxKernels]
-  [./hfp2]
-    type = ParsedAux
-    variable = hfp2
-    args = 'fp2 h2'
-    function = 'h2*fp2'
-    use_displaced_mesh = true
+  [./step_dt]
+    type = MaterialRealAux
+    property = dt
+    variable = step_dt
+    execute_on = TIMESTEP_END
   [../]
-  [./hfp3]
-    type = ParsedAux
-    variable = hfp3
-    args = 'fp3 h3'
-    function = 'h3*fp3'
-    use_displaced_mesh = true
-  [../]
-
+  # [./hfp2]
+  #   type = ParsedAux
+  #   variable = hfp2
+  #   args = 'fp2 h2'
+  #   function = 'h2*fp2'
+  #   use_displaced_mesh = true
+  # [../]
+  # [./hfp3]
+  #   type = ParsedAux
+  #   variable = hfp3
+  #   args = 'fp3 h3'
+  #   function = 'h3*fp3'
+  #   use_displaced_mesh = true
+  # [../]
   [./hyd_g]
     type = RankTwoScalarAux
     variable = hyd_g
@@ -1238,6 +1522,556 @@
     execute_on = 'initial timestep_end'
     use_displaced_mesh = true
   [../]
+  [./slip_rate_gss21]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss21
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss22]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss22
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss23]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss23
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss24]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss24
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss25]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss25
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss26]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss26
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss27]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss27
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss28]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss28
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss29]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss29
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss210]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss210
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss211]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss211
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss212]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss212
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss213]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss213
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss214]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss214
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss215]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss215
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss216]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss216
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss217]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss217
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss218]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss218
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss219]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss219
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss220]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss220
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss221]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss221
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss222]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss222
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss223]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss223
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss224]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss224
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss225]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss225
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss226]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss226
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss227]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss227
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss228]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss228
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss229]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss229
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss230]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss230
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss231]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss231
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss232]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss2
+    variable = slip_rate_gss232
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./L_2_slip_rates_gss_2]
+    type = ParsedAux
+      variable = L_2_slip_rates_gss_2
+      args = 'slip_rate_gss21   slip_rate_gss22   slip_rate_gss23   slip_rate_gss24   slip_rate_gss25   slip_rate_gss26   slip_rate_gss27   slip_rate_gss28
+              slip_rate_gss29   slip_rate_gss210   slip_rate_gss211   slip_rate_gss212   slip_rate_gss213   slip_rate_gss214   slip_rate_gss215   slip_rate_gss216
+              slip_rate_gss217   slip_rate_gss218   slip_rate_gss219   slip_rate_gss220   slip_rate_gss221   slip_rate_gss222   slip_rate_gss223   slip_rate_gss224
+              slip_rate_gss225   slip_rate_gss226   slip_rate_gss227   slip_rate_gss228   slip_rate_gss229   slip_rate_gss230   slip_rate_gss231   slip_rate_gss232
+              h2 step_dt'
+      function = 'step_dt*h2*sqrt(slip_rate_gss21^2 + slip_rate_gss22^2 +slip_rate_gss23^2 + slip_rate_gss24^2 + slip_rate_gss25^2 + slip_rate_gss26^2 + slip_rate_gss27^2 + slip_rate_gss28^2
+                        + slip_rate_gss29^2 + slip_rate_gss210^2 + slip_rate_gss211^2 + slip_rate_gss212^2 + slip_rate_gss213^2 + slip_rate_gss214^2 + slip_rate_gss215^2 + slip_rate_gss216^2
+                        + slip_rate_gss217^2 + slip_rate_gss218^2 + slip_rate_gss219^2 + slip_rate_gss220^2 + slip_rate_gss221^2 + slip_rate_gss222^2 + slip_rate_gss223^2 + slip_rate_gss224^2
+                        + slip_rate_gss225^2 + slip_rate_gss226^2 + slip_rate_gss227^2 + slip_rate_gss228^2 + slip_rate_gss229^2 + slip_rate_gss230^2 + slip_rate_gss231^2 + slip_rate_gss232^2)'
+  [../]
+  [./accum_L_2_slip_rates_gss_2]
+    type = AccumulateAux
+    accumulate_from_variable = L_2_slip_rates_gss_2
+    variable = accum_L_2_slip_rates_gss_2
+    execute_on = TIMESTEP_END
+  [../]
+  [./slip_rate_gss31]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss31
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss32]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss32
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss33]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss33
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss34]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss34
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss35]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss35
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss36]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss36
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss37]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss37
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss38]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss38
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss39]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss39
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss310]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss310
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss311]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss311
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss312]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss312
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss313]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss313
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss314]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss314
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss315]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss315
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss316]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss316
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss317]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss317
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss318]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss318
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss319]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss319
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss320]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss320
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss321]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss321
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss322]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss322
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss323]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss323
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss324]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss324
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss325]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss325
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss326]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss326
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss327]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss327
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss328]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss328
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss329]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss329
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss330]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss330
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss331]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss331
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./slip_rate_gss332]
+    type = MaterialStdVectorAux
+    property = slip_rate_gss3
+    variable = slip_rate_gss332
+    index = 0
+    execute_on = TIMESTEP_END
+    use_displaced_mesh = true
+  [../]
+  [./L_2_slip_rates_gss_3]
+    type = ParsedAux
+      variable = L_2_slip_rates_gss_3
+      args = 'slip_rate_gss31   slip_rate_gss32   slip_rate_gss33   slip_rate_gss34   slip_rate_gss35   slip_rate_gss36   slip_rate_gss37   slip_rate_gss38
+              slip_rate_gss39   slip_rate_gss310   slip_rate_gss311   slip_rate_gss312   slip_rate_gss313   slip_rate_gss314   slip_rate_gss315   slip_rate_gss316
+              slip_rate_gss317   slip_rate_gss318   slip_rate_gss319   slip_rate_gss320   slip_rate_gss321   slip_rate_gss322   slip_rate_gss323   slip_rate_gss324
+              slip_rate_gss325   slip_rate_gss326   slip_rate_gss327   slip_rate_gss328   slip_rate_gss329   slip_rate_gss330   slip_rate_gss331   slip_rate_gss332
+              h3 step_dt'
+      function = 'step_dt*h3*sqrt(slip_rate_gss31^2 + slip_rate_gss32^2 +slip_rate_gss33^2 + slip_rate_gss34^2 + slip_rate_gss35^2 + slip_rate_gss36^2 + slip_rate_gss37^2 + slip_rate_gss38^2
+                        + slip_rate_gss39^2 + slip_rate_gss310^2 + slip_rate_gss311^2 + slip_rate_gss312^2 + slip_rate_gss313^2 + slip_rate_gss314^2 + slip_rate_gss315^2 + slip_rate_gss316^2
+                        + slip_rate_gss317^2 + slip_rate_gss318^2 + slip_rate_gss319^2 + slip_rate_gss320^2 + slip_rate_gss321^2 + slip_rate_gss322^2 + slip_rate_gss323^2 + slip_rate_gss324^2
+                        + slip_rate_gss325^2 + slip_rate_gss326^2 + slip_rate_gss327^2 + slip_rate_gss328^2 + slip_rate_gss329^2 + slip_rate_gss330^2 + slip_rate_gss331^2 + slip_rate_gss332^2)'
+  [../]
+  [./accum_L_2_slip_rates_gss_3]
+    type = AccumulateAux
+    accumulate_from_variable = L_2_slip_rates_gss_3
+    variable = accum_L_2_slip_rates_gss_3
+    execute_on = TIMESTEP_END
+  [../]
 []
 
 [Postprocessors]
@@ -1334,23 +2168,13 @@
 []
 
 [Outputs]
-  file_base = 1Cu1imc2sn-e2-0-0-0-e3-45-0-0-bdf2-asm-110calib
+  file_base = 1Cu1imc2sn-e2-45-0-0-e3-0-0-0-bdf2-asm-110calib
   exodus = true
   csv = true
   [./checkpoint]
     type = Checkpoint
     num_files = 2
-    append_date = true
     suffix = cp
     use_displaced = true
   [../]
 []
-
-# [Controls]
-#   [./A_cu_control]
-#     type = RealFunctionControl
-#     parameter = 'Materials/energy_A/coef'
-#     function = 'func_coef'
-#     execute_on = 'initial timestep_begin'
-#   [../]
-# []
