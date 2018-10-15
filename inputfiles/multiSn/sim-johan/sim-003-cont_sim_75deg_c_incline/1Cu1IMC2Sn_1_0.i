@@ -172,7 +172,7 @@
     scale_factor = 1.0
   [../]
   [./state_var_evol_rate_comp_gss2]
-    type = CrystalPlasticityStateVarRateComponentVoce
+    type = CrystalPlasticityStateVarRateComponentVoceP
     variable_size = 32
     groups = '0 2 4 6 10 20 24 32'
     h0_group_values = '0.12484 0.12484 0.12484 0.12484 0.12484 0.12484 0.12484'
@@ -216,7 +216,7 @@
   [../]
   [./state_var_evol_rate_comp_gss3]
     #type = CrystalPlasticityStateVarRateComponentGSS // johans
-    type = CrystalPlasticityStateVarRateComponentVoce
+    type = CrystalPlasticityStateVarRateComponentVoceP
     variable_size = 32
     #hprops = '1.4 100 40 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
     #hprops = '1.4 0.624 0.250 2' #qab h0 ss c see eq (9) in Zhao 2017, values from Darbandi 2013 table V
