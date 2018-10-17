@@ -11,6 +11,7 @@
 //InitialConditions
 #include "VarDepIC.h"
 #include "UnitySubVarIC.h"
+#include "TricrystalTripleJunctionICyscale.h"
 
 //Actions
 #include "KKSMultiACKernelAction.h"
@@ -72,6 +73,7 @@ PuffinApp::registerObjects(Factory & factory)
   registerPostprocessor(IMCFraction);
   registerInitialCondition(VarDepIC);
   registerInitialCondition(UnitySubVarIC);
+  registerInitialCondition(TricrystalTripleJunctionICyscale);
   registerKernel(LangevinNoisePositive);
   registerMaterial(ComputeElasticityTensorCPBaseName);
   registerMaterial(FiniteStrainUObasedCPBaseName);
