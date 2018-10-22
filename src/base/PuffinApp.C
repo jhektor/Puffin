@@ -19,6 +19,9 @@
 //Kernels
 #include "LangevinNoisePositive.h"
 
+//AuxKernels
+#include "CrystalPlasticityTotalSlip.h"
+
 //Materials
 #include "ComputeElasticityTensorCPBaseName.h"
 #include "FiniteStrainUObasedCPBaseName.h"
@@ -81,6 +84,7 @@ PuffinApp::registerObjects(Factory & factory)
   registerMaterial(ElasticEnergyMaterialGreenPK2);
   registerMaterial(CPPlasticEnergyMaterial);
   registerUserObject(CrystalPlasticitySlipRateGSSBaseName);
+  registerKernel(CrystalPlasticityTotalSlip);
   // registerUserObject(CrystalPlasticityStateVarRateComponentVoce);
   // registerUserObject(CrystalPlasticitySlipResistanceGSSBaseName);
 
