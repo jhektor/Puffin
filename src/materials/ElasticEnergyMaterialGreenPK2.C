@@ -23,6 +23,7 @@ validParams<ElasticEnergyMaterialGreenPK2>()
                        "Vector of displacement gradient variables (see "
                        "Modules/PhaseField/DisplacementGradients "
                        "action)");
+  params.addParam<Real>("scale_factor",1.0,"Scale energy by this factor");
 
   return params;
 }
@@ -36,7 +37,8 @@ ElasticEnergyMaterialGreenPK2::ElasticEnergyMaterialGreenPK2(const InputParamete
     _f(getMaterialProperty<RankTwoTensor>(_base_name  +"deformation_gradient")),
     _firr(_plasticity ? getMaterialPropertyByName<RankTwoTensor>(_base_name  +"fp") : (_eigenstrain ? getMaterialPropertyByName<RankTwoTensor>(_eigenstrain_name) : _f)),
     _elasticity_tensor(getMaterialPropertyByName<RankFourTensor>(_base_name + "elasticity_tensor")),
-    _stress(_plasticity ? getMaterialPropertyByName<RankTwoTensor>(_base_name + "pk2") : getMaterialPropertyByName<RankTwoTensor>(_base_name + "stress"))
+    _stress(_plasticity ? getMaterialPropertyByName<RankTwoTensor>(_base_name + "pk2") : getMaterialPropertyByName<RankTwoTensor>(_base_name + "stress")),
+    _scale_factor(getParam<Real>("scale_factor"))
 {
 
 
@@ -72,7 +74,7 @@ ElasticEnergyMaterialGreenPK2::computeF()
   else
     S = _elasticity_tensor[_qp] * E;
 
-  return 0.5 * S.doubleContraction(E);
+  return _scale_factor*0.5 * S.doubleContraction(E);
 }
 
 Real

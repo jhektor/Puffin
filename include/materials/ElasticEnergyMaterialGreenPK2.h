@@ -45,7 +45,7 @@ protected:
   const MaterialProperty<RankFourTensor> & _elasticity_tensor;
   const MaterialProperty<RankTwoTensor> & _stress;
 
-
+  const Real _scale_factor;
 
 };
 
