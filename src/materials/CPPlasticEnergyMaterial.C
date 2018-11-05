@@ -113,7 +113,7 @@ CPPlasticEnergyMaterial::computeF()
 
       sum += qab * _mat_prop_state_var[_qp][i] * _mat_prop_state_var[_qp][j];
       // This will not give sum = 0 for purely elastic so must subtract initial value of _mat_prop_state_var
-      // sum -= qab * s0[i] * s0[j];
+      sum -= qab * s0[i] * s0[j];
 
     }
   }
