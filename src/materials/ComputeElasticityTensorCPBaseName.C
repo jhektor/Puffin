@@ -6,6 +6,7 @@
 /****************************************************************/
 #include "ComputeElasticityTensorCPBaseName.h"
 #include "RotationTensor.h"
+registerMooseObject("PuffinApp", ComputeElasticityTensorCPBaseName);
 
 template <>
 InputParameters

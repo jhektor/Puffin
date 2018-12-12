@@ -5,7 +5,7 @@
 
 class PuffinApp;
 
-template<>
+template <>
 InputParameters validParams<PuffinApp>();
 
 class PuffinApp : public MooseApp
@@ -15,8 +15,7 @@ public:
   virtual ~PuffinApp();
 
   static void registerApps();
-  static void registerObjects(Factory & factory);
-  static void associateSyntax(Syntax & syntax, ActionFactory & action_factory);
+  static void registerAll(Factory & f, ActionFactory & af, Syntax & s);
 };
 
-#endif /* PUFFINAPP_H */
+#endif /* PuffinAPP_H */

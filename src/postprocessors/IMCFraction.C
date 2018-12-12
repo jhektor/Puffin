@@ -16,6 +16,9 @@
 #include "MooseMesh.h"
 #include "SubProblem.h"
 
+registerMooseObject("PuffinApp", IMCFraction);
+
+
 template <>
 InputParameters
 validParams<IMCFraction>()

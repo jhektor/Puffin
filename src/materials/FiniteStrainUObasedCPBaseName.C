@@ -11,6 +11,7 @@
 #include "CrystalPlasticitySlipResistance.h"
 #include "CrystalPlasticityStateVariable.h"
 #include "CrystalPlasticityStateVarRateComponent.h"
+registerMooseObject("PuffinApp", FiniteStrainUObasedCPBaseName);
 
 template <>
 InputParameters

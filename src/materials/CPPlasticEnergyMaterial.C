@@ -6,6 +6,7 @@
 /****************************************************************/
 #include "CPPlasticEnergyMaterial.h"
 // #include "CrystalPlasticityStateVariable.h"
+registerMooseObject("PuffinApp", CPPlasticEnergyMaterial);
 
 template <>
 InputParameters

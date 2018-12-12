@@ -7,6 +7,7 @@
 #include "CrystalPlasticitySlipRateGSSBaseName.h"
 
 #include <fstream>
+registerMooseObject("PuffinApp", CrystalPlasticitySlipRateGSSBaseName);
 
 template <>
 InputParameters

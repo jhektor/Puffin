@@ -1,4 +1,5 @@
 #include "UnitySubVarIC.h"
+registerMooseObject("PuffinApp", UnitySubVarIC);
 
 template <>
 InputParameters

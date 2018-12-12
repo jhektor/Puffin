@@ -11,7 +11,7 @@
 // #include "FunctionIC.h"
 // #include "TricrystalTripleJunctionIC.h"
 
-// registerMooseObject("PuffinApp", TricrystalTripleJunctionICyscale);
+registerMooseObject("PuffinApp", TricrystalTripleJunctionICyscale);
 
 template <>
 InputParameters

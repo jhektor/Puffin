@@ -7,6 +7,7 @@
 #include "ElasticEnergyMaterialGreenPK2.h"
 #include "RankTwoTensor.h"
 #include "RankFourTensor.h"
+registerMooseObject("PuffinApp", ElasticEnergyMaterialGreenPK2);
 
 template <>
 InputParameters

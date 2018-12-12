@@ -3,6 +3,8 @@
 #include "Conversion.h"
 #include "FEProblem.h"
 #include <iostream>
+registerMooseAction("PuffinApp", KKSMultiACKernelAction,"add_kernel");
+
 template <>
 InputParameters
 validParams<KKSMultiACKernelAction>()

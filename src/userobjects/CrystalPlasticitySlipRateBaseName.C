@@ -8,6 +8,7 @@
 #include "libmesh/utility.h"
 
 #include <fstream>
+// registerMooseObject("PuffinApp", CrystalPlasticitySlipRateBaseName);
 
 template <>
 InputParameters

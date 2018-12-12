@@ -47,6 +47,14 @@ protected:
    * updates the stress at a quadrature point.
    */
   virtual void computeQpStress();
+  /**
+   * calculate stress residual.
+   */
+  virtual void calcResidual();
+  /**
+   * calculate jacobian.
+   */
+  // virtual void calcJacobian();
 
   // Solves only where this h material is >0
   const std::string _h_scale_name;

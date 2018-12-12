@@ -1,4 +1,5 @@
 #include "VarDepIC.h"
+registerMooseObject("PuffinApp", VarDepIC);
 
 template <>
 InputParameters

@@ -13,6 +13,8 @@
 // #include "CrystalPlasticityStateVariable.h"
 // #include "CrystalPlasticityStateVarRateComponent.h"
 
+registerMooseObject("PuffinApp", FiniteStrainUObasedCPBaseNamehscale);
+
 template <>
 InputParameters
 validParams<FiniteStrainUObasedCPBaseNamehscale>()
@@ -44,24 +46,57 @@ FiniteStrainUObasedCPBaseNamehscale::computeQpStress()
   {
     // reset everything
     FiniteStrainUObasedCPBaseName::initQpStatefulProperties();
+    FiniteStrainUObasedCPBaseName::postSolveQp();
 
     // FiniteStrainUObasedCPBaseName::preSolveQp();
     // _dfgrd_tmp = _deformation_gradient[_qp];
-    _pk2[_qp].zero();
+    //
+    // _pk2[_qp].zero();
     // _fe.zero();
     // _fe.addIa(1.0);
+    // _fp[_qp].zero();
+    // _fp[_qp].addIa(1.0);
+    // _dfgrd_tmp.zero();
+    // _dfgrd_tmp.addIa(1.0);
+
+    _stress[_qp].zero();
+
     _fp[_qp].zero();
     _fp[_qp].addIa(1.0);
+
+    _pk2[_qp].zero();
+
+    _lag_e[_qp].zero();
+
+    _update_rot[_qp].zero();
+    _update_rot[_qp].addIa(1.0);
+
     _dfgrd_tmp.zero();
     _dfgrd_tmp.addIa(1.0);
-
-
 
   }
   else
   {
     FiniteStrainUObasedCPBaseName::computeQpStress();
   }
-
-  FiniteStrainUObasedCPBaseName::postSolveQp();
 }
+
+void
+FiniteStrainUObasedCPBaseNamehscale::calcResidual()
+{
+  // residual = 0 where h<=h_tol
+  // if (_h_scale[_qp] <= _h_tol )
+  //   _resid.zero();
+  // else
+  FiniteStrainUObasedCPBaseName::calcResidual();
+}
+
+// void
+// FiniteStrainUObasedCPBaseNamehscale::calcJacobian()
+// {
+//   // residual = 0 where h<=h_tol
+//   if (_h_scale[_qp] <= _h_tol )
+//     _jac = RankFourTensor::IdentityFour();
+//   else
+//     FiniteStrainUObasedCPBaseName::calcJacobian();
+// }

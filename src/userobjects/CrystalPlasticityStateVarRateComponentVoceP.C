@@ -12,7 +12,7 @@
 #include <iostream>  // I/O
 
 
-registerMooseObject("TensorMechanicsApp", CrystalPlasticityStateVarRateComponentVoceP);
+registerMooseObject("PuffinApp", CrystalPlasticityStateVarRateComponentVoceP);
 
 template <>
 InputParameters

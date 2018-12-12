@@ -1,5 +1,6 @@
 #include "LangevinNoisePositive.h"
 #include "MooseRandom.h"
+registerMooseObject("PuffinApp", LangevinNoisePositive);
 
 template <>
 InputParameters
