@@ -18,4 +18,4 @@ public:
   static void registerAll(Factory & f, ActionFactory & af, Syntax & s);
 };
 
-#endif /* PuffinAPP_H */
+#endif /* PuffinAPP_H  */

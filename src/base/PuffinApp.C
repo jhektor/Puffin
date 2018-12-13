@@ -27,7 +27,7 @@ PuffinApp::registerAll(Factory & f, ActionFactory & af, Syntax & syntax)
   Registry::registerActionsTo(af, {"PuffinApp"});
 
   /* register custom execute flags, action syntax, etc. here */
-  registerSyntax("KKSMultiACKernelAction","Kernels/KKSMultiACKernel");
+  registerSyntax("KKSMultiACKernelAction","Kernels/KKSMultiACKernel"); // assumes Syntax variable is called syntax
 }
 
 void
