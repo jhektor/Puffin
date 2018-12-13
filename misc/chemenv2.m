@@ -2,13 +2,13 @@
 close all
 clear all
 
-T=220+273.15;%453;%25+273.15;
+T=150+273.15;%453;%25+273.15;
 R=8.3144621;
 
 Vm=16.29e-6; %m^3/mole
-Vmcu=7.124e-6;%7.11e-6;%Vm;
-Vmeps=8.6e-6;%Vm;
-Vmeta=10.6e-6;%Vm;
+Vmcu=Vm;%7.124e-6;%7.11e-6;%Vm;
+Vmeps=Vm;%8.6e-6;%Vm;
+Vmeta=Vm;%10.6e-6;%Vm;
 Vmsn=Vm;
 %% Thermodynamic data from Shim KOLLA HUR DET BLIR MED DU2009
 if T<1357.77
@@ -207,19 +207,19 @@ hold off
 
 
 disp('Cu')
-Agcu=eval(Agcu)
-Bgcu=eval(Bgcu)
-Cgcu=eval(Cgcu)
+Agcu=eval(Afcu)
+Bgcu=eval(Bfcu)
+Cgcu=eval(Cfcu)
 disp('--------')
 disp('Cu6Sn5')
-Ageta=eval(Ageta)
-Bgeta=eval(Bgeta)
-Cgeta=Cgeta
+Ageta=eval(Afeta)
+Bgeta=eval(Bfeta)
+Cgeta=Cfeta
 disp('---------')
 disp('Sn')
-Agsn=eval(Agsn)
-Bgsn=eval(Bgsn)
-Cgsn=eval(Cgsn)
+Agsn=eval(Afsn)
+Bgsn=eval(Bfsn)
+Cgsn=eval(Cfsn)
 disp('-----------')
 disp('Interface concentrations')
 chatcu=chatcu

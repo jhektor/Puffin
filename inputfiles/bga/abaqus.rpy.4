@@ -1,0 +1,60 @@
+# -*- coding: mbcs -*-
+#
+# Abaqus/CAE Release 6.13-3 replay file
+# Internal Version: 2013_10_09-13.29.32 126623
+# Run by johan on Thu Mar  8 10:15:48 2018
+#
+
+# from driverUtils import executeOnCaeGraphicsStartup
+# executeOnCaeGraphicsStartup()
+#: Executing "onCaeGraphicsStartup()" in the site directory ...
+from abaqus import *
+from abaqusConstants import *
+session.Viewport(name='Viewport: 1', origin=(0.0, 0.0), width=419.099975585938, 
+    height=237.175018310547)
+session.viewports['Viewport: 1'].makeCurrent()
+session.viewports['Viewport: 1'].maximize()
+from caeModules import *
+from driverUtils import executeOnCaeStartup
+executeOnCaeStartup()
+session.viewports['Viewport: 1'].partDisplay.geometryOptions.setValues(
+    referenceRepresentation=ON)
+openMdb(pathName='/home/johan/projects/Puffin/inputfiles/multiSn/abq-mesh.cae')
+#: The model database "/home/johan/projects/Puffin/inputfiles/multiSn/abq-mesh.cae" has been opened.
+session.viewports['Viewport: 1'].setValues(displayedObject=None)
+p = mdb.models['Model-1'].parts['Part-1']
+session.viewports['Viewport: 1'].setValues(displayedObject=p)
+#--- Recover file: 'abq-mesh.rec' ---
+# -*- coding: mbcs -*- 
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].parts['Part-1'].Set(
+    faces=mdb.models['Model-1'].parts['Part-1'].faces.getSequenceFromMask((
+    '[#4 ]', ), ), name='right')
+mdb.models['Model-1'].parts['Part-1'].Set(
+    faces=mdb.models['Model-1'].parts['Part-1'].faces.getSequenceFromMask((
+    '[#2 ]', ), ), name='top')
+#--- End of Recover file ------
+session.viewports['Viewport: 1'].view.setValues(nearPlane=8909.68, 
+    farPlane=16243.6, width=7253.35, height=4260.79, cameraPosition=(7410.34, 
+    8895.4, -5398.54), cameraUpVector=(-0.435184, 0.481375, 0.760851), 
+    cameraTarget=(110.019, 914.546, 975.436))
+session.viewports['Viewport: 1'].view.setValues(nearPlane=9280.33, 
+    farPlane=15721.2, width=7555.1, height=4438.04, cameraPosition=(-6189.21, 
+    5663, -8809.87), cameraUpVector=(0.345442, 0.746235, 0.569037), 
+    cameraTarget=(86.1138, 908.864, 969.44))
+session.viewports['Viewport: 1'].view.setValues(nearPlane=9038.19, 
+    farPlane=16035.6, width=7357.97, height=4322.24, cameraPosition=(-8164.92, 
+    -4366.96, -6855.94), cameraUpVector=(-0.171755, 0.984005, 0.0472781), 
+    cameraTarget=(94.6124, 952.008, 961.035))

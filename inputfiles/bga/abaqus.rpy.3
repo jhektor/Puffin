@@ -1,0 +1,222 @@
+# -*- coding: mbcs -*-
+#
+# Abaqus/CAE Release 6.13-3 replay file
+# Internal Version: 2013_10_09-13.29.32 126623
+# Run by johan on Wed Mar  7 17:25:04 2018
+#
+
+# from driverUtils import executeOnCaeGraphicsStartup
+# executeOnCaeGraphicsStartup()
+#: Executing "onCaeGraphicsStartup()" in the site directory ...
+from abaqus import *
+from abaqusConstants import *
+session.Viewport(name='Viewport: 1', origin=(0.0, 0.0), width=419.099975585938, 
+    height=237.175018310547)
+session.viewports['Viewport: 1'].makeCurrent()
+session.viewports['Viewport: 1'].maximize()
+from caeModules import *
+from driverUtils import executeOnCaeStartup
+executeOnCaeStartup()
+session.viewports['Viewport: 1'].partDisplay.geometryOptions.setValues(
+    referenceRepresentation=ON)
+openMdb(pathName='/home/johan/projects/Puffin/inputfiles/bga/bga-1um.cae')
+#: The model database "/home/johan/projects/Puffin/inputfiles/bga/bga-1um.cae" has been opened.
+session.viewports['Viewport: 1'].setValues(displayedObject=None)
+p = mdb.models['Model-1'].parts['Part-2']
+session.viewports['Viewport: 1'].setValues(displayedObject=p)
+a = mdb.models['Model-1'].rootAssembly
+a.regenerate()
+a = mdb.models['Model-1'].rootAssembly
+session.viewports['Viewport: 1'].setValues(displayedObject=a)
+#--- Recover file: 'bga-1um.rec' ---
+# -*- coding: mbcs -*- 
+from part import *
+from material import *
+from section import *
+from assembly import *
+from step import *
+from interaction import *
+from load import *
+from mesh import *
+from optimization import *
+from job import *
+from sketch import *
+from visualization import *
+from connectorBehavior import *
+mdb.models['Model-1'].rootAssembly.regenerate()
+mdb.models['Model-1'].rootAssembly.Instance(dependent=ON, name='Part-2-2', 
+    part=mdb.models['Model-1'].parts['Part-2'])
+del mdb.models['Model-1'].rootAssembly.features['Part-2-1']
+mdb.Job(activateLoadBalancing=False, atTime=None, contactPrint=OFF, 
+    description='', echoPrint=OFF, explicitPrecision=SINGLE, 
+    getMemoryFromAnalysis=True, historyPrint=OFF, memory=90, 
+    memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='bga-1um', nodalOutputPrecision=SINGLE, 
+    numCpus=1, numDomains=1, parallelizationMethodExplicit=DOMAIN, queue=None, 
+    scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
+del mdb.models['Model-1'].parts['Part-2'].surfaces['bottom']
+del mdb.models['Model-1'].parts['Part-2'].surfaces['front']
+del mdb.models['Model-1'].parts['Part-2'].surfaces['top']
+mdb.models['Model-1'].parts['Part-2'].Set(
+    faces=mdb.models['Model-1'].parts['Part-2'].faces.getSequenceFromMask((
+    '[#1 ]', ), ), name='bottom')
+mdb.models['Model-1'].rootAssembly.regenerate()
+del mdb.jobs['bga-1um']
+mdb.Job(activateLoadBalancing=False, atTime=None, contactPrint=OFF, 
+    description='', echoPrint=OFF, explicitPrecision=SINGLE, 
+    getMemoryFromAnalysis=True, historyPrint=OFF, memory=90, 
+    memoryUnits=PERCENTAGE, model='Model-1', modelPrint=OFF, 
+    multiprocessingMode=DEFAULT, name='bga-1um', nodalOutputPrecision=SINGLE, 
+    numCpus=1, numDomains=1, parallelizationMethodExplicit=DOMAIN, queue=None, 
+    scratch='', type=ANALYSIS, userSubroutine='', waitHours=0, waitMinutes=0)
+mdb.models['Model-1'].parts['Part-2'].Set(
+    faces=mdb.models['Model-1'].parts['Part-2'].faces.getSequenceFromMask((
+    '[#180 ]', ), ), name='front')
+#--- End of Recover file ------
+p1 = mdb.models['Model-1'].parts['Part-2']
+session.viewports['Viewport: 1'].setValues(displayedObject=p1)
+p = mdb.models['Model-1'].parts['Part-2']
+f = p.faces
+faces = f.getSequenceFromMask(mask=('[#40 ]', ), )
+p.Set(faces=faces, name='top')
+#: The set 'top' has been created (1 face).
+mdb.save()
+#: The model database has been saved to "/home/johan/projects/Puffin/inputfiles/bga/bga-1um.cae".
+a = mdb.models['Model-1'].rootAssembly
+a.regenerate()
+session.viewports['Viewport: 1'].setValues(displayedObject=a)
+session.viewports['Viewport: 1'].assemblyDisplay.setValues(
+    optimizationTasks=OFF, geometricRestrictions=OFF, stopConditions=OFF)
+del mdb.jobs['bga-1um']
+mdb.Job(name='bga-1um', model='Model-1', description='', type=ANALYSIS, 
+    atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90, 
+    memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True, 
+    explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, echoPrint=OFF, 
+    modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='', 
+    scratch='', parallelizationMethodExplicit=DOMAIN, numDomains=1, 
+    activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1)
+mdb.jobs['bga-1um'].writeInput(consistencyChecking=OFF)
+#: The job input file has been written to "bga-1um.inp".
+p1 = mdb.models['Model-1'].parts['Part-2']
+session.viewports['Viewport: 1'].setValues(displayedObject=p1)
+del mdb.models['Model-1'].parts['Part-2'].sets['bottom']
+session.viewports['Viewport: 1'].view.setValues(nearPlane=2553.26, 
+    farPlane=4283.42, width=2143.44, height=1259.11, cameraPosition=(2956.91, 
+    588.811, 1358.28), cameraUpVector=(-0.498616, 0.858873, -0.117129), 
+    cameraTarget=(22.9228, -13.8174, -261.936))
+session.viewports['Viewport: 1'].view.setValues(nearPlane=2427.64, 
+    farPlane=4440.45, width=2037.98, height=1197.16, cameraPosition=(2636.93, 
+    -2092.46, 426.34), cameraUpVector=(0.153412, 0.887837, 0.433833), 
+    cameraTarget=(21.7087, -23.9911, -265.472))
+session.viewports['Viewport: 1'].view.setValues(nearPlane=2550.41, 
+    farPlane=4332.68, width=2141.05, height=1257.7, cameraPosition=(647.94, 
+    -3372.5, -478.668), cameraUpVector=(0.616511, 0.417697, 0.667415), 
+    cameraTarget=(5.10059, -34.6796, -273.029))
+p = mdb.models['Model-1'].parts['Part-2']
+f = p.faces
+faces = f.getSequenceFromMask(mask=('[#1 ]', ), )
+p.Set(faces=faces, name='bottom')
+#: The set 'bottom' has been created (1 face).
+a = mdb.models['Model-1'].rootAssembly
+a.regenerate()
+session.viewports['Viewport: 1'].setValues(displayedObject=a)
+del mdb.jobs['bga-1um']
+mdb.Job(name='bga-1um', model='Model-1', description='', type=ANALYSIS, 
+    atTime=None, waitMinutes=0, waitHours=0, queue=None, memory=90, 
+    memoryUnits=PERCENTAGE, getMemoryFromAnalysis=True, 
+    explicitPrecision=SINGLE, nodalOutputPrecision=SINGLE, echoPrint=OFF, 
+    modelPrint=OFF, contactPrint=OFF, historyPrint=OFF, userSubroutine='', 
+    scratch='', parallelizationMethodExplicit=DOMAIN, numDomains=1, 
+    activateLoadBalancing=False, multiprocessingMode=DEFAULT, numCpus=1)
+mdb.save()
+#: The model database has been saved to "/home/johan/projects/Puffin/inputfiles/bga/bga-1um.cae".
+mdb.jobs['bga-1um'].writeInput(consistencyChecking=OFF)
+#: The job input file has been written to "bga-1um.inp".
+p1 = mdb.models['Model-1'].parts['Part-2']
+session.viewports['Viewport: 1'].setValues(displayedObject=p1)
+session.viewports['Viewport: 1'].view.setValues(nearPlane=2518.66, 
+    farPlane=4337.57, width=2114.4, height=1242.05, cameraPosition=(866.74, 
+    -2325.08, 2112.51), cameraUpVector=(0.405084, 0.883919, 0.233656), 
+    cameraTarget=(7.4004, -23.6702, -245.793))
+p = mdb.models['Model-1'].parts['Part-2']
+s = p.features['Solid revolve-1'].sketch
+mdb.models['Model-1'].ConstrainedSketch(name='__edit__', objectToCopy=s)
+s1 = mdb.models['Model-1'].sketches['__edit__']
+g, v, d, c = s1.geometry, s1.vertices, s1.dimensions, s1.constraints
+s1.setPrimaryObject(option=SUPERIMPOSE)
+p.projectReferencesOntoSketch(sketch=s1, 
+    upToFeature=p.features['Solid revolve-1'], filter=COPLANAR_EDGES)
+s1.unsetPrimaryObject()
+del mdb.models['Model-1'].sketches['__edit__']
+mdb.save()
+#: The model database has been saved to "/home/johan/projects/Puffin/inputfiles/bga/bga-1um.cae".
+Mdb()
+#: A new model database has been created.
+#: The model "Model-1" has been created.
+session.viewports['Viewport: 1'].setValues(displayedObject=None)
+s = mdb.models['Model-1'].ConstrainedSketch(name='__profile__', 
+    sheetSize=4000.0)
+g, v, d, c = s.geometry, s.vertices, s.dimensions, s.constraints
+s.setPrimaryObject(option=STANDALONE)
+session.viewports['Viewport: 1'].view.setValues(nearPlane=3080.13, 
+    farPlane=4462.34, width=7473.26, height=4389.98, cameraPosition=(-285.138, 
+    79.6238, 3771.24), cameraTarget=(-285.138, 79.6238, 0))
+s.rectangle(point1=(-2000.0, -1000.0), point2=(2000.0, 3000.0))
+p = mdb.models['Model-1'].Part(name='Part-1', dimensionality=THREE_D, 
+    type=DEFORMABLE_BODY)
+p = mdb.models['Model-1'].parts['Part-1']
+p.BaseSolidExtrude(sketch=s, depth=2000.0)
+s.unsetPrimaryObject()
+p = mdb.models['Model-1'].parts['Part-1']
+session.viewports['Viewport: 1'].setValues(displayedObject=p)
+del mdb.models['Model-1'].sketches['__profile__']
+p = mdb.models['Model-1'].parts['Part-1']
+s1 = p.features['Solid extrude-1'].sketch
+mdb.models['Model-1'].ConstrainedSketch(name='__edit__', objectToCopy=s1)
+s2 = mdb.models['Model-1'].sketches['__edit__']
+g, v, d, c = s2.geometry, s2.vertices, s2.dimensions, s2.constraints
+s2.setPrimaryObject(option=SUPERIMPOSE)
+p.projectReferencesOntoSketch(sketch=s2, 
+    upToFeature=p.features['Solid extrude-1'], filter=COPLANAR_EDGES)
+s2.unsetPrimaryObject()
+del mdb.models['Model-1'].sketches['__edit__']
+p = mdb.models['Model-1'].parts['Part-1']
+s = p.features['Solid extrude-1'].sketch
+mdb.models['Model-1'].ConstrainedSketch(name='__edit__', objectToCopy=s)
+s1 = mdb.models['Model-1'].sketches['__edit__']
+g, v, d, c = s1.geometry, s1.vertices, s1.dimensions, s1.constraints
+s1.setPrimaryObject(option=SUPERIMPOSE)
+p.projectReferencesOntoSketch(sketch=s1, 
+    upToFeature=p.features['Solid extrude-1'], filter=COPLANAR_EDGES)
+s1.autoDimension(objectList=(g[2], g[3], g[4], g[5]))
+#: 2 dimensions added
+session.viewports['Viewport: 1'].view.setValues(nearPlane=8625.25, 
+    farPlane=12002.2, width=7444.67, height=4373.18, cameraPosition=(102.198, 
+    1062.4, 11313.7), cameraTarget=(102.198, 1062.4, 0))
+s1.unsetPrimaryObject()
+del mdb.models['Model-1'].sketches['__edit__']
+p = mdb.models['Model-1'].parts['Part-1']
+f = p.faces
+faces = f.getSequenceFromMask(mask=('[#10 ]', ), )
+p.Set(faces=faces, name='front')
+#: The set 'front' has been created (1 face).
+mdb.saveAs(pathName='/home/johan/projects/Puffin/inputfiles/multiSn/abq-mesh')
+#: The model database has been saved to "/home/johan/projects/Puffin/inputfiles/multiSn/abq-mesh.cae".
+p = mdb.models['Model-1'].parts['Part-1']
+f = p.faces
+faces = f.getSequenceFromMask(mask=('[#4 ]', ), )
+p.Set(faces=faces, name='right')
+#: The set 'right' has been created (1 face).
+p = mdb.models['Model-1'].parts['Part-1']
+f = p.faces
+faces = f.getSequenceFromMask(mask=('[#2 ]', ), )
+p.Set(faces=faces, name='top')
+#: The set 'top' has been created (1 face).
+session.viewports['Viewport: 1'].view.setValues(nearPlane=9138.78, 
+    farPlane=16104.4, width=7439.86, height=4370.35, cameraPosition=(9569.91, 
+    5257.32, -6043.62), cameraUpVector=(-0.371408, 0.743732, 0.555805), 
+    cameraTarget=(110.019, 914.546, 975.437))
+session.viewports['Viewport: 1'].view.setValues(nearPlane=9065.6, 
+    farPlane=16155.5, width=7380.29, height=4335.36, cameraPosition=(-10758.9, 
+    -4226.39, -2996.42), cameraUpVector=(0.0136188, 0.973184, -0.229624), 
+    cameraTarget=(2.02069, 864.163, 991.625))

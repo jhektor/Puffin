@@ -3,11 +3,11 @@
   dim = 2
   elem_type = QUAD4 #HEX8
   nx = 200#100#80#80#12
-  ny = 200#100#114#114#114#16
+  ny = 100#100#114#114#114#16
   # nz = 1
   xmin = -500#-3000
   xmax = 500#3000
-  ymin = -500#-1000
+  ymin = 0#-1000
   ymax = 500#7000
   # zmin = 0
   # zmax = 10
@@ -339,7 +339,7 @@
     args = 'imc_cu imc_sn'
     f_name = prefactor
     constant_names = 'esn ecu'
-    constant_expressions = '0.003 -0.003'
+    constant_expressions = '-0.02 -0.02'
     # constant_expressions = '0.02 -0.02'
     function = 'esn*if(imc_sn>0.05,1,0)+ecu*if(imc_cu>0.05,1,0)'
     # function = '0'
@@ -624,7 +624,7 @@
     f_name = Lsnsn
     material_property_names = 'energy_scale length_scale chat_sn chat_imc Dsn Dimc A_sn A_imc kappa mu'
     # function = '(length_scale^5/energy_scale)*mu*(Dsn/A_sn+Dimc/A_imc)/(3*kappa*(chat_sn-chat_imc)^2)'
-    function = '0.5'
+    function = '2.7'
     output_properties = Lsnsn
     outputs = exodus
   [../]
@@ -645,6 +645,7 @@
   [./ACMobility]
     type = GenericConstantMaterial
     prop_names = L
+    # prop_values = 2.7
     prop_values = 2.7
   [../]
 
@@ -861,7 +862,7 @@
 [VectorPostprocessors]
   [./slip_line]
     type = LineValueSampler
-    contains_complete_history = true
+    contains_complete_history = false
     variable = accum_slip
     start_point = '-500 0 0'
     end_point = '500 0 0'
@@ -871,7 +872,7 @@
   [../]
   [./eta1_line]
     type = LineValueSampler
-    contains_complete_history = true
+    contains_complete_history = false
     variable = eta1
     start_point = '-500 0 0'
     end_point = '500 0 0'
@@ -881,7 +882,7 @@
   [../]
   [./eta2_line]
     type = LineValueSampler
-    contains_complete_history = true
+    contains_complete_history = false
     variable = eta2
     start_point = '-500 0 0'
     end_point = '500 0 0'
@@ -954,7 +955,7 @@
 []
 [Outputs]
   # file_base = circle_100x100_0-0-0_90-90-0_0.003_symall_hex_fp_wi0
-  file_base = circle2d_200x200_0.003_sym_fp_wi0_0-0-0_90-90-0
+  file_base = circle2d_200x100_0.02_sym_fp_wi0_0-0-0_90-90-0_half
   [./exodus]
     type = Exodus
     append_date = true

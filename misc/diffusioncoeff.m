@@ -13,7 +13,7 @@ Qsncu=33.02e3;         %Cu in Sn
 
 R = 8.314;
 
-T=220+293.15;
+T=150+293.15;
 
 Dcu=D0cusn*exp(-Qcusn/(R*T))
 Deps=D0eps*exp(-Qeps/(R*T))

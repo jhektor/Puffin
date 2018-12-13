@@ -25,7 +25,7 @@
   junction = '0 6000 1'
   length_scale = 1.0e-9 # Length scale in nm
   time_scale = 1.0e-9 # Time scale in ns
-  ylim='1000*(cos(x*3.1415/6000))^10+400'
+  ylim='1000*(cos(x*3.1415/6000))^10'
 []
 
 [Variables]
