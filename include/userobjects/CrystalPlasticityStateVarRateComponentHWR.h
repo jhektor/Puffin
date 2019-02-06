@@ -26,7 +26,7 @@ protected:
   const MaterialProperty<std::vector<Real>> & _mat_prop_state_var;
   const MaterialProperty<std::vector<Real>> & _mat_prop_slip_res;
 
-  const Real _B;
+  const std::vector<Real> _B;
 
   const MaterialProperty<RankTwoTensor> & _pk2;
   const MaterialProperty<std::vector<RankTwoTensor>> & _flow_direction;

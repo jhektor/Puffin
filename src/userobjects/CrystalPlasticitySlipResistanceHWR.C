@@ -20,10 +20,10 @@ validParams<CrystalPlasticitySlipResistanceHWR>()
                                "Name of state variable property: Same as "
                                "state variable user object specified in input "
                                "file.");
-  params.addParam<MooseEnum>(
+  params.addParam<unsigned int>(
                                "crystal_lattice_type",
-                               CrystalPlasticitySlipResistanceHWR::crystalLatticeTypeOptions(), // could choose FCC, BCC, or tin BCT crystals
-                               "Type of crystal lattice structure output");
+                               2, // could choose FCC, BCC, or tin BCT crystals
+                               "Type of crystal lattice structure: 0: FCC, 1: BCC, 2: BCT_tin");
   params.addParam<Real>("Q",1.0,"Material parameter for slip resistance");
   params.addParam<Real>("G0",1.0,"Lattice friction part of slip resistance");
   params.addParam<Real>("q",1.0,"ratio between self and latent hardening");
@@ -37,18 +37,18 @@ CrystalPlasticitySlipResistanceHWR::CrystalPlasticitySlipResistanceHWR(
   : CrystalPlasticitySlipResistance(parameters),
     _mat_prop_state_var(
         getMaterialProperty<std::vector<Real>>(parameters.get<std::string>("uo_state_var_name"))),
-    _crystal_lattice_type(getParam<MooseEnum>("crystal_lattice_type")),
+    _crystal_lattice_type(getParam<unsigned int>("crystal_lattice_type")),
     _Q(getParam<Real>("Q")),
     _G0(getParam<Real>("G0")),
     _q(getParam<Real>("q"))
 {
 }
 
-MooseEnum
-CrystalPlasticitySlipResistanceHWR::crystalLatticeTypeOptions()
-{
-  return MooseEnum("FCC BCC BCT_tin", "BCT_tin");
-}
+// MooseEnum
+// CrystalPlasticitySlipResistanceHWR::crystalLatticeTypeOptions()
+// {
+//   return MooseEnum("FCC BCC BCT_tin", "BCT_tin");
+// }
 
 bool
 CrystalPlasticitySlipResistanceHWR::calcSlipResistance(unsigned int qp,
@@ -71,9 +71,12 @@ CrystalPlasticitySlipResistanceHWR::calcSlipResistance(unsigned int qp,
               hab = 1.0;
             else
               hab = _q;
+            break;
         }
         case 1: // BCC
+        {
           mooseError("Slip resistance for BCC is not yet implemented");
+        }
         case 2: // BCT_tin
         {
           // This requires a slip system file which is sorted on slip plane normals (5 groups of 4 and 12 singles)
@@ -82,11 +85,13 @@ CrystalPlasticitySlipResistanceHWR::calcSlipResistance(unsigned int qp,
           jplane = j / 4;
           if (i==j)
             hab = 1.0;
-          else if (iplane == jplane && (i<20 && j<20))
-            hab = 1.0;
+          // else if (iplane == jplane && (i<20 && j<20))
+          //   hab = 1.0;
           else
             hab = _q;
+          break;
         }
+        default: mooseError("You've requested the wrong lattice type");
       }
       sum += hab*_mat_prop_state_var[qp][j];
     }

@@ -9,12 +9,12 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx], idx
 
-
+pattern = sys.argv[-1]
 
 #Find slip, eta1 eta2 csv files first file is empty for unknown reason...
-slip_csv = sorted(glob.glob('*slip_line*.csv'))[1:]
-eta1_csv = sorted(glob.glob('*eta1_line*.csv'))[1:]
-eta2_csv = sorted(glob.glob('*eta2_line*.csv'))[1:]
+slip_csv = sorted(glob.glob(pattern+'*slip_line*.csv'))[1:]
+eta1_csv = sorted(glob.glob(pattern+'*eta1_line*.csv'))[1:]
+eta2_csv = sorted(glob.glob(pattern+'*eta2_line*.csv'))[1:]
 
 #Scalar postprocessors
 scalar_csv = slip_csv[1][:-19]+'.csv'
@@ -32,7 +32,7 @@ print plot_times_sim
 print idxs
 
 # x-coordinates (always the same)
-x = np.genfromtxt(slip_csv[1],delimiter=',')[:,0]
+x = np.genfromtxt(slip_csv[1],delimiter=',')[1:,0]
 
 res_csv = [x]
 
@@ -41,9 +41,9 @@ for j,i in enumerate(idxs):
     e1 = eta1_csv[i]
     e2 = eta2_csv[i]
     s = slip_csv[i]
-    eta1 = np.genfromtxt(e1,delimiter=',')[:,4]
-    eta2 = np.genfromtxt(e2,delimiter=',')[:,4]
-    slip = np.genfromtxt(s,delimiter=',')[:,4]
+    eta1 = np.genfromtxt(e1,delimiter=',')[1:,4]
+    eta2 = np.genfromtxt(e2,delimiter=',')[1:,4]
+    slip = np.genfromtxt(s,delimiter=',')[1:,4]
     result = (eta1**2+eta2**2)*slip
     result[result<0] = 0
     res_csv.append(result)

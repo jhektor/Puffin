@@ -69,4 +69,5 @@ ComputeElasticityTensorCPBaseName::computeQpElasticityTensor()
   _crysrot[_qp] = _R.transpose();
   _elasticity_tensor[_qp] = _Cijkl;
   _elasticity_tensor[_qp].rotate(_crysrot[_qp]);
+
 }

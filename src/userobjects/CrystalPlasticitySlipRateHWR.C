@@ -76,7 +76,7 @@ CrystalPlasticitySlipRateHWR::calcSlipRate(unsigned int qp, Real dt, std::vector
 
   for (unsigned int i = 0; i < _variable_size; ++i)
   {
-    tau = _pk2[qp].doubleContraction(_flow_direction[qp][i]);
+    tau = _pk2[qp].doubleContraction(_flow_direction[qp][i]); // Here it is assumed that the elastic deformation is small
 
     val[i] = _gd0 * std::pow(std::abs(tau / _mat_prop_slip_res[qp][i]), _m) *
              copysign(1.0, tau);

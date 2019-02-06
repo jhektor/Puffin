@@ -28,13 +28,14 @@ public:
   virtual bool calcSlipResistance(unsigned int qp, std::vector<Real> & val) const;
 
   /// class for switching between different crystal lattice types
-  static MooseEnum crystalLatticeTypeOptions();
+  // static MooseEnum crystalLatticeTypeOptions();
 protected:
 
   const MaterialProperty<std::vector<Real>> & _mat_prop_state_var;
 
   /// the variable to switch crystal lattice type
-  MooseEnum _crystal_lattice_type;
+  // MooseEnum _crystal_lattice_type;
+  const unsigned int _crystal_lattice_type;
 
   const Real _Q; // hardening parameter
   const Real _G0; // Lattice friction

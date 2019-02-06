@@ -84,31 +84,14 @@ CPPlasticEnergyMaterial::computeF()
       //
       // // Not sure why not if i==j
       // if (iplane == jplane) // Kalidindi
-      if (i == j)
+      // This requires a slip system file which is sorted on slip plane normals (5 groups of 4 and 12 singles)
+      unsigned int iplane, jplane;
+      iplane = i / 4;
+      jplane = j / 4;
+      if (i==j)
         qab = 1.0;
-      // else
-      //   qab = _q;
-      else if ( i >=20 || j >=20)
-        qab = _q;
-
-      else if ((i == 0||i==4)||(i==14||i==15))
-        if ((j == 0||j==4)||(j==14||j==15))
-          qab = 1.0;
-      else if ((i == 1||i==5)||(i==12||i==13))
-        if ((j == 1||j==5)||(j==12||j==13))
-          qab = 1.0;
-      else if ((i==2||i==6)||(i==7||i==10))
-        if ((j==2||j==6)||(j==7||j==10))
-          qab = 1.0;
-
-      else if ((i==3||i==8)||(i==9||i==11))
-        if ((j==3||j==8)||(j==9||j==11))
-          qab = 1.0;
-
-      else if (i>=16&&i<=19)
-        if (i>=16&&i<=19)
-          qab = 1.0;
-
+      // else if (iplane == jplane && (i<20 && j<20))
+      //   qab = 1.0;
       else
         qab = _q;
 
