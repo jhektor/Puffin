@@ -90,8 +90,8 @@ CPPlasticEnergyMaterial::computeF()
       jplane = j / 4;
       if (i==j)
         qab = 1.0;
-      // else if (iplane == jplane && (i<20 && j<20))
-      //   qab = 1.0;
+      else if (iplane == jplane && (i<20 && j<20))
+        qab = 1.0;
       else
         qab = _q;
 

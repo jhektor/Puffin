@@ -79,24 +79,26 @@
     type = CrystalPlasticitySlipResistanceHWR
     #variable_size = 10 #32
     variable_size = 32
+    groups = '0 32'
+    G0 = '10'
     q = 1.4
     Q = 10
-    G0 = 10
     crystal_lattice_type = 2
     uo_state_var_name = state_var
   [../]
   [./state_var]
-    type = CrystalPlasticityStateVariable
+    type = CrystalPlasticityStateVariableHWR
     variable_size = 32
-    groups = '0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32'
-    group_values = '7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3 7e-3'
+    groups = '0 32'
+    group_values = '0'
     uo_state_var_evol_rate_comp_name = state_var_evol_rate
     scale_factor = 1.0
   [../]
   [./state_var_evol_rate]
     type = CrystalPlasticityStateVarRateComponentHWR
     variable_size = 32
-    B = '8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8 8'
+    groups = '0 32'
+    B = '8'
     uo_slip_resistance_name = slip_resistance
     uo_slip_rate_name = slip_rate
     uo_state_var_name = state_var
@@ -537,8 +539,8 @@
   [./pk2_zz]
     type = MaterialRankTwoTensorAux
     variable = pk2_zz
-    i = 3
-    j = 3
+    i = 2
+    j = 2
     property = pk2
   [../]
 []

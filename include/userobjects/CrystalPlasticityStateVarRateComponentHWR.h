@@ -26,7 +26,9 @@ protected:
   const MaterialProperty<std::vector<Real>> & _mat_prop_state_var;
   const MaterialProperty<std::vector<Real>> & _mat_prop_slip_res;
 
-  const std::vector<Real> _B;
+  std::vector<unsigned int> _groups;
+  std::vector<Real> _group_values;
+  std::vector<Real> _B; // Saturation parameter
 
   const MaterialProperty<RankTwoTensor> & _pk2;
   const MaterialProperty<std::vector<RankTwoTensor>> & _flow_direction;

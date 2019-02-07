@@ -24,8 +24,15 @@ validParams<CrystalPlasticitySlipResistanceHWR>()
                                "crystal_lattice_type",
                                2, // could choose FCC, BCC, or tin BCT crystals
                                "Type of crystal lattice structure: 0: FCC, 1: BCC, 2: BCT_tin");
+  params.addParam<std::vector<unsigned int>>("groups",
+                                            "To group the initial values on different "
+                                            "slip systems 'format: [start end)', i.e.'0 "
+                                            "4 8 11' groups 0-3, 4-7 and 8-11 ");
+  params.addParam<std::vector<Real>>("G0",
+                                    "The initial values of G0 correspoinding to each "
+                                    "group, i.e. '0.0 1.0 2.0' means 0-4 = 0.0, "
+                                    "4-8 = 1.0 and 8-12 = 2.0 ");
   params.addParam<Real>("Q",1.0,"Material parameter for slip resistance");
-  params.addParam<Real>("G0",1.0,"Lattice friction part of slip resistance");
   params.addParam<Real>("q",1.0,"ratio between self and latent hardening");
   params.addClassDescription("HWR crystal plasticity model slip resistance class."
                             );
@@ -39,9 +46,40 @@ CrystalPlasticitySlipResistanceHWR::CrystalPlasticitySlipResistanceHWR(
         getMaterialProperty<std::vector<Real>>(parameters.get<std::string>("uo_state_var_name"))),
     _crystal_lattice_type(getParam<unsigned int>("crystal_lattice_type")),
     _Q(getParam<Real>("Q")),
-    _G0(getParam<Real>("G0")),
-    _q(getParam<Real>("q"))
+    _q(getParam<Real>("q")),
+    _groups(getParam<std::vector<unsigned int>>("groups")),
+    _group_values(getParam<std::vector<Real>>("G0"))
 {
+  // fill _G0 vector from groups and group_values
+  _G0.resize(_groups[_groups.size()-1]);
+  if (_groups.size() <= 0)
+    mooseError("CrystalPlasticitySlipResistanceHWR: Error in reading initial state variable values: "
+               "Specify input in .i file");
+  else if (_groups.size() != (_group_values.size() + 1))
+    mooseError(
+        "CrystalPlasticitySlipResistanceHWR: The size of the groups and group_values does not match.");
+
+  for (unsigned int i = 0; i < _groups.size() - 1; ++i)
+  {
+    unsigned int is, ie;
+
+    is = _groups[i];
+    ie = _groups[i + 1] - 1;
+
+    if (is > ie)
+      mooseError("CrystalPlasticitySlipResistanceHWR: Start index is = ",
+                 is,
+                 " should be greater than end index ie = ",
+                 ie,
+                 " in state variable read");
+
+    for (unsigned int j = is; j <= ie; ++j)
+      _G0[j] = _group_values[i];
+
+  }
+
+
+
 }
 
 // MooseEnum
@@ -85,8 +123,8 @@ CrystalPlasticitySlipResistanceHWR::calcSlipResistance(unsigned int qp,
           jplane = j / 4;
           if (i==j)
             hab = 1.0;
-          // else if (iplane == jplane && (i<20 && j<20))
-          //   hab = 1.0;
+          else if (iplane == jplane && (i<20 && j<20))
+            hab = 1.0;
           else
             hab = _q;
           break;
@@ -95,7 +133,7 @@ CrystalPlasticitySlipResistanceHWR::calcSlipResistance(unsigned int qp,
       }
       sum += hab*_mat_prop_state_var[qp][j];
     }
-    val[i] = _G0 + _Q*sum;
+    val[i] = _G0[i] + _Q*sum;
   }
   return true;
 }

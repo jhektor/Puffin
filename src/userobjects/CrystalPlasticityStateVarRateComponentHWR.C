@@ -32,7 +32,14 @@ validParams<CrystalPlasticityStateVarRateComponentHWR>()
                                "Name of slip resistance property: Same as "
                                "slip resistance user object specified in input "
                                "file.");
-  params.addRequiredParam<std::vector<Real>>("B", "Material property for saturation of g");
+     params.addParam<std::vector<unsigned int>>("groups",
+                                               "To group the initial values on different "
+                                               "slip systems 'format: [start end)', i.e.'0 "
+                                               "4 8 11' groups 0-3, 4-7 and 8-11 ");
+     params.addParam<std::vector<Real>>("B",
+                                       "The initial values of B correspoinding to each "
+                                       "group, i.e. '0.0 1.0 2.0' means 0-4 = 0.0, "
+                                       "4-8 = 1.0 and 8-12 = 2.0 ");
   params.addClassDescription("HWR crystal CrystalPlasticityUOBase model state variable evolution rate ");
   return params;
 }
@@ -47,12 +54,39 @@ CrystalPlasticityStateVarRateComponentHWR::CrystalPlasticityStateVarRateComponen
         getMaterialProperty<std::vector<Real>>(parameters.get<std::string>("uo_state_var_name"))),
     _mat_prop_slip_res(
         getMaterialProperty<std::vector<Real>>(parameters.get<std::string>("uo_slip_resistance_name"))),
-    _B(getParam<std::vector<Real>>("B")),
+    _groups(getParam<std::vector<unsigned int>>("groups")),
+    _group_values(getParam<std::vector<Real>>("B")),
     _pk2(getMaterialPropertyByName<RankTwoTensor>(_base_name + "pk2")),
     _flow_direction(getMaterialProperty<std::vector<RankTwoTensor>>(parameters.get<std::string>("uo_slip_rate_name")+"_flow_direction"))
 {
-  if (_B.size() != _variable_size)
-    mooseError("CrystalPlasticityStateVarRateComponentHWR: Size of B does not match the number of slip systems.");
+  // fill _B vector from groups and group_values
+  _B.resize(_groups[_groups.size()-1]);
+  if (_groups.size() <= 0)
+    mooseError("CrystalPlasticityStateVarRateComponentHWR: Error in reading initial state variable values: "
+               "Specify input in .i file");
+  else if (_groups.size() != (_group_values.size() + 1))
+    mooseError(
+        "CrystalPlasticityStateVarRateComponentHWR: The size of the groups and group_values does not match.");
+
+  for (unsigned int i = 0; i < _groups.size() - 1; ++i)
+  {
+    unsigned int is, ie;
+
+    is = _groups[i];
+    ie = _groups[i + 1] - 1;
+
+    if (is > ie)
+      mooseError("CrystalPlasticityStateVarRateComponentHWR: Start index is = ",
+                 is,
+                 " should be greater than end index ie = ",
+                 ie,
+                 " in state variable read");
+
+    for (unsigned int j = is; j <= ie; ++j)
+      {
+        _B[j] = _group_values[i];
+      }
+  }
 }
 
 bool

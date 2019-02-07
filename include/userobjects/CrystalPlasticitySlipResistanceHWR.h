@@ -38,8 +38,11 @@ protected:
   const unsigned int _crystal_lattice_type;
 
   const Real _Q; // hardening parameter
-  const Real _G0; // Lattice friction
   const Real _q; // self or latent hardening
+
+  std::vector<unsigned int> _groups;
+  std::vector<Real> _group_values;
+  std::vector<Real> _G0; // Lattice friction
 
 };
 
