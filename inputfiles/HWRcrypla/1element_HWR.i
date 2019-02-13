@@ -57,10 +57,10 @@
   [../]
   [./loading]
     type = FunctionPresetBC
-    variable = disp_x
-    boundary = 'right'
-    # function = '-0.05*t' #should give 1e-3 strain rate as in Y. Kariya et. al. 2012
-    function = '0.1*t-0.00022'
+    variable = disp_z
+    boundary = 'front'
+    function = '-0.001*t' #should give 1e-3 strain rate as in Y. Kariya et. al. 2012
+    # function = '0.1*t-0.00022'
   [../]
 
 []
@@ -71,7 +71,7 @@
     type = CrystalPlasticitySlipRateHWR
     variable_size = 32
     gamma0 = 0.001
-    m = 6
+    m = 3
     slip_sys_file_name = slip_systems_bct_HWR.txt
     uo_slip_res_name = slip_resistance
   [../]
@@ -79,10 +79,13 @@
     type = CrystalPlasticitySlipResistanceHWR
     #variable_size = 10 #32
     variable_size = 32
-    groups = '0 32'
-    G0 = '10'
+    groups = '0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32'
+    G0 = '8.5 10.4 5.1 5.1 8.5 10.4 5.1 5.1 4.3 4.5 4.5 5.6 4.3 4.5 4.5 5.6 7.4 7.4 15 15 6.6 6.6 6.6 6.6 12 12 12 12 12 12 12 12'
+    # G0 = '4.5 5.4 3.1 3.1 4.5 5.4 3.1 3.1 2.3 2.5 2.5 3.6 2.3 2.5 2.5 3.6 4.4 4.4 7 7 3.6 3.6 3.6 3.6 6 6 6 6 6 6 6 6'
+    # groups = '0 32'
+    # G0 = '0.5'
     q = 1.4
-    Q = 10
+    Q = 20
     crystal_lattice_type = 2
     uo_state_var_name = state_var
   [../]
@@ -98,7 +101,7 @@
     type = CrystalPlasticityStateVarRateComponentHWR
     variable_size = 32
     groups = '0 32'
-    B = '8'
+    B = '10'
     uo_slip_resistance_name = slip_resistance
     uo_slip_rate_name = slip_rate
     uo_state_var_name = state_var
@@ -126,9 +129,10 @@
   #[../]
   [./elasticity_tensor]
     type = ComputeElasticityTensorCPBaseName #Allows for changes due to crystal re-orientation
-    # C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 24e3 22e3 22e3' #MPa #From Darbandi 2013 table I
-    C_ijkl = '19e3 0.36'
-    fill_method = symmetric_isotropic_E_nu
+    C_ijkl = '72.3e3 59.4e3 35.8e3 72.3e3 35.8e3 88.4e3 24e3 22e3 22e3' #MPa #From Darbandi 2013 table I
+    fill_method = symmetric9
+    # C_ijkl = '19e3 0.36'
+    # fill_method = symmetric_isotropic_E_nu
     euler_angle_1 = 90
     euler_angle_2 = 60
     euler_angle_3 = 30
@@ -141,7 +145,7 @@
   [./block1]
     strain = FINITE
     add_variables = true
-    generate_output = 'stress_xx stress_yy stress_zz stress_xy strain_xx strain_xy vonmises_stress'
+    generate_output = 'stress_zz strain_zz'
   [../]
 []
 
@@ -152,9 +156,9 @@
 
 [Executioner]
   type = Transient
-  #end_time = 1200 #Should give 12% strain for Darbandi 2013?
-  num_steps = 100
-  dt = 5e-3
+  end_time = 50 #Should give 12% strain for Darbandi 2013?
+  # num_steps = 100
+  # dt = 1#5e-3
   solve_type = 'PJFNK'
   petsc_options_iname = '-pc_type -sub_pc_type -pc_asm_overlap -ksp_gmres_restart'
   petsc_options_value = 'asm lu 1 101'
@@ -162,16 +166,17 @@
 
 
 
-  # [./TimeStepper]
-  #     # Turn on time stepping
-  #     type = IterationAdaptiveDT
-  #     dt = 0.05
-  #     cutback_factor = 1.0
-  #     growth_factor = 1.0
-  #     optimal_iterations = 10
-  #     linear_iteration_ratio = 10
-  #     #postprocessor_dtlim = 5
-  # [../]
+  [./TimeStepper]
+      # Turn on time stepping
+      type = IterationAdaptiveDT
+      dt = 0.05
+      cutback_factor = 0.5
+      growth_factor = 1.5
+      optimal_iterations = 5
+      linear_iteration_ratio = 10
+      postprocessor_dtlim = 10
+      #postprocessor_dtlim = 5
+  [../]
 []
 
 [Outputs]
@@ -545,225 +550,225 @@
   [../]
 []
 [Postprocessors]
-  # [./slip0]
-  #   type = ElementAverageValue
-  #   variable = slip0
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip1]
-  #   type = ElementAverageValue
-  #   variable = slip1
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip2]
-  #   type = ElementAverageValue
-  #   variable = slip2
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip3]
-  #   type = ElementAverageValue
-  #   variable = slip3
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip4]
-  #   type = ElementAverageValue
-  #   variable = slip4
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip5]
-  #   type = ElementAverageValue
-  #   variable = slip5
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip6]
-  #   type = ElementAverageValue
-  #   variable = slip6
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip7]
-  #   type = ElementAverageValue
-  #   variable = slip7
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip8]
-  #   type = ElementAverageValue
-  #   variable = slip8
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip9]
-  #   type = ElementAverageValue
-  #   variable = slip9
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip10]
-  #   type = ElementAverageValue
-  #   variable = slip10
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip11]
-  #   type = ElementAverageValue
-  #   variable = slip11
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip12]
-  #   type = ElementAverageValue
-  #   variable = slip12
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip13]
-  #   type = ElementAverageValue
-  #   variable = slip13
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip14]
-  #   type = ElementAverageValue
-  #   variable = slip14
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip15]
-  #   type = ElementAverageValue
-  #   variable = slip15
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip16]
-  #   type = ElementAverageValue
-  #   variable = slip16
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip17]
-  #   type = ElementAverageValue
-  #   variable = slip17
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip18]
-  #   type = ElementAverageValue
-  #   variable = slip18
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip19]
-  #   type = ElementAverageValue
-  #   variable = slip19
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip20]
-  #   type = ElementAverageValue
-  #   variable = slip20
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip21]
-  #   type = ElementAverageValue
-  #   variable = slip21
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip22]
-  #   type = ElementAverageValue
-  #   variable = slip22
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip23]
-  #   type = ElementAverageValue
-  #   variable = slip23
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip24]
-  #   type = ElementAverageValue
-  #   variable = slip24
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip25]
-  #   type = ElementAverageValue
-  #   variable = slip25
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip26]
-  #   type = ElementAverageValue
-  #   variable = slip26
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip27]
-  #   type = ElementAverageValue
-  #   variable = slip27
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip28]
-  #   type = ElementAverageValue
-  #   variable = slip28
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip29]
-  #   type = ElementAverageValue
-  #   variable = slip29
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip30]
-  #   type = ElementAverageValue
-  #   variable = slip30
-  #   #point = '1. 1. 1.'
-  # [../]
-  # [./slip31]
-  #   type = ElementAverageValue
-  #   variable = slip31
-  #   #point = '1. 1. 1.'
-  # [../]
-  [./stress_center_xx]
+  [./slip0]
     type = ElementAverageValue
-    variable = stress_xx
-    # #point = '1. 1. 1.'
-    # use_displaced_mesh = true
-  [../]
-  [./stress_center_yy]
-    type = ElementAverageValue
-    variable = stress_yy
+    variable = slip0
     #point = '1. 1. 1.'
   [../]
+  [./slip1]
+    type = ElementAverageValue
+    variable = slip1
+    #point = '1. 1. 1.'
+  [../]
+  [./slip2]
+    type = ElementAverageValue
+    variable = slip2
+    #point = '1. 1. 1.'
+  [../]
+  [./slip3]
+    type = ElementAverageValue
+    variable = slip3
+    #point = '1. 1. 1.'
+  [../]
+  [./slip4]
+    type = ElementAverageValue
+    variable = slip4
+    #point = '1. 1. 1.'
+  [../]
+  [./slip5]
+    type = ElementAverageValue
+    variable = slip5
+    #point = '1. 1. 1.'
+  [../]
+  [./slip6]
+    type = ElementAverageValue
+    variable = slip6
+    #point = '1. 1. 1.'
+  [../]
+  [./slip7]
+    type = ElementAverageValue
+    variable = slip7
+    #point = '1. 1. 1.'
+  [../]
+  [./slip8]
+    type = ElementAverageValue
+    variable = slip8
+    #point = '1. 1. 1.'
+  [../]
+  [./slip9]
+    type = ElementAverageValue
+    variable = slip9
+    #point = '1. 1. 1.'
+  [../]
+  [./slip10]
+    type = ElementAverageValue
+    variable = slip10
+    #point = '1. 1. 1.'
+  [../]
+  [./slip11]
+    type = ElementAverageValue
+    variable = slip11
+    #point = '1. 1. 1.'
+  [../]
+  [./slip12]
+    type = ElementAverageValue
+    variable = slip12
+    #point = '1. 1. 1.'
+  [../]
+  [./slip13]
+    type = ElementAverageValue
+    variable = slip13
+    #point = '1. 1. 1.'
+  [../]
+  [./slip14]
+    type = ElementAverageValue
+    variable = slip14
+    #point = '1. 1. 1.'
+  [../]
+  [./slip15]
+    type = ElementAverageValue
+    variable = slip15
+    #point = '1. 1. 1.'
+  [../]
+  [./slip16]
+    type = ElementAverageValue
+    variable = slip16
+    #point = '1. 1. 1.'
+  [../]
+  [./slip17]
+    type = ElementAverageValue
+    variable = slip17
+    #point = '1. 1. 1.'
+  [../]
+  [./slip18]
+    type = ElementAverageValue
+    variable = slip18
+    #point = '1. 1. 1.'
+  [../]
+  [./slip19]
+    type = ElementAverageValue
+    variable = slip19
+    #point = '1. 1. 1.'
+  [../]
+  [./slip20]
+    type = ElementAverageValue
+    variable = slip20
+    #point = '1. 1. 1.'
+  [../]
+  [./slip21]
+    type = ElementAverageValue
+    variable = slip21
+    #point = '1. 1. 1.'
+  [../]
+  [./slip22]
+    type = ElementAverageValue
+    variable = slip22
+    #point = '1. 1. 1.'
+  [../]
+  [./slip23]
+    type = ElementAverageValue
+    variable = slip23
+    #point = '1. 1. 1.'
+  [../]
+  [./slip24]
+    type = ElementAverageValue
+    variable = slip24
+    #point = '1. 1. 1.'
+  [../]
+  [./slip25]
+    type = ElementAverageValue
+    variable = slip25
+    #point = '1. 1. 1.'
+  [../]
+  [./slip26]
+    type = ElementAverageValue
+    variable = slip26
+    #point = '1. 1. 1.'
+  [../]
+  [./slip27]
+    type = ElementAverageValue
+    variable = slip27
+    #point = '1. 1. 1.'
+  [../]
+  [./slip28]
+    type = ElementAverageValue
+    variable = slip28
+    #point = '1. 1. 1.'
+  [../]
+  [./slip29]
+    type = ElementAverageValue
+    variable = slip29
+    #point = '1. 1. 1.'
+  [../]
+  [./slip30]
+    type = ElementAverageValue
+    variable = slip30
+    #point = '1. 1. 1.'
+  [../]
+  [./slip31]
+    type = ElementAverageValue
+    variable = slip31
+    #point = '1. 1. 1.'
+  [../]
+  # [./stress_center_xx]
+  #   type = ElementAverageValue
+  #   variable = stress_xx
+  #   # #point = '1. 1. 1.'
+  #   # use_displaced_mesh = true
+  # [../]
+  # [./stress_center_yy]
+  #   type = ElementAverageValue
+  #   variable = stress_yy
+  #   #point = '1. 1. 1.'
+  # [../]
   [./stress_center_zz]
     type = ElementAverageValue
     variable = stress_zz
-    #point = '1. 1. 1.'
+    # point = '0.5 0.5 0.5'
   [../]
-  [./strain_center_xx]
+  [./strain_center_zz]
     type = ElementAverageValue
-    variable = strain_xx
-    #point = '1. 1. 1.'
+    variable = strain_zz
+    # point = '0.5 0.5 0.5'
   [../]
-  [./stress_center_xy]
-    type = ElementAverageValue
-    variable = stress_xy
-    #point = '1. 1. 1.'
-  [../]
-  [./strain_center_xy]
-    type = ElementAverageValue
-    variable = strain_xy
-    #point = '1. 1. 1.'
-  [../]
-  [./u_xx]
-    type = ElementAverageValue
-    variable = disp_x
-    #point = '1. 1. 1.'
-  [../]
-  [./u_yy]
-    type = ElementAverageValue
-    variable = disp_y
-    #point = '1. 1. 1.'
-  [../]
-  [./u_zz]
-    type = ElementAverageValue
-    variable = disp_z
-    #point = '1. 1. 1.'
-  [../]
-  [./pk2_xx]
-    type = ElementAverageValue
-    variable = pk2_xx
-    #point = '1. 1. 1.'
-  [../]
-  [./pk2_yy]
-    type = ElementAverageValue
-    variable = pk2_yy
-    #point = '1. 1. 1.'
-  [../]
-  [./pk2_zz]
-    type = ElementAverageValue
-    variable = pk2_zz
-    #point = '1. 1. 1.'
-  [../]
+  # [./stress_center_xy]
+  #   type = ElementAverageValue
+  #   variable = stress_xy
+  #   #point = '1. 1. 1.'
+  # [../]
+  # [./strain_center_xy]
+  #   type = ElementAverageValue
+  #   variable = strain_xy
+  #   #point = '1. 1. 1.'
+  # [../]
+  # [./u_xx]
+  #   type = ElementAverageValue
+  #   variable = disp_x
+  #   #point = '1. 1. 1.'
+  # [../]
+  # [./u_yy]
+  #   type = ElementAverageValue
+  #   variable = disp_y
+  #   #point = '1. 1. 1.'
+  # [../]
+  # [./u_zz]
+  #   type = ElementAverageValue
+  #   variable = disp_z
+  #   #point = '1. 1. 1.'
+  # [../]
+  # [./pk2_xx]
+  #   type = ElementAverageValue
+  #   variable = pk2_xx
+  #   #point = '1. 1. 1.'
+  # [../]
+  # [./pk2_yy]
+  #   type = ElementAverageValue
+  #   variable = pk2_yy
+  #   #point = '1. 1. 1.'
+  # [../]
+  # [./pk2_zz]
+  #   type = ElementAverageValue
+  #   variable = pk2_zz
+  #   #point = '1. 1. 1.'
+  # [../]
 []
